@@ -1,0 +1,19 @@
+---
+title: "BIOF 439: Data visualization using R"
+output: 
+  github_document:
+    html_preview: false
+
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This is the course repository for BIOF 439. Various aspects are under current development
+
