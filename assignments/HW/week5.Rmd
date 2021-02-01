@@ -1,0 +1,141 @@
+---
+title: Homework, Week 5
+author: BIOF 439
+output: 
+  html_document:
+    css: style.css
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, eval=FALSE, 
+                      message=FALSE, warning=FALSE,
+                      cache=TRUE)
+```
+
+# Instructions
+
+Create your own R Markdown file and submit your R Markdown and knitted HTML file by Sunday 11:59pm. I will **not** make any deductions for a Sunday submission. 
+
+
+## Question 1 (10 points)
+
+We'll use the data set `beaches` to
+fit a linear regression of $\log_{10}(\text{enterococci})$ on other variables. 
+
+```{r, eval=T, echo=TRUE}
+library(tidyverse)
+beaches <- read_csv('data/sydneybeaches3.csv')
+model <- lm(log10(enterococci)~ temperature + rainfall + 
+              month_name, data = beaches)
+```
+
+Create a plot of the coefficients and 95% confidence intervals of this model, including a reference line at 0. State which variables and levels are statistically significant. Order the months in chronological order, with January being the reference month. Make the plot publication quality, in that the graph shouldn't have raw variable names, and should have appropriate titles and axes labels and legends (in English). 
+
+> Note that the code above is basic; you may have to work on the data as well as the plot
+
+```{r}
+library(broom)
+beaches <- beaches %>% 
+  mutate(month_name = fct_reorder(month_name, month))
+model <- lm(log10(enterococci)~ temperature + rainfall + 
+              month_name, data = beaches)
+out <- tidy(model, conf.int=TRUE) %>% 
+  mutate(term = str_remove(term, 'month_name')) %>% 
+  mutate(term = fct_rev(fct_inorder(term))) %>% 
+  filter(term != '(Intercept)')
+
+ggplot(out, aes(x = term, y = estimate, ymin = conf.low, 
+                ymax = conf.high))+
+  geom_pointrange()+
+  geom_hline(yintercept = 0, linetype=2)+
+  coord_flip() + 
+  theme_minimal()
+```
+
+**Extra credit (5 points)**
+
+Color the plot according to which variables and levels are significant.
+
+## Question 2 (10 points)
+
+US state and county coronavirus data can be obtained from the NY Times using the **covid19nytimes** package. Please install this using `install.packages`. Then you can get the latest state data using
+
+```{r, echo=TRUE}
+library(covid19nytimes)
+state_data <- refresh_covid19nytimes_states()
+```
+
+Filter this data to get cumulative death data (filter on the column `data_type`). 
+
+Then filter the data to keep data from the first of each month from April to July. 
+
+> _Hint:_ You can use `filter(as.character(date) %in% c('2020-03-01','2020-04-01'))` and so on 
+
+To map this, we need to get state map data. This is available in the **USABoundaries** package, which you might need to install. You should also install the **USAboundariesData** package using `remotes::install_github('ropensci/USAboundariesData')`. You can merge the two data sets using FIPS codes:
+
+```{r, echo=TRUE}
+library(USAboundariesData)
+library(sf)
+library(tidyverse)
+
+mainland.name = setdiff(state.name, c('Hawaii','Alaska'))
+
+states1 <- state_data %>%
+    filter(as.character(date) %in%  c('2020-04-01','2020-07-01')) %>%
+    filter(location %in% mainland.name) %>% 
+  filter(data_type=='deaths_total')
+
+states2 <- state_data %>%
+    filter(date == '2020-07-01') %>%
+    filter(location %in% mainland.name) %>% 
+  filter(data_type=='cases_total')
+    
+d1 = USAboundaries::us_states() %>% 
+  filter(state_name %in% mainland.name) %>% 
+  select(statefp, geometry) 
+
+states <- left_join(d1, states1, by = c("statefp" = "location_code"))
+
+states <- states %>% 
+  filter(data_type=='deaths_total')
+
+
+states <- dplyr::left_join(state_data, 
+                           USAboundaries::us_states() %>% select(statefp, geometry),
+                           by = c('location_code'='statefp'))
+
+```
+
+We are going to make 4 maps, one for each month, showing the cumulative deaths on the first of each month. The final output 
+should look something like this:
+
+```{r, eval=TRUE}
+library(tidyverse)
+library(sf)
+pacman::p_load(USAboundaries)
+# remotes::install_github('ropensci/USAboundariesData')
+pacman::p_load(covid19nytimes)
+library(USAboundaries)
+state_data <- covid19nytimes::refresh_covid19nytimes_states()
+state_data <- state_data %>% filter(data_type=='deaths_total')
+state_boundaries <- us_states() %>% select(statefp, geometry)
+
+states <- state_data %>% left_join(state_boundaries, by=c('location_code' = 'statefp'))
+
+states1 <- states %>% filter(as.character(date) %in% paste('2020',c('04','05','06','07'),'01', sep='-'))
+
+ggplot(states1) + geom_sf(aes(geometry=geometry))+
+  geom_sf(data=states1 , aes(geometry=geometry, fill = (value+1))) + 
+  xlim(-125, -65) + scale_fill_distiller(palette=4, direction=1, trans='log10')+ 
+  facet_wrap(~date, nrow=1) + 
+  labs(fill = 'Deaths')+
+  theme_void() + 
+  theme(legend.position = 'bottom')
+```
+
+You can choose to do this using either the `ggplot+geom_sf` route or the **tmaps** package. Either is fine. You don't have to match my color palette, but you should use a sequential palette for this.
+
+## Question 3 (optional, no grade)
+
+Many of you may not be doing bioinformatics work, so the learning curve to using Bioconductor will probably be too steep. So, if you are comfortable using Bioconductor, please provide a visualization using one of the packages mentioned in the lecture or an alternative package that can achieve the same kind of visualization
+
+

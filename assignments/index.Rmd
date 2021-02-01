@@ -1,0 +1,41 @@
+---
+title: Assignments
+author: BIOF 439
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: ../style.css
+---
+
+All assignments must be completed as RMarkdown documents with an accompanying
+HTML document derived from it. Assignments will be submitted via RStudio Cloud. 
+
+See the [instructions](instructions.html) for how to do this
+
+----
+
+## Homeworks
+
+```{r, echo = F, message = F}
+library(tidyverse)
+library(glue)
+library(fs)
+solutions <- dir_ls('HW', glob = '*solution.html')
+templates <- dir_ls('HW', glob = '*template.rmd')
+hws <- dir_ls('HW', glob = 'HW*.html')
+hws <- setdiff(setdiff(hws, solutions), templates)
+rmds <- dir_ls('HW', regexp = 'HW\\d+.Rmd')
+numbers <- sort(unique(stringr::str_match(hws, 'HW(\\d+)')[,2]))
+ind <- match(glue('HW/HW{i}_solution.html', i=numbers), solutions)
+# out_data <- tibble(n = numbers, hws = sort(hws), solutions = solutions[ind])
+
+# out <- tibble('Homework' = glue_data(out_data,'[Homework {n}]({hws})'),
+#               # 'R Markdown Template' = glue_data(out_data,
+#                                        # '[R Markdown]({templates})'),
+#               'Solutions' = ifelse(!is.na(out_data$solutions),
+#                                    glue_data(out_data,'[Solution]({solutions})'),
+#                                    ''))
+# knitr::kable(out)
+```
+

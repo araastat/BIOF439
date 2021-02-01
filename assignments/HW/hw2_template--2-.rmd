@@ -1,0 +1,138 @@
+---
+title: "Homework 2"
+author: "Roshan Shet"
+output: html_document
+---
+
+```{r preamble, include = F}
+library(pacman)
+p_load(knitr)
+p_load(rmarkdown)
+p_load(gganimate)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE, error = TRUE, warning = FALSE, message = F)
+```
+
+## A touch of R basics
+
+#### Question 1 (10 points)
+
+If you look at lecture 2, we imported several datasets into R. For this homework,
+you need to import the gapminder data into R. It is available on the class website as `gapminder.csv`. Save the file in the `data` folder of the class RStudio Project you created.  You will use the `import` function from the `rio` package. When you're done, change "eval=F" to "eval=T" in the options for the code chunk
+
+```{r , echo=T, eval=T}
+## Fill in the blanks
+library(rio)
+gapm <- import("data/gapminder.csv")
+```
+
+We need to do the `library()` call to activate the package, so that R knows where to look for the function. 
+
+What happens if you just use `import` and not assign it to a name?
+
+*Answer: If you just use "import("data/gapminder.csv")", RStudio will output the data in the console but will not assign it to any variable in the workspace*
+
+## Visualizing the gapminder dataset
+
+#### Question 2 (20 points)
+
+Let's look at population growth over time. 
+
+```{r HW2-4, echo = TRUE, error = T}
+ggplot(data = gapm,
+       mapping = aes(x = year, y = pop))+
+  geom_line(color = country, show.legend = F)+
+  scale_y_log10()
+```
+
+Oops!! This doesn't quite work. 
+
+**a.** Update the code above so that the following plot is rendered.
+
+```{r HW2-5, error = T}
+ggplot(data = gapm,
+       mapping = aes(x = year, y = pop))+
+  geom_line(aes(color = country), show.legend = F)+
+  scale_y_log10()
+```
+
+**b.** This has too many colors, in my opinion. Lets just color the lines by continent rather than country, and allow the legend to also be drawn. The desired plot is as follows:
+
+```{r HW2-6 }
+ggplot(data = gapm,
+       mapping = aes(x = year, y = pop))+
+  geom_line(aes(color = continent, group = country), show.legend = T)+
+  scale_y_log10()
+```
+
+_Hint: you need to use both group and color, possibly with different variables in the data set_
+
+
+**c.** This is still too messy. Let's just separate out the continents and see the population growth by country.
+```{r HW2-7 }
+ggplot(data = gapm, 
+       aes(year, pop))+
+  geom_line(aes(group = country)) + 
+  facet_wrap(~continent) +
+  scale_y_log10()
+```
+
+**d.** Okay. Let's go with this as the final graph. Let's clean it up with proper
+labels on the x- and y-axes, changing the numbers on the y-axis from scientific notation to usual numbers, and adding a title. The layers you'll need to add involve
+
+- `labs(x = ___, y = ___)` for the x and y labels
+- adding an option to the `scale_y_log10` function (see the lecture)
+- `ggtitle` to add a title
+- You can also change the theme to something else if you like. 
+
+```{r}
+ggplot(data = gapm, 
+       aes(year, pop))+
+  geom_line(aes(group = country)) + 
+  facet_wrap(~continent) +
+  scale_y_log10(labels = scales::label_comma()) +
+  labs(x = "Year", y = "Population") +
+  ggtitle("Global Population Changes (1957-2007)")
+```
+
+#### Question 3 (20 points)
+
+Now, let's look at the relationship between per capita GDP of a country and
+the life expectancy in the country in the gapminder dataset. The final visualization will mimic (with more limited data) a famous visualization that was shown in the Hans Rosling video *[The Joy of Stats](https://www.youtube.com/watch?v=jbkSRLYSojo)*  
+
+Let's start out by plotting the life expectancy against per capita GDP in a scatter plot
+
+```{r HW2-9, echo = TRUE}
+ggplot(gapm, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+```
+
+We're going to successively build up this visualization by adding (`+`) layers to the plot. Don't create a legend for this plot
+
+**a.** Change the x-axis to display on the log scale  
+**b.** Change the size of the points to reflect the square root (the R function is `sqrt`) of the population  
+**c.** Color the inside of each point by continent  
+**d.** Separate the graphs out by year (use `facet_wrap`)
+
+
+```{r HW2-10}
+ggplot(gapm, aes(x = gdpPercap, y = lifeExp, size = sqrt(pop), color = continent)) + 
+  geom_point() +
+  scale_x_log10() +
+  facet_wrap(~year)
+```
+
+#### Extra credit (10 points)
+
+Make the following visualization using `gganimate` based on the plot you developed in Question 3. Note that it might take a minute, literally, for the animation to render. 
+
+```{r HW2-11}
+ggplot(gapm, aes(gdpPercap, lifeExp, size = pop, colour = continent)) +
+    geom_point(alpha = 0.5, show.legend = TRUE) +
+    scale_size(range = c(2, 12)) +
+    scale_x_log10() +
+    labs(title = 'Year: {frame_time}', x = 'Per capita GDP', y = 'Life expectancy') +
+    ggtitle("Relationship between GDP and life expectancy over time") +
+    transition_time(year) +
+    ease_aes('linear')
+```

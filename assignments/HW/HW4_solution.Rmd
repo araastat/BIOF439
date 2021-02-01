@@ -1,0 +1,196 @@
+---
+title: "HW 4 Solution"
+author: "Abhijit Dasgupta"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = 'hw_img', fig.ext = 'png')
+library(tidyverse)
+library(broom)
+library(ggpubr)
+datadir = '~/Dropbox/teaching/BIOF439/data'
+riskfactors <- readRDS(fs::path(datadir,'riskfactors.rds'))
+```
+
+
+In this homework you will generate your own R Markdown file, either using the R Markdown templates in RStudio or from scratch. For each question, you will create R chunks which you will populate with code. The code and the results should be visible in the HTML file that you knit the R Markdown to. 
+
+The header of the R Markdown file will look like this
+
+```
+---
+title: "Week 4 assignment"
+author: "Your name"
+output: html_document
+---
+```
+
+Each question is 10 points.
+
+### Question 1
+
+We will use the dataset `riskfactors` available in the class data link. 
+
+There are two files holding the same data. 
+`riskfactors.rds` stores the data in R-native format, which can be read as `riskfactors <- readRDS('data/riskfactors.rds')` (you can update the path based on where you store the file). The `riskfactors.csv` file can be read using `read_csv`. 
+
+```{r, echo=T, eval=T}
+riskfactors <- readRDS('data/riskfactors.rds')
+```
+
+#### Part a
+
+Draw a summary plot that shows data types and missing data patterns
+
+```{r}
+library(visdat)
+vis_dat(riskfactors)
+```
+
+
+#### Part b
+
+Draw an upset plot of missing data patterns in this dataset including the top 10 most missing variables.
+
+```{r, echo=TRUE, eval=TRUE}
+naniar::gg_miss_upset(riskfactors, nsets = 10)
+```
+
+
+### Question 2
+
+Plot the frequency distribution of marital status in this dataset, as seen below.
+
+```{r, echo=TRUE}
+ggplot(riskfactors %>% filter(!is.na(marital)), aes(fct_rev(fct_infreq(marital))))+
+  geom_bar() + 
+  labs(x = 'Marital status', 
+       y = 'Frequency',
+       title = 'Frequency distribution of marital status')+
+  coord_flip()
+```
+
+> Important points for this plot. 
+> 
+> 1. I do not want a bar for missing values
+> 1. The tricky part may be getting the right order. See the forcats cheatsheet for hints
+> 1. There is use of `coord_flip`. This should be the last thing you do in the ggplot pipe. 
+
+```{r, echo = FALSE, eval = FALSE}
+plot_data <- riskfactors %>% filter(is.na(marital))
+
+ggplot(plot_data, 
+       aes(x = fct_rev(fct_infreq(marital))))+
+  geom_bar() + 
+  labs(x = 'Marital status', 
+       y = 'Frequency',
+       title = 'Frequency distribution of marital status')+
+  coord_flip()
+```
+
+
+### Question 3
+
+We will use the `USArrests` data set that is inbuilt in R. 
+
+Recreate the following plot in R
+
+```{r, echo=TRUE}
+library(ggrepel)
+USArrests %>% rownames_to_column('State') %>% 
+  ggplot(aes(UrbanPop/100, Murder))+
+  geom_text_repel(aes(label = State)) + 
+  labs(y = 'Murder arrests (per 100,000)', 
+       caption = 'McNeil (1977). Interactive Data Analysis') + 
+  scale_x_continuous('Percent of population that is urban',
+                     labels = scales::percent) +
+  theme_classic()
+```
+
+> You will need to add the rownames in the data to become a proper column named `State`  using `USArrests %>% rownames_to_column('State')`
+
+
+### Question 4
+
+Using the `riskfactors` data, create a panel of plots using any of the three packages introduced in lecture, where the plots will be
+
+1. A histogram of age
+1. A frequency bar plot of sex
+1. A boxplot of BMI by education level
+1. A barplot showing the proportion of each educational level for each marital status.
+
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(cowplot)
+library(ggpubr)
+library(patchwork)
+
+plt1 <- ggplot(riskfactors) + geom_histogram(aes(x=age))
+plt2 <- ggplot(riskfactors) + geom_bar(aes(x = sex))
+plt3 <- ggplot(riskfactors) + geom_boxplot(aes(x = education, y = bmi))
+plt4 <- ggplot(riskfactors) + 
+  geom_bar(aes(x = marital, fill = education), position='fill')+
+  coord_flip()
+
+# plot_grid(plt1, plt2, plt3, plt4, nrow=2)
+
+# ggarrange(plt1, plt2, plt3, plt4, nrow=2, ncol=2)
+
+(plt1 + plt2 ) / (plt3 + plt4)
+```
+
+
+### Extra credit (10 pts)
+
+Install the **coronavirus** package (`install.packages('coronavirus')`). Once that is installed, run `coronavirus::update_dataset()`. This will update the data to the latest data from JHU, and also ask you to restart
+your R session (`Session > Restart R`). 
+
+#### Part a
+
+The `coronavirus` dataset is in the **coronavirus** package and contains data on cases, deaths and recoveries on a daily basis from around the world. We will only use the deaths data, which is obtained by filtering the rows
+of the `coronavirus` dataset to contain only rows with `type=="death"`
+
+Extract out data for 6th July, 2020 (`date == "2020-07-06`) and then identify the top 10 countries in terms of
+deaths on that date. 
+
+```{r, message=FALSE}
+library(coronavirus)
+countries_10 <- coronavirus %>% 
+  filter(type=='death') %>% 
+  filter(date=='2020-07-06') %>% 
+  group_by(country) %>% 
+  summarise(cases = sum(cases, na.rm=T)) %>% 
+  ungroup() %>% 
+  slice_max(cases, n=10) %>% 
+  pull(country)
+```
+
+
+There are a couple of nuances here. For some countries, there is also provincial data, so you have to sum over those rows within country (`%>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T) %>% ungroup()`))
+
+You can use `slice_max` to grab the approriate rows. To pull out the countries, you can then use `%>% pull(country)` and save the result. You should have
+
+```{r, echo=FALSE, message=FALSE}
+library(coronavirus)
+coronavirus %>% filter(date=='2020-07-06', type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country)
+```
+
+#### Part b
+
+Make a plot of smoothed lines of daily deaths over time for these 10 countries, from the beginning of the data collection to 6th July. Transform the `country` variable so that the legend is ordered in order of deaths on 6th July. The y-axis should also be log-transformed (`scale_y_log10()`). This should look something like this.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(coronavirus)
+coronavirus %>% filter(date==max(date), type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country) -> country_top10
+
+coronavirus %>% filter(type=='death', country %in% country_top10, date <= '2020-07-06') %>% 
+  ggplot(aes(x = date, y = cases, 
+             color = fct_reorder2(country, date, cases)))+
+  geom_smooth(se=FALSE) + 
+  scale_y_log10('Number of deaths') +
+  labs(x = '', color = 'Country',
+       title = 'Patterns of daily deaths globally from COVID-19',
+       caption = 'Johns Hopkins University CCSE, 2020')
+```
+

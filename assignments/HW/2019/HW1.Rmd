@@ -1,0 +1,106 @@
+---
+title: "Homework 1"
+author: "BIOF 439, Spring 2019"
+date: "Due date: Tuesday, April 9 at midnight"
+output: html_document
+---
+
+-----
+
+### Readings
+
+R for Data Science [https://r4ds.had.co.nz](https://r4ds.had.co.nz)
+
+- Chapter 4 (Workflow: Basics)
+- Chapter 27 (R Markdown)
+
+### Hands-on practice
+
+On RStudio Cloud, you will have a new project called Homework 1, which has a R Markdown document called `hw1.Rmd`. Please open it, follow the instructions within it, answer
+the questions, and then compile to HTML (see [instructions](instructions.html))
+
+-----
+
+## Exercises
+
+### Question 1
+
+Run the following code, either in your console or from the R Markdown document
+```{r, eval=F}
+living_wage <- 15
+l1ving_wage
+```
+
+Does this code work? Why or why not? How would you correct it? Put the corrected code in a R code chunk in your answer, with option `eval = T` to show that the code works
+
+__Answer:__
+
+
+
+
+
+### Question 2
+
+Complete the code below by repalcing the `___`, following the instructions in the comments (lines starting with `#`). Change `eval = F` to `eval = T`, so that the answers show in the HTML file. You can learn more about the dataset by typing `?mtcars` in the console.
+
+```{r warmup, message = F, warning = F, eval = F}
+library(tidyverse)
+
+data(mtcars)
+
+# Show me the first 3 rows of this dataset
+
+___(mtcars, n = ___)
+
+# What is the average mpg of all the cars?
+
+___(mtcars$___)
+
+
+# Find the average mpg for 4 cylinder cars
+
+___(mtcars$mpg[mtcars$___ == 4])
+
+
+# Find the average mpg for 4, 6 and 8 cylinder cars, in one statement
+
+mtcars %>% 
+  group_by(___) %>% 
+  summarize(avg_mpg = mean(___))
+
+
+# Convert mpg to km/l (1 mpg = 1.6 km/g = 0.42 km / l) and compute avg mpg & km/l by cylinder
+
+mtcars %>% 
+  mutate( kml = mpg * ___) %>% 
+  group_by(___) %>% 
+  summarize(avg_US = mean(___), avg_metric = ____(____))
+  
+```
+
+### Question 3A first pass at graphs
+
+There is some template ggplot2 code below. Once again fill in the blanks and change `eval = F` to `eval = T` to run the code during knitting.
+
+```{r graphs1, eval = F}
+library(ggplot2)
+
+# Draw a scatter plot showing the relationship between displacement and mpg
+
+ggplot(mtcars, aes(x = ___, y = ___)) +
+  geom_point()
+```
+
+```{r graphs2, eval = F}
+
+# Draw a scatterplot like above, but color points based on cylinders
+# 
+
+ggplot(mtcars, aes(x = disp, y = mpg)) + 
+  geom_point(aes(color = ___))
+```
+
+_Extra credit:_  
+Is this quite right? Can you fix it by changing the data type of `cyl`?
+
+
