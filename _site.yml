@@ -1,0 +1,35 @@
+name: BIOF 439
+output_dir: docs/toplevel
+exclude: ['Personal','slides','assignments','notes', 'R', 'README.Rmd']
+navbar:
+  title: Data Visualization using R
+  left:
+    - text: "Home"
+      href: index.html
+    - text: Syllabus
+      href: syllabus.html
+    - text: Instructor bio
+      href: bio.html
+    - text: Lectures
+      href: slides/
+    - text: Homework
+      href: assignments/
+    - text: Resources
+      href: resources.html
+
+  right:
+    - text: Final Projects
+      href: FinalProjects/2020Summer/index.html
+    - text: Course Notes
+      href: notes/
+    - icon: fa-github
+      text: GitHub
+      href: https://www.github.com/araastat/BIOF439
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: ./style.css
+  github_document:
+    html_preview: false
+

@@ -1,0 +1,89 @@
+---
+title: Resources
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: style.css
+    toc: true
+    toc_depth: 1
+    toc_float: true
+---
+
+# Books
+
+## Data visualization using R (optional)
+
+[<img  style="height:150px; width:112px; border: 3px solid black;" src="img/wilke.jpg"/>](https://serialmentor.com/dataviz/index.html){target=_blank}
+[<img  src="img/healy.jpg" style="border: 3px solid black;height:150px; width:112px"/>](https://socviz.co/){target=_blank} 
+
+Clicking on the covers will send you to the free online versions of each book
+
+## R fundamentals (optional)
+
+[<img style="height:150px; width:112px; border: 3px solid black" src = "img/r4ds.png"/>](https://r4ds.had.co.nz/){target=_blank}
+
+## R Markdown (optional)
+
+[
+<img src='img/rmd.png' style="width:112px; height:150px; border:3px solid black" />
+](https://bookdown.org/yihui/rmarkdown/){target=_blank}
+
+Of partcular interest to us will be chapters on [HTML
+documents](https://bookdown.org/yihui/rmarkdown/html-document.html){target=_blank} and [HTML
+Presentations](https://bookdown.org/yihui/rmarkdown/ioslides-presentation.html){target=_blank}
+
+
+### Other books
+
+- [The Truthful Art: Data, Charts, and Maps for Communication](http://www.thefunctionalart.com/p/the-truthful-art-book.html){target=_blank} by Albert Cairo
+- [FLowing Data](https://www.amazon.com/gp/product/0470944889/){target=_blank} by Nathan Yau
+- [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/){target=_blank} by Winston Chang
+- [Modern Statistics for Modern Biology](http://web.stanford.edu/class/bios221/book/index.html){target=_blank} by Susan Holmes and Wolfgang Huber
+
+-----
+
+# Web references
+
+## Data viz
+- [ggplot2 reference](https://ggplot2.tidyverse.org/){target=_blank}: The definitive guide to ggplot2. Check out the pages for the different functions for great examples
+- [R graph gallery](https://www.r-graph-gallery.com/): Example-filled site for different R-based graphs, specially in ggplot. The ads can be a bit irritating, but the content is great.
+- [htmlwidgets for R](https://www.htmlwidgets.org/): Reference and gallery for different Javascript interactive graphics libraries that have been ported to R
+- Bioinformatics-related
+  - [Bioconductor packages](http://www.bioconductor.org/packages/release/BiocViews.html#___Visualization){target=_blank} for visualization
+  -[heatmaply](https://cran.r-project.org/web/packages/heatmaply/vignettes/heatmaply.html): R package for interactive heatmaps
+  - [manhattanly](https://cran.r-project.org/web/packages/manhattanly/): R package for interactive Manhattan plots
+  - [Graphics chapter](http://web.stanford.edu/class/bios221/book/Chap-Graphics.html) from _Modern Statistics for Modern Biology_ by Holmes and Huber
+
+## R programming
+
+- 
+- Bioinformatics-related
+  - [RNAseq analysis in R](http://combine-australia.github.io/RNAseq-R/)
+  - [GEN 242](http://girke.bioinformatics.ucr.edu/GEN242/index.html) course website from University of California Riverside
+  - [RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408/v3): Open review paper on using R for RNA-seq analysis
+  - [Analysis of single cell RNA-seq data](https://hemberg-lab.github.io/scRNA.seq.course/index.html) from Hember lab
+
+
+-----
+
+# Web resources
+
+- [Flowing Data](https://www.flowingdata.com): This is one of my favorite sites for learning data viz. There are several [tutorials](https://flowingdata.com/category/tutorials/) in R for different graphics, as well as other languages. Nathan Yau, who runs the website, also has 2 excellent [books](https://flowingdata.com/books/) on data viz, as well as a few self-guided [courses](https://flowingdata.com/courses/) for data viz in R.
+- [JunkCharts](https://junkcharts.typepad.com): Critiques of chartjunk + junk art
+- [I want hue](https://medialab.github.io/iwanthue/): Colors for data scientists
+
+
+## Infographics
+
+- [BusinessPundit’s Guide to Infographics](https://www.businesspundit.com/guide-to-infographics/)
+- [A complete exploratory data analysis and visualization for text data](https://towardsdatascience.com/a-complete-exploratory-data-analysis-and-visualization-for-text-data-29fb1b96fb6a)
+- 
+-----
+
+# ggplot2-related resources {#ggplot}
+
+- [ggplot2 reference](https://ggplot2.tidyverse.org/){target=_blank}: The definitive guide to ggplot2. Check out the pages for the different functions for great examples
+- [ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf){target=_blank}
+- [Cheatsheets](https://www.r-graph-gallery.com/cheatsheet/){target=_blank} from the [R-Graph Gallery](https://www.r-graph-gallery.com/){target=_blank}
+- [Themes to improve your ggplot figures](https://rfortherestofus.com/2019/08/themes-to-improve-your-ggplot-figures/)

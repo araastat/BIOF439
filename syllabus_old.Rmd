@@ -1,0 +1,136 @@
+---
+title: "BIOF 439: Data Visualization using R "
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(echo = F, warning=F, message = F)
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(pander)
+```
+```{r, echo = F, eval = T}
+startDate <- lubridate::ymd('20200204')
+classDate <- function(wk, startDate){
+  today <- startDate + 7*(wk-1)
+  format(today, "%B %d, %Y")
+}
+```
+
+
+## Instructor 
+Abhijit Dasgupta  
+Contact: via email ([adasgupta@araastat.com](adasgupta@araastat.com)) or via Slack channel
+
+## Course description
+This course will demonstrate and practice the use of R in creating and presenting data visualizations. After a short introduction to R tools, especially the tidyverse packages, we will look at good principles for data visualization, examples of good and bad visualizations, and the use of ggplot2 to create static publication-quality graphs. We will also explore modern web-based interactive graphics using the htmlwidgets packages as well as dynamic graphics and dashboards that can be created using flexdashboard and Shiny. We will explore ways in which bioinformatics data can be presented using static and dynamic visualizations. Finally, we will use RMarkdown and several packages to develop web pages for presenting data visualizations as self-explanatory, and possibly interactive, storyboards. 
+
+## Learning objectives
+
+- Understand principles of good data visualization; avoid poor or inappropriate data visualization
+- Practical short introduction to R to enable data visualization; Manipulating data to enable good visualizations
+-	Appropriate use of color, symbols and small multiples
+-	Static and dynamic data visualizations
+-	Using the web as a presentation medium
+
+## Books and Learning Materials
+
+1. _R for Data Science_ [R4DS] by Hadley Wickham and Garrett Grolemund (available [online](https://r4ds.had.co.nz/){target=_blank})
+1. _Principles of Data Visualization_ [PDV] by Claus O. Wilke (available [online](https://serialmentor.com/dataviz/index.html){target=_blank})
+
+## Grades
+
+Grades will be based on the following requirements:
+
+1. Homeworks, available Friday after class, due by midnight the following Tuesday. See [instructions](assignments/).  (50%)
+1. Final project: A presentation demonstrating visualizations in R using your own data (20%)
+1. Class participation (30%)
+
+## Academic policy regarding plagiarism
+
+See [this link](https://faes.org/sites/default/files/Student_Handbook_2016-17.pdfhttps://faes.org/sites/default/files/Student_Handbook_2016-17.pdf){target=_blank} for FAES policy on academic plagiarism.
+
+## Lessons
+
+### `r classDate(1, startDate)` (Day 1)
+
+- Introduction to the class
+- Principles of good data visualization
+- An understanding of bad data visualizations
+- Introduction to RStudio, RStudio Cloud and R
+- Introduction to the `flexdashboard` package
+
+###  `r classDate(2, startDate)` (Day 2)
+
+__Readings:__ R4DS Chapters 4 and 27    
+__Resource:__ PDV Chapters 2-4
+
+__Theme:__ Descriptive plots
+
+- Introduction to ggplot2
+- Layering components
+- Basic graphs
+- Grouped graphs
+- Facets (small multiples)
+- Thematic personalization
+- Easy animation
+
+### `r classDate(3, startDate)` (Day 3)
+
+__Theme:__ Analytic plots
+
+- Using R for analysis
+  - Data manipulation
+  - Statistics
+  - Hypothesis tests
+- Producing graphs from analysis
+  - Effect sizes
+  - Group differences
+  - Annotations
+  - Networks
+  - Maps
+  
+### `r classDate(4, startDate)` (Day 4)
+
+__Theme:__ R for Bioinformatics
+
+- Visualizations for Bioinformatics
+  - Manhattan plots
+  - Heatmaps
+  - Dendrograms
+  - Phylogenetic trees
+  - Linkage maps
+- Visualizations for RNA-seq and NGS analyses
+
+### `r classDate(5, startDate)` (Day 5)
+
+__Theme:__ Dynamic visualization
+
+- Introduction to htmlwidgets
+  - plotly, rbokeh, highcharts, dygraphs
+- Interactive heatmaps
+  - d3heatmap
+- 3-D visualization
+  - threejs
+
+### `r classDate(6, startDate)` (Day 6)
+
+__Theme:__ Presenting your graphs
+
+__Reference:__ _R Markdown: The Definitive Guide_ by Yihui Xie, J.J. Allaire and Garrett Grolemund (available [online](https://bookdown.org/yihui/rmarkdown/){target=_blank})
+
+- R Markdown presentation tools
+  - Presentations
+  - Dashboards (using `flexdashboard`)
+  - Posters
+- Shiny for interactive widgets
+
+### `r classDate(7, startDate)` (Day 7)
+
+Class presentations and discussion
+
+

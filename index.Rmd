@@ -1,0 +1,40 @@
+---
+title: "BIOF 439: Data Visualization using R"
+output: 
+  html_document:
+    includes:
+      after_body: footer.html
+---
+
+```{r, include = FALSE, eval = knitr::opts_knit$get("rmarkdown.pandoc.to") == "html"}
+# Enables Font Awesome in HTML based bookdown outputs.
+fa <- rmarkdown::html_dependency_font_awesome()
+fa$attachment <- "fonts/fontawesome-webfont.ttf"
+htmltools::tagList(fa)
+```
+
+## Instructor: Abhijit Dasgupta, PhD
+
+### Course description
+
+This course will provide a short introduction to the [R](http://www.r-project.org)
+statistical programming language, and then expose students to different packages in 
+the R ecosystem that create both static and dynamic data visualizations. During this
+exploration, students will explore what makes a graph "good", and what can make it "bad".
+
+Students will be expected to do at-home studying and complete class assignments 
+in preparation for subsequent classes. This will be a rather intense 7-week course.
+Students can also work together to facilitate understanding, and share questions and
+answers on the class [Slack channel](https://biof439dataviz.slack.com){target=_blank}. 
+
+We will be working on [RStudio Cloud](http://rstudio.cloud), a cloud-based 
+implementation of R and the RStudio IDE, which has all the packages required for this
+course pre-installed. Homework assignments will be done on RStudio Cloud as 
+RMarkdown documents, and both the RMarkdown and resultant HTML documents will be 
+submitted
+
+Grades are based on completing homework, class participation, and a final presentation
+based on your own data and your own work, showing how you can use data visualizations to help
+express the (scientific) story. 
+
+
