@@ -1,0 +1,104 @@
+---
+title: "Interactive dashboar"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(pacman)
+p_load(char=c('tidyverse','broom','plotly','leaflet','rnaturalearth',
+              'rnaturalearthdata', 'janitor', 'sf', 
+              'shiny','plotly', 'DT'))
+
+mapData <- st_as_sf(rnaturalearthdata::countries50)
+
+confirmed_data <- read_csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv') %>% clean_names()
+death_data <- read_csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv') %>% clean_names()
+recovered_data <- read_csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv') %>% clean_names()
+
+confirmed_data_country <- 
+  confirmed_data %>% pivot_longer(starts_with('x'), names_to='date', values_to = 'number') %>% 
+  group_by(country_region, date) %>% 
+  summarize(number = sum(number)) %>% 
+  ungroup() %>% 
+  mutate(date = str_replace(str_replace_all(date, '_', '/'), 'x', '')) %>% 
+  mutate(date = as.Date(date, format = '%m/%d/%y'))
+death_data_country <- 
+  death_data %>% pivot_longer(starts_with('x'), names_to = 'date', 
+                              values_to = 'number') %>% 
+  group_by(country_region, date) %>% 
+  summarize(number = sum(number)) %>% 
+  ungroup() %>% 
+  mutate(date = str_replace(str_replace_all(date, '_', '/'), 'x', '')) %>% 
+  mutate(date = as.Date(date, format = '%m/%d/%y'))
+
+death_data <- death_data %>% pivot_longer(starts_with('x'), names_to = 'date', 
+                              values_to = 'number') %>% 
+  mutate(date = str_replace(str_replace_all(date, '_', '/'), 'x', '')) %>% 
+  mutate(date = as.Date(date, format = '%m/%d/%y'))
+
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput('country','Choose a country', 
+            choices = sort(unique(death_data_country$country_region)),
+            selected='Mainland China')
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Map
+
+```{r, eval=T}
+
+Country <- reactive(as.character(input$country))
+
+renderPlot({
+  dat <- death_data %>% dplyr::filter(country_region == Country(), 
+                                      date == max(date))
+  ggplot() + geom_sf(data = mapData) + 
+    geom_point(data = dat, aes(x = long, y=lat, size = number), 
+               color = 'red') + 
+    theme_classic()
+})
+
+```
+
+
+### Incidence
+
+```{r, eval = T}
+renderPlot({
+  new_data = death_data_country %>% rename('deaths'='number') %>%
+    left_join(confirmed_data_country %>% rename('cases'='number')) %>% 
+    gather(cases, deaths, key='type', value = 'n')
+ggplot(new_data %>% filter(country_region==Country()), aes(x = date, y= n))+
+  geom_line(aes(color = type)) + 
+  # gghighlight::gghighlight(country_region==Country())+
+  scale_y_log10(labels = scales::label_number()) + 
+  labs(x = 'Date', y = 'N') + 
+  hrbrthemes::theme_ipsum()
+})
+```
+
+### Where do you fall
+
+```{r}
+library(gghighlight)
+renderPlot({
+  ggplot(confirmed_data_country, aes(x = date, y = number))+
+  geom_line(aes(color = country_region), show.legend = F) +
+  gghighlight(country_region ==Country()) + 
+  scale_y_log10(labels = scales::label_number())
+})
+
+```
+

@@ -1,0 +1,103 @@
+---
+title: An explanation of dummy variables
+author: Abhijit Dasgupta, PhD
+output: 
+  html_document:
+    theme: journal
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE)
+pacman::p_load(char = c('janitor','broom','ggplot2','dplyr'))
+```
+
+```{css, echo=FALSE}
+blockquote{
+  font-size: 9pt;
+  background-color: wheat
+}
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+  .col2 {
+    columns: 2 200px;         /* number of columns and width in pixels*/
+    -webkit-columns: 2 200px; /* chrome, safari */
+    -moz-columns: 2 200px;    /* firefox */
+  }
+```
+# Background
+
+I seem to have made the assumption that most of you know about linear regression 
+and how factors (categorical variables) are handled in linear regression. This seems
+to not be quite the correct assumption. So, a bit of supplemental material...
+
+# Factors and dummy variables
+
+
+
+Since factors don't have a natural ordering and each level sort of stands on its
+own, the way they are handled in regression modeling is to create **dummy variables** 
+from each factor, with one variable per level. 
+
+For example
+
+```{r}
+(df <- tibble(f = factor(c('A','B','C')),
+             x = c(1,2,3)))
+```
+
+What happens in regression (in R, but this is true mathematically as well), is that
+the factor `f` gets exploded into separate variables by level
+
+```{r}
+contrasts(df$f)
+```
+
+So we get *2* dummy variables for `f`, one for the level `B` and one for the level
+`C`. Why not for `A`, the base level? Well, it's redundant, since we can identify the
+rows with `A` by which rows in the columns `B` and `C` are 0. So, the standard method in R
+will create one less dummy variable, omitting the base level of the factor, for each
+factor in the model.
+
+> Mathematically, if you include an intercept term in the model, which is the 
+default, and then added one dummy variable for each level of the factor, then you'd
+end up with a _rank-deficient_ matrix, which you couldn't invert. This is crucial, 
+since in almost all parametric regression models like linear regression and logistic regression, this model matrix needs to be inverted to get unique
+solutions for the coefficients.
+
+# Going further
+
+You'll notice, in the output of the model matrix above, there is this section:
+
+```
+## attr(,"contrasts")$f
+## [1] "contr.treatment
+```
+
+This is saying that the kind of dummy variables we are creating are the 
+_treatment contrasts_, which omits the base level. There are other kinds of dummy
+variables you can make. Technically these transformations are called **contrast matrices**. 
+
+
+Each of these examples shows you how dummy variables are created from a 5-level factor.
+
+`contr.treatment` and `contr.SAS` are similar, except that `contr.treatment` omits the 
+first (lowest) level and `contr.SAS` omits the last (highest) level. If you work with SAS and are getting different resuls from R doing regression, this is the most likely reason. `contr.helmert` returns Helmert contrasts, which contrast the second level with the first, the third with the average of the first two, and so on.
+`contr.sum` compares the effect of the a particular level to the overall mean. 
+
+<div class="col2">
+```{r}
+contr.treatment(5)
+contr.SAS(5)
+contr.helmert(5)
+contr.sum(5)
+```
+</div>
+
+There is a really nice, though involved, [blog post](http://www.clayford.net/statistics/tag/sum-contrasts/) by Clay Ford at the University of Virginia library, that explains what each contrast does. 
