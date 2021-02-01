@@ -1,0 +1,169 @@
+---
+title: "Saving your work"
+author: Abhijit Dasgupta, PhD
+
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+library(palmerpenguins)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16)))
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class: middle, inverse
+
+# Saving your work
+
+---
+
+You want to actually use the visualizations you make
+
++ Save to file
+    - PNG for web
+    - PDF for print
+    - High resolution PNG for Word (600-1200 dpi)
+    - Journals often want high resolution TIFF (300+ dpi)
++ Save to document
+    - Create a Word file from R Markdown
+    - Create a PowerPoint file from R Markdown.
+    
+---
+class: middle, inverse
+
+# Save to file
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+```{r, echo=TRUE, eval=FALSE}
+pdf('temp.pdf', width=5, height=5) # inches
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() #<<
+```
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+```{r, echo=TRUE, eval=FALSE}
+png('temp.png', width=5, height=5, units='in', res=300) # 300 dpi
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() #<<
+```
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+```{r, echo=TRUE, eval=FALSE}
+tiff('temp.tif', width=5, height=5, units='in', res=300, compression='lzw') # 300 dpi
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() 
+```
+
+---
+
+## Printers in R
+
+#### Issues with tiff on a Mac
+
+The `tiff` printer doesn't annotate the TIFF file properly, so Preview thinks it's at 72 dpi, regardless
+of the setting.
+
+The workaround is to print to PDF, and convert to TIFF, either via Preview, or using the **pdftools** package.
+
+```{r, echo=TRUE, eval=FALSE}
+pdf('temp.pdf', width=5, height=5) # inches
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() 
+pdftools::pdf_convert('temp.pdf', format='tiff', dpi=300)
+```
+
+---
+
+## ggplot2 savings
+
+The previous slides showed the basic R way of printing a plot to a file. **ggplot2** makes it a bit easier.
+
+```{r, echo=T, eval=F}
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+ggsave('temp.pdf', width=5, height=5)
+```
+
+`ggsave` figures out the type from the ending. If you use `temp.png` it will create a PNG file. 
+
+Note, in all of the examples, the file gets saved to the working directory (`getwd()`). 
+
+---
+
+## Practice
+
+Save to PDF by default
+
+Why?
+
++ PDF is _infinite resolution_. As a vector format, it can be infinitely magnified.
++ PNG, TIFF are raster formats, so if you magnify too much, you'll see pixels
++ Convert from PDF to other raster formats saves both resolution and disk space.
+
+---
+class: middle, inverse
+
+# Save to document
+
+---
+
+## Saving to a document
+
+From the same R Markdown where you create the plot, you can save to Word or PowerPoint (even if you 
+don't have it on your computer) by changing the _front matter_ on top (between the `---`)
+
++ For Word, use `output: word_document`
++ For PowerPoint, use `output: powerpoint_presentation`
+
+
+----
+
+You can also learn the excellent **officer** package to directly create Word and PowerPoint
+presentations from R programmatically. See the website at https://davidgohel.github.io/officer/index.html.
+
+--- 

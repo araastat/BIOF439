@@ -1,0 +1,50 @@
+---
+title: "Final comments"
+author: Abhijit Dasgupta, PhD
+date: Spring 2019
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ')
+library(emo)
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439, Spring 2019</span></div>
+
+---
+
+## Final Projects
+
+The final projects are generally great, and some of you have done a fantastic job.
+
+I've learned about nuances of ggplot from these project I didn't know before `r emo::ji('smile')`
+
+---
+
+## Some pitfalls
+
+- R Markdown documents are meant to be reproducible, so are self-contained
+    - Put all the `library` commands you need inside the document. On knitting, a new R session is started, so you have to be explicit in packages 
+    - Same goes for data imports
+- Many of you put full paths to data sets in your documents. Those won't be the right paths on my computer `r emo::ji('surprised')`
+    - The `here` package is your friend
+    - Read [this presentation](https://speakerdeck.com/jennybc/zen-and-the-art-of-workflow-maintenance) by Jenny Bryan for a lot of good ideas about workflow maintenance
+    - For that matter, read [anything](https://speakerdeck.com/jennybc/) by Jenny Bryan. Her work is something I always turn to for practical issues and best practices in R
+    
+---
+
+## Next steps
+
+- Presentations by Hadley Wickham, Jenny Bryan, Jared Lander, Daniel Chen
+- The R4DS book
+    - Look on [bookdown.org](https://bookdown.org) for other free R books
+    - One of the better ones for you guys is [Modern Statistics for Modern Biology](http://web.stanford.edu/class/bios221/book/) by Susan Holmes and Wolfgang Huber at Stanford
+- Videos of presentations (and often materials) at rstudio::conf, New York R conference, DC R Conference, satRdays, EARL, Bioconductor and R-Ladies. Google is your friend.
+    
+    
+
+

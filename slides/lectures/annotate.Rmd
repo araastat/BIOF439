@@ -1,0 +1,331 @@
+---
+title: Annotating a plot
+author: Abhijit Dasgupta, PhD
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE,
+                      fig.height=5)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16),
+                                plot.title = element_text(size=18),
+                                plot.subtitle = element_text(size=16),
+                                plot.caption = element_text(size=12)))
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class:middle, center, inverse
+
+# Annotations
+
+---
+
+## Stand-alone stories
+
+- You would like a data visualization to stand on its own
+- Relevant information should be placed on the graph
+- However, you need to balance the information content with real estate
+    - Don't clutter the graph and make it not readable
+
+---
+
+
+## An example 
+
+<div id="origecon"></div>
+![](img/economist1.gif)
+
+We will recreate this plot in a tutorial
+
+---
+
+## Titles, subtitles and captions
+
+.pull-left[
+```{r p1, eval = F, echo = T}
+library(palmerpenguins)
+(plt <- ggplot(penguins, 
+               aes(bill_length_mm, body_mass_g, 
+                   color=species))+
+  geom_point())
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="p1"}
+```
+]
+
+
+
+---
+
+## Titles, subtitles and captions
+
+.pull-left[
+```{r p2, eval = F, echo = T}
+library(palmerpenguins)
+plt <- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)')
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="p2"}
+```
+]
+
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+```{r p3, eval = F, echo = T}
+library(palmerpenguins)
+plt <- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+       color = 'Species') #<<
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="p3"}
+```
+]
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+```{r p4, eval = F, echo = T}
+library(palmerpenguins)
+plt <- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+       color = 'Species',
+       title = "Palmer penguins",#<<
+       subtitle = "Bill length vs Body mass") #<<
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="p4"}
+```
+]
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+```{r p5, eval = F, echo = T}
+library(palmerpenguins)
+plt <- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+       color = 'Species',
+       title = "Palmer penguins",
+       subtitle = "Bill length vs Body mass",
+       caption = "Palmer Station LTER") 
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="p5"}
+```
+]
+---
+class:middle,center
+
+# Adding derived statistics to a plot
+
+---
+
+## Adding group means
+
+.pull-left[
+```{r b1, eval = F, echo = T}
+ggplot(penguins, 
+       aes(x = bill_length_mm,
+           y = body_mass_g,
+           color = species))+
+  geom_point()
+```
+]
+.pull-right[
+```{r, eval=T, echo=F, ref.label="b1"}
+
+```
+
+]
+
+---
+
+## Adding group means
+
+.pull-left[
+```{r 05-Lecture5-11, eval = T, echo = T}
+means <- penguins %>% group_by(species) %>% 
+  summarize_at(vars(bill_length_mm, body_mass_g),
+               mean, na.rm=TRUE)
+means
+```
+
+
+```{r b2, eval = F, echo = T}
+ggplot(penguins, 
+       aes(x = bill_length_mm,
+           y = body_mass_g,
+           color = species))+
+  geom_point()+ 
+  geom_point(data = means, #<<
+             size=8) #<<
+```
+
+Adding data from a different dataset
+
+]
+.pull-right[
+```{r, eval=T, echo=F, ref.label='b2'}
+
+```
+
+]
+---
+
+
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+```{r c1, eval = F, echo = T}
+mod1 <- lm(hwy ~ cty, data = mpg)
+r2 <- broom::glance(mod1) %>% pull(r.squared)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F) +
+  theme_bw()
+```
+]
+.pull-right[
+```{r,eval=T, echo=F, ref.label='c1'}
+
+```
+]
+---
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+```{r c2, eval = F, echo = T}
+mod1 <- lm(hwy ~ cty, data = mpg)
+r2 <- broom::glance(mod1) %>% pull(r.squared) %>% 
+  round(., 2)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F)+
+  annotate(geom='text',
+           x = 15, y = 40,
+           label=glue::glue("R^2 == {r}",r=r2),
+           size=12,
+           parse=T) + 
+  theme_bw()
+```
+]
+.pull-right[
+```{r, eval=T, echo=F, ref.label='c2'}
+
+```
+
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+```{r d1, eval = F, echo = T}
+mpg %>% 
+  mutate(cyl = as.factor(cyl)) %>% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()
+```
+]
+.pull-right[
+```{r, eval=T, echo=F, ref.label='d1'}
+
+```
+
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+```{r d2, eval = F, echo = T}
+mpg %>% 
+  mutate(cyl = as.factor(cyl)) %>% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()+
+  annotate(geom = 'rect',
+           xmin=3.75,xmax=4.25,
+           ymin = 22, ymax = 28,
+           fill = 'red',
+           alpha = 0.2) +
+  annotate('text', 
+           x = 4.5, y = 25,
+           label = 'Outliers?',
+           hjust = 0)+
+  coord_cartesian(xlim = c(0,5))+ 
+  theme_bw()
+```
+
+Note: If you have a factor on the x-axis, they are plotted at 1, 2, 3, ...
+]
+.pull-right[
+```{r, eval=T, echo=F, ref.label='d2'}
+
+```
+
+]
+

@@ -1,0 +1,179 @@
+---
+title: "Plotting systems in R"
+author: Abhijit Dasgupta, PhD
+abstract: ""
+---
+
+```{r setup, include=FALSE, message = F}
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', 
+                      message = F, warning = F,
+                      cache=FALSE)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+</div>
+
+---
+
+## Plotting systems in R
+
+There are three basic plotting systems in R
+
++ Base plotting (what comes with R)
++ ggplot2
++ lattice
+
+The latter two are related, in that both are based on the package **grid** that implements a system called
+_grid graphics_. This actually allows ggplot2 and lattice graphics to be put together in panels using 
+functions from packages like **gridExtra** and **ggpubr**
+
+---
+
+## ggplot2
+
+Since we've learned **ggplot2** in this class, lets start with a plot using it
+
+```{r , fig.height=5}
+library(ggplot2)
+library(palmerpenguins)
+
+ggplot(penguins,
+       aes(x = bill_length_mm, y = body_mass_g, color=species))+  geom_point()
+```
+
+---
+
+## lattice
+
+The **lattice** package was built by Deepayan Sarkar, one of the R core members
+
+```{r , fig.height=5}
+library(lattice)
+
+xyplot(body_mass_g ~ bill_length_mm, groups =  species, auto.key=TRUE, data=penguins)
+```
+
+---
+
+## Base graphics
+
+Base graphics allow you to build up a plot, but the process is much more granular, in that you 
+have to specify everything instead of a package making choices for you like **ggplot2** or **lattice**
+
+```{r , fig.height=5}
+plot(body_mass_g ~ bill_length_mm, data = penguins, col=species)
+```
+
+---
+class: middle, inverse
+
+# Facets
+
+---
+
+## Facets
+
+Facets is where the grid-based graphics has a significant advantage over base graphics.
+
+.pull-left[
+```{r , fig.height=4}
+ggplot(penguins,
+       aes(bill_length_mm, body_mass_g))+
+    geom_point()+
+    facet_wrap(~species)
+```
+]
+.pull-right[
+```{r , fig.height=4}
+xyplot(body_mass_g ~ bill_length_mm | species,
+       data=penguins)
+```
+]
+
+---
+
+## Facets
+
+```{r , fig.height=5, fig.width=8}
+op <- par(mfrow = c(1,3))
+for(n in unique(penguins$species)){
+    plot(body_mass_g ~ bill_length_mm, data=subset(penguins, species==n),
+         main=n, #<< Title
+         ylim = range(penguins$body_mass_g, na.rm=T),
+         xlim = range(penguins$bill_length_mm, na.rm=T)) #<< making scales the same
+}
+par(op) #<< have to return back to original graphical parameters    
+```
+
+---
+
+## Facets
+
+Let's consider 2-dimensional faceting
+
+.pull-left[
+```{r, fig.height=4}
+ggplot(penguins)+
+geom_point(aes(bill_length_mm,
+               body_mass_g))+
+    facet_wrap(species~island)
+```
+]
+.pull-right[
+```{r , fig.height=4}
+xyplot(body_mass_g ~ bill_length_mm |
+           species+island,
+       data = penguins)
+```
+]
+
+---
+
+## Facets
+
+.pull-left[
+```{r base, echo=T, eval=F}
+op <- par(mfrow=c(3,3))
+for(i in unique(penguins$island)){
+    for(j in unique(penguins$species)){
+        plot(body_mass_g ~ bill_length_mm,
+             data=subset(penguins, island==i & species==j),
+             xlim = range(penguins$bill_length_mm,na.rm=T),
+             ylim = range(penguins$body_mass_g, na.rm=T),
+             main = paste(paste('Species =',j),paste('Island =',i), collapse='\n'))
+    }
+}
+```
+
+We basically have to do a lot of detail in base graphics
+]
+.pull-right[
+```{r , eval=T, echo=F, ref.label = 'base'}
+
+```
+]
+
+---
+
+## Facets
+
++ Both ggplot2 and lattice automatically title the panels and maintain the same x- and y-axis for all theplots
+- Base graphics requires a for-loop and explicitly forcing the axes to be the same. Titling is also explicitly done
+
+
+---
+
+## Why are there still 3 systems?
+
++ ggplot2 has traditionally been the slowest of the bunch
+    + Don't try and plot 1M points
++ Base plots and lattice are a lot faster
++ Base plots and lattice aren't pipe-friendly
++ People still like base plots for the control
+    + You can control almost every single aspect of a plot
+    + margins, annotations and labels, aspect ratio, ...

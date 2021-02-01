@@ -1,0 +1,146 @@
+---
+title: "Visualizing the nature of data sets"
+author: Abhijit Dasgupta, PhD
+abstract: We explore patterns in data sets
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16)))
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class: middle, center
+
+# The nature of a data set
+
+---
+
+## Data characteristics
+
+Some of the things we care about in a data set are 
+
++ Nature of each column
++ Missing data patterns
++ Correlation patterns
+
+The **visdat** package and the **naniar** package help us with visualizing these.
+
+---
+
+## Without visualization
+
+.pull-left[
+```{r}
+summary(airquality)
+```
+]
+.pull-right[
+```{r}
+glimpse(airquality, width=40)
+```
+
+]
+
+These give us a variable-by-variable view.
+
+---
+
+## Visualizing a dataset
+
+.pull-left[
+
+```{r}
+visdat::vis_dat(airquality)
+```
+]
+.pull-right[
+
++ What kinds of variables are in the dataset
++ Which elements are missing
++ A sense of missing patterns
+]
+
+---
+
+## Correlation patterns
+
+```{r, fig.height=6}
+visdat::vis_cor(airquality)
+```
+
+---
+
+## Focus on missing data patterns
+
+```{r, fig.height=6}
+visdat::vis_miss(airquality)
+```
+
+---
+class: middle, center
+
+# A deeper look at missing data
+
+---
+
+```{r}
+library(naniar)
+gg_miss_upset(airquality)
+```
+
+---
+
+```{r}
+gg_miss_upset(riskfactors)
+```
+
+---
+
+## Missing at random? 
+
+Does missingness in one variable depend on values of another variable?
+
+.pull-left[
+```{r, fig.height=5}
+ggplot(airquality, 
+       aes(Ozone, Solar.R))+
+  geom_miss_point()
+```
+]
+.pull-right[
+The red points are the values of one variable when the other variable is missing
+]
+
+---
+
+## Missing at random?
+
+.pull-left[
+```{r, fig.height=6}
+gg_miss_fct(x = riskfactors, fct=marital)
+```
+
+]
+.pull-right[
+Percent missing in each variable by levels of a factor
+
+What you're looking for is relatively even colors across
+]
+
+---
+
+## Further exploration
+
+1. The **naniar** [website](http://naniar.njtierney.com/)

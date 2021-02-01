@@ -1,0 +1,1039 @@
+---
+title: "A sampling of bioinformatics using R"
+author: Abhijit Dasgupta, PhD
+output_dir: "`r here::here('docs/slides/lectures')`"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = '#> ', cache=FALSE, fig.height=6)
+library(tidyverse)
+```
+
+layout: true
+
+<div class="my-header">
+<span style="left: 15px; bottom:2px;">BIOF 439: Data Visualization with R</span>
+<span style='right:15px; bottom:2px;'>Abhijit Dasgupta</span>
+</div>
+
+
+---
+
+## Expectations
+
+1. We will explore
+    - the basics of using Bioconductor packages for bioinformatics
+    - visualizations useful for bioinformatics
+    - ways to annotate our graphics
+1. We will not explore
+    - how to do bioinformatics using R
+    - bioinformatic workflows
+    - data cleaning, modeling, analytics
+
+This area is too broad and interests too varied to cover this with any sort of breadth or depth. 
+
+---
+
+## A very simple example
+
+```{r 04-bioinformatics-1}
+clinical <- rio::import('data/BreastCancer_Clinical.xlsx') %>% janitor::clean_names() 
+proteome <- rio::import('data/BreastCancer_Expression.xlsx') %>% janitor::clean_names()
+final_data <- clinical %>% 
+    inner_join(proteome, by = c('complete_tcga_id' = 'tcga_id')) %>% 
+    filter(gender == 'FEMALE') %>% 
+    select(complete_tcga_id, age_at_initial_pathologic_diagnosis, er_status, starts_with("np"))
+head(final_data)
+```
+
+---
+
+## A very simple example
+
+```{r 04-bioinformatics-2}
+results <- final_data %>% 
+    summarise_at(vars(starts_with('np')), #<<
+                 ~wilcox.test(. ~ er_status)$p.value)#<<
+results
+```
+
+`.` is the placeholder for what's specified inside the `vars()`. 
+
+--
+
+This isn't in the right format for me to plot
+
+---
+
+## A very simple example
+
+.pull-left[
+```{r 04-bioinformatics-3}
+results %>% tidyr::pivot_longer(cols=everything(), 
+                                names_to='protein', 
+                                values_to='pvalue')
+```
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+```{r a1, eval = F}
+theme_439 <- theme_bw() + 
+    theme(axis.title = element_text(size=16),
+          axis.text = element_text(size=8))
+
+
+results %>% pivot_longer(
+  cols=everything(),
+  names_to='protein', 
+  values_to='pvalue') %>% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+  theme_439
+```
+]
+.pull-right[
+```{r 04-bioinformatics-4, ref.label='a1', echo=F, eval = T}
+
+```
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+```{r a2, eval = F}
+results %>% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %>% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+  geom_segment(aes(x = protein, xend = protein, #<<
+                   y = 0, yend = pvalue))+ #<<
+  theme_439 
+```
+]
+.pull-right[
+```{r 04-bioinformatics-5, ref.label='a2', echo=F, eval = T}
+
+```
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+```{r a3, eval = F}
+results %>% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %>% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+      geom_point() +
+    geom_segment(aes(x = protein, xend = protein, 
+                     y = 0, yend = pvalue))+
+    geom_hline(yintercept = 0.05, linetype=2)+ #<<
+    theme_439 
+```
+]
+.pull-right[
+```{r 04-bioinformatics-6, ref.label='a3', echo=F, eval = T}
+
+```
+
+]
+
+???
+
+This is basically the beginnings of a Manhattan plot
+
+---
+
+## Manhattan plot
+
+A Manhattan plot is used to visualize a set of p-values from unit-based tests
+
+It plots the negative log p-value at each unit
+
+.pull-left[
+```{r a4, eval=F}
+results %>% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %>% 
+  ggplot(aes(x = protein, y = -log10(pvalue))) +
+    geom_point() + 
+    geom_segment(aes(xend = protein, yend = 0))+
+    geom_hline(yintercept = 8, linetype=2)+
+    labs(x = 'Protein',
+         y = expression(log[10](p-value))) +
+    theme_439
+```
+]
+.pull-right[
+```{r 04-bioinformatics-7, ref.label='a4', echo=F, eval=T, fig.height=4}
+
+```
+
+]
+
+---
+
+## Manhattan plot
+
+There is a specialized package for doing Manhattan plots and quantile plots for GWAS data
+
+This package is meant to work with PLINK output, but the function is generic
+
+.pull-left[
+```{r b1, eval = F}
+library(qqman) #<<
+manhattan(gwasResults)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-8, ref.label='b1', eval=T, echo=F, fig.height=6}
+
+```
+]
+
+---
+
+## Manhattan plot
+
+.pull-left[
+```{r b2, eval = F}
+library(qqman) #<<
+manhattan(gwasResults, 
+          annotatePval = 1e-6, 
+          annotateTop=F)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-9, ref.label='b2', eval=T, echo=F}
+
+```
+]
+
+???
+
+Look at the help for manhattan
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+```{r c1,eval=F}
+head(gwasResults)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-10, ref.label='c1', eval=T, echo=F}
+
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+```{r c2, eval =F}
+plt_x_position <- gwasResults %>% 
+    group_by(CHR) %>% 
+    summarize(chr_len = max(BP)) %>% 
+    mutate(tot = cumsum(chr_len) - chr_len)
+head(plt_x_position)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-11, ref.label='c2', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+```{r c3, eval = F}
+plt_dat <- gwasResults %>% 
+    left_join(plt_x_position %>% select(-chr_len), 
+              by = c('CHR'='CHR')) %>% 
+    arrange(CHR, BP) %>% 
+    mutate(BPcumul = BP + tot)
+tail(plt_dat)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-12, ref.label='c3', eval=T, echo =F}
+
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data for plotting x-axis labels
+
+.pull-left[
+```{r c4, eval = F}
+axisdf <- plt_dat %>% 
+    group_by(CHR) %>% 
+    summarize(center = (max(BPcumul)+min(BPcumul))/2)
+axisdf
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-13, ref.label='c4', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c5, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point() 
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-14, ref.label='c5', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c6, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), #<<
+               alpha = 0.8, size=1.3) #<<
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-15, ref.label='c6', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c7, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-16, ref.label='c7', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c8, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(#<<
+        name = 'Chromosome',#<<
+        breaks = axisdf$center,#<<
+        labels = axisdf$CHR#<<
+    )#<<
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-17, ref.label='c8', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c9, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+    scale_y_continuous(expand = c(0,0)) + #<<
+    theme_bw()
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-18, ref.label='c9', eval=T, echo =F}
+
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c10, eval = F}
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+    scale_y_continuous(expand = c(0,0)) + #<<
+    theme_bw() + 
+    geom_point(data = plt_dat %>% filter(P < 1e-5),#<<
+               color = 'orange', 
+               size=2)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-19, ref.label='c10', eval=T, echo =F}
+
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+```{r c11, eval = F}
+(plt_manhattan <- ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+    scale_y_continuous(expand = c(0,0)) + 
+    theme_bw() + 
+    geom_point(data = plt_dat %>% filter(P < 1e-5),#<<
+               color = 'orange', 
+               size=2)+
+    geom_hline(yintercept = -log10(5e-8), linetype=2)+
+    theme(legend.position='none',
+          panel.grid.major.x=element_blank(),
+          panel.grid.minor.x = element_blank())
+)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-20, ref.label='c11', eval=T, echo =F}
+
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Annotation
+
+.pull-left[
+```{r c12, eval = F}
+library(ggrepel) #<<
+plt_manhattan +
+    geom_label_repel(
+        data = plt_dat %>% filter(P < 1e-5),
+        aes(label = SNP),
+        size = 2)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-21, ref.label='c12', eval=T, echo =F}
+
+```
+]
+
+---
+
+## Circular Manhattan plots
+
+.pull-left[
+```{r d1, eval =F}
+library(CMplot)
+CMplot(gwasResults, plot.type = 'c',
+       r = 1.6,
+       cir.legend = T, 
+       outward=T,
+       cir.legend.col='black',
+       cir.chr.h=.1,
+       chr.den.col='orange',
+       file.output=F)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-22, ref.label='d1', eval=T, echo=F, message=F}
+
+```
+
+]
+
+
+---
+class: middle,center
+
+# Heatmaps
+
+---
+
+## Let us count the ways
+
+There are several ways of doing heatmaps in R:
+
++ [https://jokergoo.github.io/ComplexHeatmap-reference/book/](ComplexHeatmap)
++ [http://sebastianraschka.com/Articles/heatmaps_in_r.html](http://sebastianraschka.com/Articles/heatmaps_in_r.html)
++ [https://plot.ly/r/heatmaps/](https://plot.ly/r/heatmaps/)
++ [http://moderndata.plot.ly/interactive-heat-maps-for-r/](http://moderndata.plot.ly/interactive-heat-maps-for-r/)
++ [http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2](http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2)
++ [https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/](https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/)
+
+---
+
+## Some example data
+
+```{r 04-bioinformatics-23}
+library(Biobase)
+#data(sample.ExpressionSet)
+exdat <-  readRDS('data/exprset.rds')
+library(limma)
+design1 <- model.matrix(~type, data=pData(exdat))
+lm1 <- lmFit(exprs(exdat), design1)
+lm1 <- eBayes(lm1) # compute linear model for each probeset
+geneID <- rownames(topTable(lm1, coef = 2, number = 100, 
+                            adjust.method = 'none',
+                            p.value = 0.05))
+exdat2 <- exdat[geneID,] # Keep features with p-values < 0.05
+
+head(exdat2)
+```
+
+---
+
+## Using Heatplus
+
+.pull-left[
+```{r e1, eval=F}
+# BiocManager::install('Heatplus')
+library(Heatplus)
+reg1 <- regHeatmap(exprs(exdat2), legend=2, col=heat.colors, 
+                   breaks=-3:3)
+plot(reg1)
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-24, ref.label='e1', eval=T, echo=F}
+
+```
+]
+
+---
+
+## Using Heatplus
+
+.pull-left[
+```{r e2, echo=T, eval=F}
+corrdist <- function(x) as.dist(1-cor(t(x)))
+hclust.avl <- function(x) hclust(x, method='average')
+reg2 <- regHeatmap(exprs(exdat2), legend=2, 
+                   col=heat.colors,
+                   breaks=-3:3, 
+                   dendrogram = 
+                       list(clustfun=hclust.avl, 
+                            distfun=corrdist))
+plot(reg2)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-25, ref.label='e2', eval=T, echo=F}
+
+```
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+```{r e3, echo=T, eval=F}
+ann1 <- annHeatmap(exprs(exdat2), 
+                   ann=pData(exdat2), #<<
+                   col = heat.colors)
+plot(ann1)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-26, ref.label='e3', echo=F, eval=T}
+
+```
+
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+```{r e4, echo=T, eval=F, fig.width=7, fig.height=6}
+ann2 <- annHeatmap(exprs(exdat2), 
+                   ann=pData(exdat2), 
+                   col = heat.colors,
+        cluster = 
+            list(cuth=7500,
+                 label=c('Control-like','Case-like')))
+plot(ann2)
+```
+]
+.pull-right[
+```{r 04-bioinformatics-27, ref.label='e4', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Using ComplexHeatmap
+
+```{r complexhm, echo = F}
+library(ComplexHeatmap)
+library(circlize)
+mat = readRDS(system.file("extdata", "measles.rds", package = "ComplexHeatmap"))
+ha1 = HeatmapAnnotation(
+    dist1 = anno_barplot(
+        colSums(mat), 
+        bar_width = 1, 
+        gp = gpar(col = "white", fill = "#FFE200"), 
+        border = FALSE,
+        axis_param = list(at = c(0, 2e5, 4e5, 6e5, 8e5),
+            labels = c("0", "200k", "400k", "600k", "800k")),
+        height = unit(2, "cm")
+    ), show_annotation_name = FALSE)
+ha2 = rowAnnotation(
+    dist2 = anno_barplot(
+        rowSums(mat), 
+        bar_width = 1, 
+        gp = gpar(col = "white", fill = "#FFE200"), 
+        border = FALSE,
+        axis_param = list(at = c(0, 5e5, 1e6, 1.5e6),
+            labels = c("0", "500k", "1m", "1.5m")),
+        width = unit(2, "cm")
+    ), show_annotation_name = FALSE)
+year_text = as.numeric(colnames(mat))
+year_text[year_text %% 10 != 0] = ""
+ha_column = HeatmapAnnotation(
+    year = anno_text(year_text, rot = 0, location = unit(1, "npc"), just = "top")
+)
+col_fun = colorRamp2(c(0, 800, 1000, 127000), c("white", "cornflowerblue", "yellow", "red"))
+ht_list = Heatmap(mat, name = "cases", col = col_fun,
+    cluster_columns = FALSE, show_row_dend = FALSE, rect_gp = gpar(col= "white"), 
+    show_column_names = FALSE,
+    row_names_side = "left", row_names_gp = gpar(fontsize = 8),
+    column_title = 'Measles cases in US states 1930-2001\nVaccine introduced 1961',
+    top_annotation = ha1, bottom_annotation = ha_column,
+    heatmap_legend_param = list(at = c(0, 5e4, 1e5, 1.5e5), 
+        labels = c("0", "50k", "100k", "150k"))) + ha2
+draw(ht_list, ht_gap = unit(3, "mm"))
+decorate_heatmap_body("cases", {
+    i = which(colnames(mat) == "1961")
+    x = i/ncol(mat)
+    grid.lines(c(x, x), c(0, 1), gp = gpar(lwd = 2, lty = 2))
+    grid.text("Vaccine introduced", x, unit(1, "npc") + unit(5, "mm"))
+})
+
+```
+
+---
+
+## UpSet plots
+
+UpSet plots are nice visualizations for looking at commonalities (complex intersections) between sets
+of objects. 
+
+In BIOF339 we used UpSet plots to look at missing value patterns
+
+```{r, echo=F}
+library(UpSetR)
+library(ComplexHeatmap)
+
+set.seed(123)
+lt = list(a = sample(letters, 5),
+          b = sample(letters, 10),
+          c = sample(letters, 15))
+m = make_comb_mat(lt)
+UpSet(m)
+```
+
+---
+
+## UpSet plots
+
+```{r, echo =F, eval=F}
+file_list = c(
+    "ESC" = "data/E016-H3K4me3.narrowPeak.gz",
+    "ES-deriv1" = "data/E004-H3K4me3.narrowPeak.gz",
+    "ES-deriv2" = "data/E006-H3K4me3.narrowPeak.gz",
+    "Brain" = "data/E071-H3K4me3.narrowPeak.gz",
+    "Muscle" = "data/E100-H3K4me3.narrowPeak.gz",
+    "Heart" = "data/E104-H3K4me3.narrowPeak.gz"
+)
+library(GenomicRanges)
+peak_list = lapply(file_list, function(f) {
+    df = read.table(f)
+    GRanges(seqnames = df[, 1], ranges = IRanges(df[, 2], df [, 3]))
+})
+m = make_comb_mat(peak_list)
+m = m[comb_size(m) > 500000]
+UpSet(m)
+```
+
+![](img/upset1.png)
+
+
+---
+
+# clusterProfiler
+
+Enrichment network based on GSEA
+
+```{r, echo=F}
+library(DOSE)
+data(geneList)
+de <- names(geneList)[abs(geneList) > 2]
+
+edo <- enrichDGN(de)
+
+library(clusterProfiler)
+emapplot(edo)
+```
+
+---
+
+
+class:middle, center
+
+# Playing with Seurat
+
+---
+
+## Example data
+
+```{r 04-bioinformatics-28}
+library(Seurat)
+# pbmc.data <- Read10X(data.dir='data/hg19/')
+# pbmc <- CreateSeuratObject(counts = pbmc.data, project='pbmc3k', min.cells=3, min.features=200)
+pbmc <- readRDS('data/pbmc.rds')
+pbmc
+names(pbmc)
+slotNames(pbmc)
+```
+
+---
+
+## Adding QC metrics and plotting
+
+We'll calculate mitochondrial QC metrics (percentage counts originating from mitochondrial genes)
+
+```{r 04-bioinformatics-29}
+pbmc[['percent.mt']] <- PercentageFeatureSet(pbmc, pattern = '^MT-')
+head(pbmc@meta.data) #<<
+```
+
+---
+
+## Visualizing metrics
+
+.pull-left[
+```{r f1, eval=F}
+# plt <- VlnPlot(object = pbmc, 
+#   features = c('nFeature_RNA',
+#                'nCount_RNA',
+#                'percent.mt'))
+
+plot_data <- pbmc@meta.data %>%
+  tidyr::gather(variable, value, -orig.ident)
+
+ggplot(plot_data, aes(orig.ident, value)) +
+  geom_violin(fill = 'red') +
+  geom_jitter(width=0.5, alpha = 0.1) +
+  facet_wrap(~variable, nrow = 1, 
+             scales = 'free_y') + #<<
+  labs(x = 'Identity',y = 'Expression Level') +
+  theme_classic()
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-30, ref.label='f1', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+```{r g1, eval=F}
+plot1 <- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "percent.mt")
+plot2 <- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "nFeature_RNA")
+CombinePlots(plots = list(plot1, plot2))
+```
+]
+.pull-right[
+```{r 04-bioinformatics-31, ref.label='g1', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+```{r g2, eval=F}
+cormatrix <- cor(pbmc@meta.data %>% select(-orig.ident))
+plt1 <-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = percent.mt, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+    theme_classic() +
+    labs(color = 'Identity',
+         title=as.character(round(cormatrix['nCount_RNA','percent.mt'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+plt2 <-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = nFeature_RNA, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+  theme_classic() +
+  labs(color = 'Identity',
+       title=as.character(round(cormatrix['nCount_RNA','nFeature_RNA'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+ggpubr::ggarrange(plt1, plt2, nrow = 1, ncol=2)
+
+```
+]
+.pull-right[
+```{r 04-bioinformatics-32, ref.label='g2', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+```{r g3, eval=F}
+pbmc <- subset(x = pbmc, 
+    subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
+pbmc <- NormalizeData(object = pbmc, 
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 10000)
+# This is stored in pbmc[['RNA']]@meta.features
+
+pbmc <- FindVariableFeatures(object = pbmc, 
+                             selection.method = "vst", 
+                             nfeatures = 2000)
+
+
+# Identify the 10 most highly variable genes
+top10 <- head(x = VariableFeatures(object = pbmc), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(object = pbmc)
+plot1
+
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-33, ref.label='g3', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+```{r g4, eval=F}
+plt_data <- pbmc[['RNA']]@meta.features %>% 
+    rownames_to_column(var='id')
+topvars <- pbmc[['RNA']]@var.features
+plt_data <- plt_data %>% 
+    mutate(indic = ifelse(id %in% topvars, 
+                          'Variable count',
+                          'Non-variable count'))
+bl <- plt_data %>% 
+    count(indic) %>% 
+    glue::glue_data("{indic}: {n}")
+names(bl) <- c('Non-variable count','Variable count')
+plt_data <- plt_data %>%
+  mutate(indic = bl[indic])
+plt11 <- ggplot(plt_data, 
+                aes(x = vst.mean, 
+                    y = vst.variance.standardized, 
+                    color = indic)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_color_manual(values = c('black','red')) +
+  labs(x = 'Average Expression', y = 'Standardized Variance', color = '')+
+  theme_classic()
+plt11
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-34, ref.label='g4', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+```{r g5, eval=F}
+# plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plt12 <- plt11 + ggrepel::geom_text_repel(data = plt_data %>% filter(id %in% top10),
+                                          aes(label = id),
+                                          color = 'black')
+plt12
+```
+
+]
+.pull-right[
+```{r 04-bioinformatics-35, ref.label='g5', eval=T, echo=F}
+
+```
+]
+---
+
+## There's a lot more
+
+We'll stop our sampling here. 
+
++ Many Bioconductor packages do use ggplot, however some use base graphics
+    - Faster
++ Key is to find where the data is stored, and use that to create visualizations
++ Bioconductor tends to create
+    - One monolithic object
+    - Containing different information in slots 
+    - combined by lists
++ `slotNames` and `names` are your friends

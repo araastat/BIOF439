@@ -1,0 +1,79 @@
+---
+title: "Publishing with R Markdown"
+author: Abhijit Dasgupta, PhD
+abstract: ""
+---
+
+```{r setup, include=FALSE, message = F}
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', 
+                      message = F, warning = F,
+                      cache=FALSE)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+</div>
+
+---
+
+## Why R Markdown?
+
+R Markdown allows you to create reproducible documents
+
++ It combines code and text, and allows the code to fill in data-driven bits
+    + tables and figures
+    + summaries
+
+You have seen how to add code chunks to a document. 
+
+You can add summaries inline within the text by putting code inside `` `r ` ``. 
+For example you can write `` `r
+mean(mpg$cty)` `` which will produce `r mean(mpg$cty)` in your document
+
+---
+
+R Markdown and the **rmarkdown** package leverages [pandoc](https://pandoc.org), a universal document converter, so several outputs are now possible. 
+
+<iframe src="https://rmarkdown.rstudio.com/formats.html   " width="100%" height="400"></iframe>
+
+---
+
+## Dashboards
+
+Dashboards can be created in R using either the **flexdashboard** or **shinydashboard** packages. The former does not require Shiny, the interactive R web app generator, though it can be included to make the dashboard 
+interactive.
+
+The **flexdashboard** website [here](https://rmarkdown.rstudio.com/flexdashboard) provides detailed instructions
+on how to create a dashboard using R. 
+
+---
+
+## Websites
+
+You can create entire websites or blogs using R Markdown and some specialty packages. 
+
++ My personal blog is written using the R package **blogdown**
++ The class website for [BIOF339](https://www.araastat.com/BIOF339) is written using **rmarkdown**, which can render static sites
++ There are entire books, including *R for Data Science* and others, written using the **bookdown** package. See [this site](https://bookdown.org) for several examples of books written using **bookdown**. 
++ This [interactive dashboard](https://webbedfeet.shinyapps.io/PowerApp) was generated using **flexdashboard** powered by **shiny**
+
+---
+
+## Demo
+
+I will go through a demo of flexdashboard using [this](flexdashboard_essentials.Rmd1) R Markdown file, which
+generated [this](flexdashboard_essentials.html) dashboard
+
+---
+
+## Putting multiple plots into a PPT
+
+If you have multiple plots to make, that you can generate in a for-loop, for
+example, similar plots from repeated experiments, you can use R Markdown to
+create a PowerPoint with one figure per slide. 
+
+I provide an example [here](gapminder2ppt.Rmd) with the corresponding PPT slides [here](gapminder2ppt.pptx)

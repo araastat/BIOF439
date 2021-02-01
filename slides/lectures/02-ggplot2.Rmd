@@ -1,0 +1,2060 @@
+---
+title: "Starting DataViz using R: ggplot2"
+author: Abhijit Dasgupta, PhD
+output_dir: '`r here::here("docs/slides/lectures")`'
+---
+
+layout: true
+
+<div class="my-header">
+<span style="left: 15px; bottom:2px;">BIOF 439: Data Visualization with R</span>
+</div>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', warning = FALSE, cache=T)
+library(tidyverse)
+```
+
+---
+
+## What is ggplot2?
+
+- A second (and final) iteration of the ggplot
+- Implementation of Wilkerson's Grammar of Graphics in R
+- Conceptually, a way to layer different elements onto a canvas to create a data visualization
+- Started as Dr. Hadley Wickham's PhD thesis (with Dr. Dianne Cook)
+- Won the John M. Chambers Statistical Software Award in 2006
+
+- Mimicked in other software platforms
+  - `ggplot` and `seaborn` in Python
+  - Translated in `plotly`
+
+---
+
+## ggplot2 uses the __grammar__ of __graphics__
+
+.pull-left[
+### A grammar ...
+
+- compose and re-use small parts
+- build complex structures from simpler units
+
+]
+
+--
+
+.pull-right[
+### of graphics ...
+
+- Think of yourself as a painter
+- Build a visualization  using layers on a canvas
+- Draw layers on top of each other
+]
+
+---
+
+## A dataset
+
+```{r, echo = T, message = F}
+library(tidyverse) # do this once per session
+beaches <- read_csv('data/sydneybeaches3.csv')
+```
+```{r, echo = F}
+beaches
+```
+
+<p align="right" style="font-size: 10pt;">Credit: D. J. Navarro</p>
+
+> Download the `sydneybeaches3.csv` file from the website and save it in your project's data folder
+
+---
+class: middle, center
+
+# Building a graph
+
+---
+
+.pull-left[
+### Start with a blank canvas
+
+```{r gr2, eval=F}
+ggplot()
+```
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr2', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Add a data set
+
+```{r gr3, eval=F}
+ggplot(
+  data = beaches # Tell ggplot the data you're using #<<
+)
+```
+
+> Nothing has really happened yet, since we haven't said what we want to plot from the data set
+
+> The `#` symbol tells R that anything after it is a *comment* and should be ignored. We'll make a lot of use of comments in our code.
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr3', eval=T, echo = F}
+
+```
+
+
+]
+
+
+---
+
+.pull-left[
+### Add a mapping from data to elements
+
+```{r gr4, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes( #<<
+    x = temperature, #<<
+    y = rainfall #<<
+  )
+)
+```
+
+What goes in 
+
+- the x and y axes
+- the color of markers
+- the shape of markers
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr4', eval=T, echo = F}
+
+```
+
+> Now we've said what we want to plot, so axes get drawn. We haven't yet specified how we want to plot it
+
+]
+
+---
+
+.pull-left[
+### Add a geometry to draw
+
+```{r gr5, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point() #<<
+```
+
+What to draw:
+
+- Points, lines
+- histogram, bars, pies
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr5', eval=T, echo = F}
+
+```
+
+> Now we've said **how** we want to plot the things we want from the data
+]
+
+---
+
+.pull-left[
+### Add options for the geom
+
+```{r gr6, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(size = 4) #<<
+```
+
+> Options pertaining to how we want things drawn are usually put in the function for the geometry, e.g. `geom_point`, `geom_line`, etc. If the option is based on any element from the dataset, we have to wrap it in a `aes()` function. We'll see this later
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr6', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Add a mapping to modify the geom
+
+```{r gr7, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name), #<<
+    size = 4
+  )
+```
+
+> Anything data-driven has to be a mapping, driven by the `aes` function
+
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr7', eval=T, echo = F}
+
+```
+
+]
+
+---
+class:middle, center
+
+# A side note on `aes`
+
+---
+
+## The `aes` function
+
+The `aes` function and when it needs to be used creates quite a bit of confusion initially. Let's start with the documentation for this function
+
+```{r, eval=F}
+?aes
+```
+
+> #### Description
+Aesthetic mappings describe how variables in the data are mapped to visual properties (aesthetics) of geoms. Aesthetic mappings can be set in ggplot2() and in individual layers.
+
+So, anytime we want to represent some aspect of the data on the plot in some form (color, shape, etc.), we have to use the `aes` function to *map* the data to the plot
+---
+
+## The `aes` function
+
+The `aes` function can occur in one of two places:
+
+.pull-left[
+Within the `ggplot` function:
+
+```{r, fig.height=2}
+ggplot(
+  data=beaches,
+  mapping=aes(
+    x = temperature,
+    y = rainfall
+  )
+) + 
+  geom_point()
+```
+
+]
+.pull-right[
+In the actual `geom` layer:
+
+```{r, fig.height=2}
+ggplot(
+  data = beaches
+) +
+  geom_point(
+    mapping = aes(
+      x = temperature,
+      y = rainfall
+    )
+  )
+```
+
+]
+
+---
+
+## The `aes` function
+
+The `aes` function can occur in one of two places:
+
+.pull-left[
+Within the `ggplot` function:
+
++ You do this if the same mapping will be common to **all** the subsequent geometry layers
+]
+.pull-right[
+In the actual `geom` layer:
+
++ You do this if the mapping will apply **only** to that layer
++ You do it if it makes more sense to put it in the `geom`. 
+]
+---
+class: middle, center
+
+# Facets / Trellis / Small multiples
+
+---
+.pull-left[
+### Split into facets
+
+```{r gr8, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4
+  ) +
+  facet_wrap( ~ season_name) #<<
+```
+
+> Create separate plots based on unique values of some variable (`season_name`) in your dataset
+
+> Typically this variable should a few distinct values
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr8', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Remove the legend
+
+```{r gr9, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE #<<
+  ) +
+  facet_wrap( ~ season_name) 
+```
+
+> Now we're getting more into the look of the plot and how much information should be on it
+
+> `show.legend` option is in `geom_point` here since it would be based on the colors of the points. If you had a different geometry like `geom_line`, you would put the `show.legend` option there if the legend was based on that geom.
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr9', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Change the background
+
+```{r gr10, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() #<<
+```
+
+> Again, a look-and-feel choice
+
+> In-built `ggplot` themes are described [here](https://ggplot2.tidyverse.org/reference/ggtheme.html). Other themes are availabe via packages [`ggthemes`](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) and others.
+
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr10', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Update the labels
+
+```{r gr11, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+  labs(x = 'Temperature (C)', y = 'Rainfall (mm)') #<<
+```
+
+> This is **important**. Make sure the information in your plot is self-contained by putting appropriate labels and titles on it.
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr11', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Add titles
+
+```{r gr12, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+  labs(x = 'Temperature (C)', 
+       y = 'Rainfall (mm)',
+       title = 'Sydney weather by season', #<<
+       subtitle = "Data from 2013 to 2018") #<<
+```
+
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr12', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+### Customize
+
+```{r gr13, eval=F}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+  labs(x = 'Temperature (C)', 
+       y = 'Rainfall (mm)',
+       title = 'Sydney weather by season', 
+       subtitle = "Data from 2013 to 2018") +
+  theme(axis.title = element_text(size = 14), #<<
+        axis.text = element_text(size = 12), #<<
+        strip.text = element_text(size = 12)) #<<
+```
+
+]
+.pull-right[
+
+### 
+
+```{r, ref.label='gr13', eval=T, echo = F}
+
+```
+
+> Once again, a look-and-feel choice, but this is very useful for publications when the actual figure will be smaller but we need the labels to be legible.
+]
+
+---
+class: middle, center
+
+# Understanding the structure of ggplot
+
+---
+
+## The grammar
+.left-column70[
+- Data
+- Aesthetics (or aesthetic mappings)
+- Geometries (as layers)
+- Facets
+- Themes
+- (Coordinates)
+- (Scales)
+]
+.right-column70[
+> Data, Aesthetics and Geometries are **required** to actually create a plot
+]
+
+---
+class: middle, center
+
+# Peeking under the hood
+
+---
+.pull-left[
+### If I write...
+
+```{r, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = temperature,
+      y = rainfall)
+) + 
+  geom_point()
+```
+
+]
+--
+.pull-right[
+### what's really run is ...
+
+```{r,echo = T, eval = F}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = temperature, y = rainfall)) + 
+layer(
+  geom = "point",
+  stat = "identity",
+  position = "identity") + 
+facet_null() +
+theme_grey() + 
+coord_cartesian() + 
+scale_x_continuous() + 
+scale_y_continuous()
+```
+
+]
+
+--
+
+### Each element can be adapted and tweaked to create graphs
+
+---
+class: middle, center
+
+# Exploring aesthetics, mappings and their uses
+
+---
+
+## Let's start
+
+.pull-left[
+```{r grp1, eval = F, echo = T}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci
+  )
+) + 
+  geom_density()
+```
+
+> This is looking at the distribution of enterococci concentration (x-axis) in this dataset
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp1"}
+```
+]
+
+---
+
+## Bacteria growth should depend on temperature....
+
+.pull-left[
+```{r grp2, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci,
+    group = season_name #<<
+  )
+) + 
+  geom_density()
+```
+
+> Can't really parse the seasons out from the graph. 
+
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp2"}
+```
+]
+
+---
+
+## Add some color
+
+.pull-left[
+```{r grp3, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci, 
+    group = season_name,
+    color = season_name #<<
+  )
+) + 
+  geom_density()
+```
+
+> This does better distinguish the seasons (and we get a legend as a by-product). 
+
+> But.... things are too crammed on the left of the plot. This is because the bacterial concentrations are low, with some high values. A transformation may be nice.
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp3"}
+```
+]
+
+---
+
+## A better choice of scale
+
+.pull-left[
+```{r grp5, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+    color = season_name
+  )
+) + 
+  geom_density() + 
+  scale_x_log10() #<<
+```
+
+> This makes things a bit clearer, but still a bunch of squiggly lines
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp5"}
+```
+]
+
+---
+
+## A better choice of where to put the color
+
+.pull-left[
+```{r grp6, eval = F, echo = T}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+    fill = season_name #<<
+  )
+) +
+  geom_density() + 
+  scale_x_log10()
+```
+
+> Things are covered up!
+
+> For geometries with "insides", `color` puts color on the outlines, and `fill` puts color on the insides.
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp6"}
+```
+]
+
+---
+
+## Let's play peek-a-boo
+
+.pull-left[
+```{r grp7, eval = F, echo = T}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+    fill = season_name #<<
+  )
+) +
+  geom_density(alpha = 0.3) + #<< 
+  scale_x_log10()
+
+```
+
+> A bit better, but not great
+
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp7"}
+```
+]
+
+---
+
+## Let's break things out
+
+.pull-left[
+```{r grp8, eval = F, echo = T}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+    fill = season_name #<<
+  )
+) +
+  geom_density(alpha = 0.3) + 
+  scale_x_log10() + 
+  facet_wrap(~ season_name) #<<
+
+```
+
+> A lot clearer!!
+
+> There's stuff we don't need now, like the legend
+> Also, can we please make the numbers human-readable
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp8"}
+```
+]
+
+---
+
+## Cleaning up
+
+.pull-left[
+```{r grp10, eval = F, echo = T}
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    fill = season_name
+  )
+) +
+  geom_density(show.legend = FALSE) + 
+  scale_x_log10(labels = scales::label_number()) + 
+  facet_wrap(~season_name) 
+    
+
+```
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="grp10"}
+```
+]
+---
+
+
+## Fixing the legend ordering
+
+.pull-left[
+```{r gr17, eval = F}
+beaches <- beaches %>%  #<<
+  mutate(season_name = fct_relevel(season_name,#<<
+                                   c('Spring','Summer','Autumn','Winter')))#<<
+ggplot(
+  data=beaches,
+  aes(x = enterococci,
+      fill = season_name#<<
+  )
+) + 
+  geom_density(show.legend = F) + 
+  facet_wrap(~ season_name) + 
+  scale_x_log10(labels = scales::label_number())
+```
+
+]
+.pull-right[
+```{r, ref.label='gr17', eval=T, echo=F}
+
+```
+
+]
+
+
+---
+class: center, middle
+
+# Exploring geometries
+
+---
+class: center, middle
+
+# Univariate plots
+
+---
+
+## Histograms
+
+.pull-left[
+```{r gr20, eval = F}
+library(tidyverse)
+library(rio)
+dat_spine <- import('data/Dataset_spine.csv', 
+                    check.names = T)
+
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+  geom_histogram()
+```
+]
+.pull-right[
+```{r, ref.label='gr20', echo = F, eval=T, message = T}
+
+```
+
+]
+
+---
+
+
+## Histograms
+
+.pull-left[
+```{r gr21, eval = F}
+
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+  geom_histogram(bins = 100) #<<
+```
+
+This gives a very different view of the data
+]
+.pull-right[
+```{r, ref.label='gr21', echo = F, eval=T, message = T}
+
+```
+
+]
+
+---
+## Density plots
+
+.pull-left[
+```{r gr22, eval = F}
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+  geom_density() #<<
+```
+]
+.pull-right[
+```{r, ref.label='gr22', echo = F, eval=T, message = T}
+
+```
+
+]
+
+---
+
+## Density plots
+
+.pull-left[
+```{r gr23, eval = F}
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+  geom_density(adjust = 1/5) # Use 1/5 the bandwidth #<<
+```
+]
+.pull-right[
+```{r, ref.label='gr23', echo = F, eval=T, message = T}
+
+```
+
+]
+
+---
+
+## Layering geometries
+
+.pull-left[
+```{r gr24, eval = F}
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis,
+      y = stat(density)))+  # Re-scales histogram #<<
+  geom_histogram(bins = 100, fill='yellow') +
+  geom_density(adjust = 1/5, color = 'orange', size = 2)
+```
+
+]
+.pull-right[
+```{r, ref.label='gr24', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+```{r gr25, eval=F, echo=T}
+dat_brca <- rio::import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor))+
+  geom_bar()
+```
+]
+.pull-right[
+```{r,ref.label='gr25', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+```{r gr26, eval=F, echo=T}
+dat_brca <- import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor,
+      fill = ER.Status))+ #<<
+  geom_bar()
+```
+
+Add additional information via mapping
+]
+.pull-right[
+```{r,ref.label='gr26', eval=T, echo = F}
+
+```
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+```{r gr27, eval=F, echo=T}
+dat_brca <- import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor,
+      fill = ER.Status))+ 
+  geom_bar(position = 'dodge')  #<<
+    # Default is position = "stack"
+```
+
+Change the nature of the geometry
+]
+.pull-right[
+```{r,ref.label='gr27', eval=T, echo = F}
+
+```
+]
+
+???
+
+It is not easy to do patterns in R. Its been considered a bug rather than a feature,
+since you can induce cognitive problems using patterns. It is suggested to use 
+different palettes for distinguishing groups
+
+---
+
+## Graphing tabulated data
+
+.pull-left[
+```{r, eval = T, warning = T, error = T}
+tabulated <- dat_brca %>% count(Tumor)
+tabulated
+
+ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar()
+```
+]
+
+---
+
+## Graphing tabulated data
+
+.pull-left[
+```{r gr_identity, eval = F, echo = T, warning = T}
+tabulated <- dat_brca %>% count(Tumor)
+tabulated
+
+ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar(stat = 'identity') #<<
+```
+
+Here we need to change the default computation    
+
+The barplot usually computes the counts (`stat_count`)  
+
+We suppress that here since we have already   
+done the computation
+]
+.pull-right[
+```{r, ref.label='gr_identity', eval = T, results='hide',echo = F}
+
+```
+
+]
+
+---
+
+## Peeking under the hood
+
+.pull-left[
+```{r}
+plt <- ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar()
+
+plt$layers
+```
+
+]
+.pull-right[
+```{r}
+plt <- ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar(stat = 'identity')
+
+plt$layers
+```
+
+]
+
+--
+
+> Each layer has a geometry, statistic and position associated with it
+
+---
+class: middle, center
+
+# Bivariate plots
+
+---
+
+## Scatter plots
+
+.pull-left[
+```{r gr28, eval=F}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_point()
+
+```
+]
+.pull-right[
+```{r, ref.label='gr28', eval=T, echo = F}
+
+```
+
+]
+
+---
+## Scatter plots
+
+.pull-left[
+```{r gr29, eval=F}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_line() #<<
+
+```
+]
+.pull-right[
+```{r, ref.label='gr29', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+## Scatter plots
+
+.pull-left[
+```{r gr30, eval=F}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_point(color='black', size = 3) +
+  geom_line(color='red',size=2)
+
+```
+
+Layer points and lines
+]
+.pull-right[
+```{r, ref.label='gr30', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+## Scatter plots
+
+.pull-left[
+```{r gr31, eval=F}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_line(color='red',size=2) + #<<
+  geom_point(color='black', size = 3) #<<
+
+```
+
+Order of laying down geometries matters
+
+]
+.pull-right[
+```{r, ref.label='gr31', eval=T, echo = F}
+
+```
+
+]
+
+---
+
+## Doing some computations
+
+.pull-left[
+```{r gr32, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature)) +
+  geom_point() +
+  geom_smooth() #<<
+```
+
+Averages over 75% of the data
+]
+.pull-right[
+```{r, ref.label='gr32', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Doing some computations
+
+.pull-left[
+```{r gr33, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature)) +
+  geom_point() +
+  geom_smooth(span = 0.1) #<<
+```
+
+Averages over 10% of the data
+]
+.pull-right[
+```{r, ref.label='gr33', eval=T, echo=F}
+
+```
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+```{r gr34, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+  geom_smooth()
+```
+]
+.pull-right[
+```{r,ref.label='gr34', echo = F, eval = T, message = F}
+
+```
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+```{r gr35, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis,
+      color = class_attribute)) + #<<
+  geom_point() +
+  geom_smooth()
+```
+
+Computation is done by groups
+]
+.pull-right[
+```{r,ref.label='gr35', echo = F, eval = T, message = F}
+
+```
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+```{r gr36, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis,
+      color = class_attribute)) + 
+  geom_point() +
+  geom_smooth() +
+  xlim(0, 100)#<<
+```
+
+Ignore the outlier for now
+]
+.pull-right[
+```{r,ref.label='gr36', echo = F, eval = T, message = F}
+
+```
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+```{r gr37, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+  geom_smooth(aes(color = class_attribute)) + #<<
+  xlim(0, 100)
+```
+
+Only color-code the smoothers   
+
+You can change the plot based on where you map the aesthetic
+]
+.pull-right[
+```{r,ref.label='gr37', echo = F, eval = T, message = F}
+
+```
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+```{r gr38, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+  geom_smooth(aes(color = class_attribute),
+              se = F) + #<<
+  xlim(0, 100)
+```
+
+Remove the confidence bands    
+
+Maybe a cleaner look
+]
+.pull-right[
+```{r,ref.label='gr38', echo = F, eval = T, message = F}
+
+```
+
+]
+
+
+---
+
+## Box Plots
+
+.pull-left[
+```{r gr39, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot()
+```
+
+]
+.pull-right[
+```{r, ref.label='gr39', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Box Plots
+
+.pull-left[
+```{r, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot()
+```
+
+]
+.pull-right[
+```{r,  eval = T, echo = F}
+p <- ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot()
+p + annotate('text', x = 2, y = 18, label = 'Minimum') + 
+  annotate('text', x = 2.5, y = 37, label = 'Maximum (within fence)') +
+  annotate('text', x = 2.0, y = 30.3, label='3rd quartile', vjust = 1) +
+  annotate('text', x = 2.0, y = 25.7, label = '1st quartile', vjust = 0) + 
+  annotate('text', x = 2.0, y = 27.9, label = 'Median', vjust = 0) +
+  annotate('text', x = 2.1, y = 40, label = '"Outliers"', angle = -90)
+
+```
+]
+
+---
+
+## Violin plots
+
+.pull-left[
+```{r gr40, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_violin() #<<
+```
+
+]
+.pull-right[
+```{r, ref.label='gr40', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+```{r gr41, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_point()
+```
+
+Points are overlayed on each other
+]
+.pull-right[
+```{r, ref.label='gr41', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+```{r gr42, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_jitter() #<<
+```
+
+Jittering allows all points to be seen
+
+Maybe too much
+]
+.pull-right[
+```{r, ref.label='gr42', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+```{r gr43, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_jitter(width = 0.2) #<<
+```
+
+Jittering allows all points to be seen
+
+Maybe too much
+]
+.pull-right[
+```{r, ref.label='gr43', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Layers, again
+
+.pull-left[
+```{r gr44, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot() + #<<
+  geom_jitter(width = 0.2)
+```
+
+
+]
+.pull-right[
+```{r, ref.label='gr44', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Layers, again
+
+.pull-left[
+```{r gr45, echo = T, eval = F}
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_violin() + #<<
+  geom_jitter(width = 0.2)
+```
+
+
+]
+.pull-right[
+```{r, ref.label='gr45', eval = T, echo = F}
+
+```
+]
+
+
+
+
+---
+class: middle, center
+
+# Scales
+
+---
+
+.pull-left[
+```{r gr53, eval = F, echo =T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point()
+```
+
+All the action is happening in the bottom bit
+]
+.pull-right[
+```{r, ref.label='gr53', eval = T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+```{r gr54, eval = F, echo =T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point() + 
+  scale_y_log10() #<<
+```
+
+Log-transforming an axis can make things easier to see
+]
+.pull-right[
+```{r, ref.label='gr54', eval = T, echo = F}
+
+```
+
+]
+
+---
+
+.pull-left[
+```{r gr55, eval = F, echo =T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point() + 
+  scale_y_log10( #<<
+    labels = scales::number_format(digits=3)) #<<
+```
+
+Making the labels a bit easier to read
+]
+.pull-right[
+```{r, ref.label='gr55', eval = T, echo = F}
+
+```
+
+]
+
+???
+
+`scales::number_format` is calling the function `number_format` from the 
+package `scales`
+
+---
+class: middle, center
+
+# Order and orientation
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+```{r gr56, eval = F, echo = T}
+arrests <- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = State, 
+      y = Murder)) + 
+  geom_bar(stat = 'identity')
+```
+
+This plot is very hard to read
+
+There is no ordering, and states can't be read
+]
+.pull-right[
+```{r, ref.label='gr56', eval = T, echo = F}
+
+```
+
+]
+
+---
+# Arrests in the USA in 1973
+
+.pull-left[
+```{r gr561, eval = F, echo = T}
+arrests <- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = fct_reorder(State, Murder), # Order by murder rate #<<
+      y = Murder)) + 
+  geom_bar(stat = 'identity')
+```
+
+We see the pattern, but its still unreadable
+]
+.pull-right[
+```{r, ref.label='gr561', eval = T, echo = F}
+
+
+```
+
+]
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+```{r gr57, eval = F, echo = T}
+arrests <- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = fct_reorder(State, Murder), # Order by murder rate 
+      y = Murder)) + 
+  geom_bar(stat = 'identity') + 
+  coord_flip() #<<
+```
+
+Flipping the axes makes the states readable
+
+]
+.pull-right[
+```{r, ref.label='gr57', eval = T, echo = F}
+
+```
+
+]
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+```{r gr58, eval = F, echo = T}
+arrests <- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = fct_reorder(State, Murder), # Order by murder rate 
+      y = Murder)) + 
+  geom_bar(stat = 'identity') + 
+  labs(x = 'State', y = 'Murder rate') + #<<
+  theme_bw() +#<<
+  theme(panel.grid.major.y = element_blank(),#<<
+        panel.grid.minor.y = element_blank()) + #<<
+  coord_flip()
+```
+
+Cleaning it up a little
+
+
+]
+.pull-right[
+```{r, ref.label='gr58', eval = T, echo = F}
+
+```
+
+]
+
+???
+
+Note that we flip after we've done all the manipulation
+
+---
+class: middle, center
+
+# Themes
+
+---
+
+# Color schemes
+
+ggplot comes with a default color scheme. There are several other schemes available
+
+- `scale_*_brewer` uses the [ColorBrewer](http://colorbrewer2.org) palettes
+- `scale_*_gradient` uses gradients
+- `scale_*_distill` uses the ColorBrewer palettes, for continuous outcomes
+
+> Here * can be `color` or `fill`, depending on what you want to color
+>
+> Note `color` refers to the outline, and `fill` refers to the inside
+
+---
+
+.pull-left[
+```{r gr60, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))
+```
+
+]
+.pull-right[
+```{r, ref.label='gr60', eval = T, echo = F}
+
+```
+]
+---
+
+.pull-left[
+```{r gr61, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))+
+  scale_color_gradient(low = 'white', high='red') + 
+  theme_dark()
+```
+
+]
+.pull-right[
+```{r, ref.label='gr61', eval = T, echo = F}
+
+```
+]
+---
+
+.pull-left[
+```{r gr62, eval = F, echo = T}
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))+
+  scale_color_gradient(low = 'blue', high='red') + 
+  theme_bw()
+```
+
+]
+.pull-right[
+```{r, ref.label='gr62', eval = T, echo = F}
+
+```
+]
+---
+
+## Specifying colors
+
+.pull-left[
+```{r gr63, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), ylim = c(0,200))
+```
+
+]
+.pull-right[
+```{r, ref.label='gr63', eval = T, echo = F, message = F}
+
+```
+
+]
+
+---
+
+# Specifying colors
+
+.pull-left[
+```{r gr64, echo = T, eval = F}
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), ylim = c(0,200)) + 
+  scale_color_manual(values = c("Normal"="blue", 'Abnormal' = 'red'))
+```
+
+]
+.pull-right[
+```{r, ref.label='gr64', eval = T, echo = F, message = F}
+
+```
+
+]
+
+---
+## Themes
+
+You can create your own custom themes to keep a unified look to your graphs
+
+ggplot comes with
+
+- theme_classic
+- theme_bw
+- theme_void
+- theme_dark
+- theme_gray
+- theme_light
+- theme_minimal
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+```{r gr65, echo = T, eval = F}
+
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), 
+                  ylim = c(0,200))
+```
+
+]
+.pull-right[
+```{r, ref.label='gr65', eval = T, echo = F, message = F}
+
+```
+]
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+```{r gr66, echo = T, eval = F}
+
+my_theme <- function(){
+  theme_bw()
+}
+
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), 
+                  ylim = c(0,200)) +
+  my_theme() #<<
+```
+
+]
+.pull-right[
+```{r, ref.label='gr66', eval = T, echo = F, message = F}
+
+```
+]
+
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+```{r gr68, echo = T, eval = F}
+
+my_theme <- function(){
+  theme_bw() +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size=14),
+        strip.background = element_blank())
+}
+
+ggplot(
+  data = dat_brca,
+  aes(x = Tumor))+
+  geom_bar() + 
+  facet_grid(rows = vars(ER.Status),
+             cols = vars(PR.Status))
+```
+
+]
+.pull-right[
+```{r, ref.label='gr68', eval = T, echo = F}
+
+```
+]
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+```{r gr69, echo = T, eval = F}
+
+my_theme <- function(){
+  theme_bw() +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size=14),
+        strip.background = element_blank())
+}
+
+ggplot(
+  data = dat_brca,
+  aes(x = Tumor))+
+  geom_bar() + 
+  facet_grid(rows = vars(ER.Status),
+             cols = vars(PR.Status)) +
+  my_theme() #<<
+```
+
+]
+.pull-right[
+```{r, ref.label='gr69', eval = T, echo = F}
+
+```
+]
+
+---
+class: middle, center
+
+# Animations
+
+---
+
+## gganimate
+
+The new `gganimate` package has made it very easy to create animations
+
+It's literally a few lines
+
+---
+
+.pull-left[
+```{r gr70, echo = T, eval = F}
+library(gganimate)
+plt <- ggplot(beaches,
+              aes(date, temperature))+
+  geom_path(aes(color = season_name, group = 1))+
+  geom_point()
+
+plt
+```
+
+]
+.pull-right[
+```{r, ref.label='gr70', echo = F, eval = T}
+
+```
+
+]
+
+---
+
+.pull-left[
+```{r gr71, echo = T, eval = F}
+library(gganimate)
+plt <- ggplot(beaches,
+              aes(date, temperature))+
+  geom_path(aes(color = season_name, group = 1))+
+  geom_point()
+
+plt + transition_reveal(date)
+```
+
+]
+.pull-right[
+
+![](img/anime-1.gif)
+]

@@ -1,0 +1,1277 @@
+---
+title: "A quick tour of R"
+author: Abhijit Dasgupta, PhD
+abstract: In this lecture we’ll spend most of our time learning various aspects of R, and then how that can help with graphics.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = '#> ', cache=TRUE)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+
+## The bare essentials
+
+- R is a **language**
+- Everything in R is an object with a name
+
+--
+
+- Things are nouns
+    - Nouns in R are _data objects_, like scalars, matrices, data.frames/tibbles, strings, vectors
+- Nouns are acted upon by verbs
+    - Verbs in R are _functions_, like `mean(x)`, `nrow(d)`, `dim(d)`, `ggplot` and so on
+- You can modify verbs with adverbs
+    - Adverbs in R are _function options_, like `mean(x, na.rm=T)`, `geom_point(color='green')`
+
+---
+
+## The bare essentials
+
+- If you want to save and re-use an object (noun or verb), you have to name it
+    - This is done with the `<-` operator, e.g. 
+        - `beaches <- read_csv('data/sydneybeaches3.csv')` (dataset)
+        - `mn <- mean(x, na.rm=T)` (a number)
+        - `my_theme <- function() {theme_bw() + theme(axis.title=element_text(size=14))}` stores the function, which you'll call as `my_theme()`
+
+> You can see the objects you have created either by typing `ls()` in the console, or looking in the Environment pane
+
+> Note, built-in objects don't show up in the Environment pane or using `ls()`
+
+---
+
+## The bare essentials
+
+### Naming rules
+
+1. Identifiers can be a combination of letters, digits, period (.) and underscore (_).
+1. It must start with a letter or a period. If it starts with a period, it cannot be followed by a digit.
+1. Reserved words in R cannot be used as identifiers.
+
+--
+
+### Naming conventions
+
+1. Make names expressive
+1. Write multi-word names in CamelCase or snake_case
+
+---
+
+## The bare essentials
+
+### Allowing non-conventional names
+
+If a name doesn't follow the rules *per se*, it can still be used by quoting them
+using backticks.
+
+So the following names are valid, as long as backticks are present.
+
+```
+`Pelvic girdle`
+`1`
+`Sample 03/23/2019`
+```
+
+This is rather difficult to type on a regular basis, and can lead to syntactical errors
+
+----
+
+The **janitor** package has a `clean_names` function that can fix the names of columns
+when you import datasets, transforming them into snake case by default. 
+
+---
+
+## The bare essentials (brackets)
+
+`[]` are used for extracting elements from arrays, matrices, data frames.
+
+- `x[3]` is the 3rd element of an array `x`
+- `d[1,3]` is the element in the 1st row and 3rd column of a matrix/data frame `d`
+- `d[2,]` is the entire first __row__ of a matrix/data frame `d`
+- `d[,4]` is the entire 4th __column__ of a matrix/data frame `d`
+- `d[,'gender']` is the column named _gender_ in a _data frame_ `d`
+
+For a list object (we'll meet them in a few slides) you use a double bracket
+to extract elements
+
+- `lst[[3]]` is the third element of the list `lst`
+- `lst[['apple']]` is the element named _apple_ in a named list `lst`
+    
+---
+
+## The bare essentials (brackets)
+
+There are three kinds of brackets in R
+
+`()` are used for specifying arguments to functions
+
+- `mean(x)` gives the mean of an array of numbers `x`
+- `summary(d)` gives a summary representation of a data frame `d`
+- There are several functions used to make the following visualization
+
+```{r, eval=F}
+ggplot(beaches, aes(x = temperature, y = rainfall)) + 
+  geom_point() + 
+  geom_smooth() + 
+  theme_classic()
+```
+---
+
+## The bare essentials (brackets)
+
+There are three kinds of brackets in R
+
+`{}` are used to contain groups of commands/statements
+
+.pull-left[
+
+A conditional statement
+
+```{r Rintro-1, eval = F}
+if (age < 18){
+   person <- 'Minor'
+} else if (age > 65) {
+  person <- 'Senior'
+} else {
+  person <- 'Adult'
+}
+```
+]
+.pull-right[
+
+A function definition
+
+```{r Rintro-2, eval=F}
+my_mean <- function(x, na.rm = T){
+  if(na.rm){
+    x <- x[!is.na(x)]
+  }
+  s <- sum(x)
+  n <- length(x)
+  mn <- s / n # There is a built-in function mean, so I don't use that word
+  return(mn)
+}
+```
+
+]
+
+See reading and supplementary materials for more details about these constructs
+
+---
+
+## Data structures
+
+A __scalar__ (data taking a single value)
+
+- `29`
+- `"cherry"`
+- `TRUE`
+
+---
+
+## Data structures
+
+A __scalar__ (data taking a single value)
+
+- `29` : _numeric_
+- `"cherry"`: _character_
+- `TRUE`: _logical_
+
+----
+These are different data *types*, which determine how they are stored in memory. You may also see _integer_ and 
+_double_, which are both covered under _numeric_.
+
+You can check an object's type using `class`: `class(29)` (resulting in `numeric`) <br/>
+You can check if an object is of a particular type: `is.character(29)` (resulting in `FALSE`)<br/>
+You can transform an object to a different type, if allowed: `as.numeric("29")` (resulting in `29`)<p>
+The `is.___` and `as.___` functions are extremely useful for data cleaning and transformations<p>
+You typically use the variable names rather than the actual values for these functions
+---
+
+## Data structures
+
+### Vectors/Arrays
+
+These are constructed using the `c()` function (for _concatenate_).
+
+.pull-left[
+```{r Rintro-3}
+c(1,2,5,6,7,8)
+c('apple','berry','melon','citrus')
+```
+]
+.pull-right[
+Vectors must all contain objects of the same type. Can't mix and match<p> 
+If you check the `class` of an array, it will give the common data type of the elements of the array
+]
+
+---
+
+## Data structures
+
+### Matrices (2-d arrays)
+
+These are typically built from vectors
+
+```{r Rintro-4}
+x <- c(1,2,4,5,6,7)
+y <- 10:16  # Shortcut for c(10,11,12,13,14,15,16)
+```
+
+.pull-left[
+```{r Rintro-5, eval=T}
+cbind(x, y) # Vectors as columns
+```
+]
+.pull-right[
+```{r Rintro-6, eval=T}
+rbind(x, y) # Vectors as rows
+```
+]
+
+---
+
+## Data structures
+
+### Matrices (2-d arrays)
+
+You can also build matrices directly using the `matrix` function.
+
+```{r}
+matrix(seq(1, 6), nrow = 3) # Automatically determines number of columns
+```
+
+----
+Play around with different ways of creating vectors and matrices
+
+---
+
+## Data structures
+
+### Lists
+
+Lists are basically buckets or containers. Each element of a list can be anything, even other lists
+
+.pull-left[
+```{r b1, eval=F}
+my_list <- list('a', c(2,3,5,6), head(ggplot2::mpg))
+my_list
+```
+
+This has a scalar, a vector and a data set<p>
+Since lists can be composed of heterogeneous objects, the `class` of a list is `list`.
+]
+.pull-right[
+```{r Rintro-7, echo=F, eval=T, ref.label='b1'}
+
+```
+]
+---
+
+## Data structures
+
+### Lists
+
+You can create named lists, where every element has a name
+
+```{r}
+my_list2 <- list('scalar' = 'a', 'vector' = c(2,3,5,6), 'data' = head(ggplot2::mpg))
+my_list2[['vector']]
+my_list2[['data']]
+```
+
+---
+## Data structures
+
+### data.frame/tibble
+
+This is the typical container for tabular data
+
+- must be rectangular
+- each column can be of a different type
+- elements within each column have to be of the same type
+
+----
+The data frame is probably the single most important structure in R for data analysis. It
+allows you to keep different kinds of data for each observation together, regardless of type. 
+Many other scripting systems couldn't keep heterogeneous data together, which made practical data analyses
+very difficult. <p>
+This kind of structure is now present in almost every serious data analytic platform, including Python, Julia,
+SAS, SPSS. Matlab remains a significant exception.
+
+---
+
+## Data structures
+
+### data.frame/tibble
+
+```{r Rintro-8}
+# use the import function from the package rio
+beaches <- rio::import('data/sydneybeaches3.csv') 
+class(beaches)
+dim(beaches)
+head(beaches)
+
+```
+
+
+---
+
+## Data structures
+
+### data.frame/tibble
+
+```{r Rintro-9, message=F}
+library(tidyverse) # Activate the tidyverse package
+beaches_t <- as_tibble(beaches)
+class(beaches_t)
+beaches_t
+```
+
+---
+
+## Data structures
+
+### data.frame/tibble
+
+We can take a quick look at the data types of each column
+
+.pull-left[
+```{r}
+str(beaches)
+```
+]
+.pull-right[
+```{r}
+glimpse(beaches)
+```
+
+]
+---
+
+## Data structures
+
+### data.frame/tibble
+
+Extracting columns from a data frame:
+
+1. .fatinline[`beaches$temperature`] (works during exploration or when only single column needed)
+1. .heatinline[`beaches[,'temperature']`] (*This is my preferred method*)
+1. `beaches[['temperature']]`
+1. `beaches[,7]`
+1. `beaches[[7]]`
+---
+
+## Packages in R
+
+R is a modular environment with some base functionality that is augmented by __packages__ (think of them as modules)
+
+- Packages can contain _functions_ and _data_
+- There are over 15K packages on CRAN, the Comprehensive R Archive Network
+- There are over 1600 packages on Bioconductor, the main repository for bioinformatics resources
+    - Analytic, Annotation, Experimental data and Workflow packages
+
+--
+
+#### Finding packages
+
+1) CRAN [Task views](https://cran.r-project.org/web/views/)  
+2) Bioconductor [BiocViews](http://bioconductor.org/packages/release/BiocViews.html)  
+3) GitHub (open source collaboration and version control environment)
+
+---
+
+## Installing packages
+
+.pull-left[
+### From CRAN
+```{r Rintro-10, eval=F}
+install.packages("tidyverse")
+```
+
+### From Bioconductor
+```{r Rintro-11, eval = F}
+install.packages("BiocManager") # do once 
+BioManager::install('limma')
+```
+
+### From GitHub
+
+```{r Rintro-12, eval = F}
+install.packages('remotes') # do once
+remotes::install_github("rstudio/rmarkdown") 
+# usual format is username/packagename
+```
+]
+.pull-right[
+> GitHub often hosts development version of packages published on CRAN or Bioconductor
+
+> Both CRAN and Bioconductor have stringent checks to make sure packages can run properly, with no obvious program flaws. There are typically no
+  guarantees about analytic or theoretical correctness, but most packages have been crowd-validated and there are several reliable developer groups
+  including RStudio
+]
+
+---
+
+## Using packages
+
+You have to first "activate" the package in your current working session using the `library` function.
+
+```{r Rintro-13, include=F, cache=FALSE}
+# This chunk removes ggplot2 and other gg packages from the search path, so 
+# we see the subsequent error
+detach_pkg <- search()[str_detect(search(), 'gg')]
+map(detach_pkg, function(x) {
+  ind <- which(str_detect(search(), x))
+  if(length(ind) > 0) detach(pos = ind)
+})
+
+```
+
+.pull-left[
+```{r Rintro-14, error=TRUE, cache=FALSE}
+ggplot(beaches, aes(temperature, rainfall)) +
+  geom_point()
+```
+
+The first thing you look for in this error message is 
+which package isn't loaded. Then either load it, or
+install it, as the case may be<p>
+
+Recall, you have to  
+install packages once .fatinline[_per computer_],
+but  
+load packages once .heatinline[_per session_]
+]
+--
+
+.pull-right[
+```{r Rintro-15, message=F, warning = F, fig.height=4, cache=FALSE}
+library(ggplot2) # or library(tidyverse)
+ggplot(beaches, aes(temperature, rainfall)) +
+  geom_point()
+```
+
+]
+
+---
+class: center, middle
+
+# Tidying data using the tidyverse
+
+---
+
+## What is the ["Tidyverse"](http://www.tidyverse.org)?
+
+
+
+<div style="display:flex;align-items:center;font-size:28pt;font-family:'Roboto Slab',serif;width:100%;height:300px;background-color:wheat;text-align:center; border: 1px solid red; position: relative;">
+
+The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures
+
+</div>
+
+---
+
+## What is the "Tidyverse"?
+
+A set of R packages that:
+
+<ul>
+  <li> help make data more computer-friendly
+  <li>while making your code more human-friendly
+</ul>
+
+- Most of these packages are (co-)written by Dr. Hadley Wickham, who has rockstar status in the R world
+- They are supported by the company RStudio
+
+----
+The [tidyverse.org](https://www.tidyverse.org) site and the [R4DS book](https://r4ds.had.co.nz) 
+are the definitive sources for tidyverse information.<p>
+The packages are united in a common philosophy of how data analysis should be done.
+
+---
+class:middle, center
+
+# Tidying data
+
+---
+
+## Tidy data
+
+<div style="display:flex;align-items:center;font-size:30pt;font-family:'Roboto Slab';width:100%;height:300px;background-color:wheat;text-align:center; padding-left:30px;border: 1px solid red; position: relative;">
+
+Tidy datasets are all alike, <br/>
+but every messy data is messy in its own way
+
+</div>
+
+---
+
+## Tidy data
+
+Tidy data is a **computer-friendly** format based on the following characteristics:
+
+- Each row is one observation
+- Each column is one variable
+- Each set of observational unit forms a table
+
+All other forms of data can be considered **messy data**.
+
+---
+
+## Let us count the ways
+
+There are many ways data can be messy. An incomplete list....
+
++ Column headers are values, not variables
++ Multiple variables are stored in a single column
++ Variables are stored in both rows and columns
++ Multiple types of observational units are saved in the same table
++ A single observational unit is stored in multiple tables
+
+---
+
+## Ways to have messy (i.e. not tidy) data
+
+1. Column headers contain values
+
+Country   |   < $10K    | $10-20K    | $20-50K   | $50-100K    | > $100K
+----------|-------------|------------|-----------|-------------|---------
+India     |   40        |  25        |   25      |  9          |  1
+USA       |   20        |  20        |  20       | 30          |  10
+
+---
+
+## Ways to have messy (i.e. not tidy) data
+
+Column headers contain values
+
+Country   |   Income  | Percentage
+----------|-----------|------------
+India     |  < $10K   |  40
+USA       |  < $10K   | 20
+
+This is a case of reshaping or melting 
+
+---
+
+## Ways to have messy (i.e. not tidy) data
+
+Multiple variables in one column
+
+Country  | Year   | M_0-14  | F_0-14  | M_ 15-60  | F_15-60  | M_60+  | F_60+
+---------|--------|---------|---------|-----------|----------|--------|-------
+UK       |  2010  |         |         |           |          |        | 
+UK       |  2011  |         |         |           |          |        | 
+
+<p>
+Separating columns into different variables
+
+Country  | Year   | Gender  | Age    | Count
+---------|--------|---------|--------|-------
+
+
+
+
+---
+
+## Tidying data
+
+The typical steps are 
+
++ Transforming data from wide to tall (`pivot_longer`) and from tall to wide (`pivot_wider`)
++ Separating columns into different columns (`separate`)
++ Putting columns together into new variables (`unite`)
+
+----
+>The functions `pivot_longer` and `pivot_wider` supercede the older functions `gather` and `spread`, 
+which I have used in previous iterations of this class. However, if you are familiar with `gather` and `spread`, they aren't gone and can still be used in the current **tidyr** package.
+
+
+---
+class: middle, center
+
+# Cleaning data
+
+---
+
+## Some actions on data
+
++ Creating new variables (`mutate`)
++ Choose some columns (`select`)
++ Selecting rows based on some criteria (`filter`)
++ Sort data based on some variables (`arrange`)
++ Reduce multiple values to a single summary (`summarize`/`summarise`)
++ Change the order of rows (`arrange`)
+
+
+
+---
+
+## Example data
+
+```{r Rintro-16, echo = T}
+head(mtcars, 3)
+```
+
+
+- Car names are in an attribute of the data.frame called `rownames`. So it's not in a column
+- We might want to convert fuel economy to metric 
+- We might just want to look at the relationship between displacement and fuel economy based on number of cylinders
+
+----
+The function `tibble::rownames_to_column` makes short work of the first point. <p>
+Row names are an older construct to give labels to each row. They are strongly discouraged outside
+of indices since using them as data created problems.
+---
+
+## Example data ([link](https://dl.dropboxusercontent.com/s/pqavhcckshqxtjm/brca.csv))
+
+```{r Rintro-17, error=T}
+link <- 'https://dl.dropboxusercontent.com/s/pqavhcckshqxtjm/brca.csv'
+brca_data <- rio::import(link)
+```
+
+![](img/brca_data.png)
+
+---
+
+## The `tidyverse` package
+
+The `tidyverse` package is a meta-package that installs a set of packages that are useful for data 
+cleaning, data tidying and data munging (manipulating data to get a computationally "attractive" 
+dataset)
+
+---
+
+## The `tidyverse` package
+
+```{r Rintro-18, warning=FALSE}
+# install.packages('tidyverse')
+library(tidyverse)
+```
+
+#### Core `tidyverse` packages
+
+```{r Rintro-19, echo = FALSE, message=F, warning=F}
+my_tbl <- tibble::tribble(
+  ~Package, ~Description,
+      'ggplot2',     'Data visualization',
+      'tibble',     'data.frame on steroids',
+      'tidyr',     'Data tidying (today)',
+      'readr',     'Reading text files (CSV)',
+      'purrr',     'Applying functions to data iteratively',
+      'dplyr',     'Data cleaning and munging (today)',
+      'stringr',     'String (character) manipulation',
+      'forcats',     'Manipulating categorical variables'
+  )
+
+require(knitr)
+kable(my_tbl, digits = 3, row.names = FALSE, align = "l",
+              caption = NULL, format='html')
+```
+
+---
+
+## Additional `tidyverse` packages
+
+```{r Rintro-20, echo=F}
+my_tbl <- tibble::tribble(
+  ~Package, ~Description,
+      'readxl',     'Read Excel files',
+      'haven',     'Read SAS, SPSS, Stata files',
+      'lubridate',  'Deal with dates and times'  ,
+      'magrittr',     'Provides the pipe operator %>%',
+      'glue', 'Makes pasting text and data easier')
+
+require(knitr)
+kable(my_tbl, digits = 3, row.names = FALSE, align = "l",
+              caption = NULL, format='html')
+
+```
+
+### Additional useful packages
+
+```{r Rintro-21, echo=F}
+my_tbl <- tibble::tribble(
+  ~Package, ~Description,
+  'broom', 'Turns the results of models or analysis into tidy datasets',
+  'fs','Allows directory and file manipulation in OS-agnostic manner',
+  'here', 'Allows robust specification of directory structure in a Project')
+
+require(knitr)
+kable(my_tbl, digits = 3, row.names = FALSE, align = "l",
+              caption = NULL, format='html')
+```
+
+---
+class: middle, center
+
+# Pipes
+
+---
+
+## Pipes
+
+
+Pipes (denoted `%>%`, spoken as "then") are to analytic pipelines as `+` is to `ggplot` layers
+
+```{r a2, eval=T}
+mpg1 <- mpg %>% mutate(id=1:n()) %>% select(id, year, trans, cty, hwy)
+mpg_metric <- mpg1 %>% 
+  mutate(across(c(cty, hwy), function(x) {x * 1.6/3.8}))
+```
+
+.pull-left[
+
+Original data
+
+```{r Rintro-22, echo=F}
+knitr::kable(head(mpg1, 5), format='html')
+```
+
+]
+.pull-right[
+
+Transformed data
+```{r Rintro-23, echo = F}
+knitr::kable(head(mpg_metric, 5), format='html')
+```
+
+]
+
+Note I'm assigning a name to the transformed data. Otherwise it'll be lost
+
+---
+
+## Verbs to use in pipes
+
+The verbs in `tidyverse` are specially useful in pipes
+
+```{r Rintro-24, echo=F}
+my_tbl <- tribble(
+  ~"Verb", ~"Functionality",
+  'mutate','Transform a column with some function',
+  'select', 'Select some columns in the data',
+  'arrange', 'Order the data frame by values of a column(s)',
+  'filter','Keep only rows that meet some data criterion',
+  'group_by', 'Group by levels of a variable',
+  'gather', 'Transform a wide dataset to a long dataset',
+  'spread','Transform a long dataset to a wide dataset',
+  'separate', 'Separate one column into several columns',
+  'unite', 'Concatenate several columns into 1 column')
+knitr::kable(my_tbl, align = 'l', format='html')
+```
+
+Pipes almost always start with a data.frame/tibble object, and then "pipes" that data through different transformations (functions)
+
+At each `%>%`, the results of the previous step are used as input for the next step.
+
+---
+
+## A new verb: `across`
+
+**dplyr** version 1.0 introduced a new verb, `across`. It supercedes the older scoped verbs
+`*_at`, `*_if` and `*_all`, where `*` might be `mutate` or `summarise`. Use whichever makes sense to you.
+
+.pull-left[
+```{r, output.lines=1:3}
+beaches %>% 
+  summarise_if(is.numeric, mean)
+beaches %>% 
+  group_by(season_name) %>% 
+  summarise_at(vars(rainfall, enterococci),
+               median)
+```
+]
+.pull-right[
+```{r, output.lines=1:3}
+beaches %>% 
+  summarise(across(where(is.numeric), mean))
+beaches %>% 
+  group_by(season_name) %>% 
+  summarise(across(c(rainfall, enterococci),
+                   median))
+```
+
+]
+---
+class: middle, center
+
+# A complicated example
+
+There is now a `learnr` tutorial available for this example. Please play with that instead.
+
+
+---
+class: middle, center
+
+# Modeling and the broom package
+
+---
+
+## Representing model relationships
+
+In R, there is a particularly convenient way to express models, where you have
+
+- one dependent variable
+- one or more independent variables, with possible transformations and interactions
+
+```
+y ~ x1 + x2 + x1:x2 + I(x3^2) + x4*x5
+```
+
+---
+
+## Representing model relationships
+
+```
+y ~ x1 + x2 + x1:x2 + I(x3^2) + x4*x5
+```
+
+`y` depends on ...
+
+- `x1` and `x2` linearly
+- the interaction of `x1` and `x2` (represented as `x1:x2`)
+- the square of `x3` (the `I()` notation ensures that the `^` symbol is interpreted correctly)
+- `x4`, `x5` and their interaction (same as `x4 + x5 + x4:x5`)
+
+---
+
+# Representing model relationships
+
+```
+y ~ x1 + x2 + x1:x2 + I(x3^2) + x4*x5
+```
+
+This interpretation holds for the vast majority of statistical models in R
+
+- For decision trees and random forests and neural networks, don't add interactions or transformations, since the model will try to figure those out on their own
+
+---
+
+# Our first model
+
+```{r Rintro-34, echo=T}
+library(survival)
+myLinearModel <- lm(chol ~ bili, data = pbc)
+```
+
+Note that everything in R is an **object**, so you can store a model in a variable name.
+
+This statement runs the model and stored the fitted model in `myLinearModel`
+
+R does not interpret the model, evaluate the adequacy or appropriateness of the model, or comment on whether looking at the relationship between cholesterol and bilirubin makes any kind of sense.
+
+---
+
+# Our first model
+
+```{r Rintro-35, echo=T}
+myLinearModel
+```
+
+> Not very informative, is it?
+
+---
+
+# Our first model
+
+```{r Rintro-36, echo=T}
+summary(myLinearModel)
+```
+
+> A little better
+
+???
+
+Talk about the different metrics in this slide
+
+
+---
+
+# Our first model
+
+```{r Rintro-37, echo=T}
+broom::tidy(myLinearModel)
+```
+
+```{r Rintro-38, echo=T}
+broom::glance(myLinearModel)
+```
+
+---
+
+
+## Displaying model results
+
+Let's start with this model:
+
+```{r Rintro-41}
+myModel <- lm(log10(enterococci) ~ rainfall + temperature + season_name + factor(year), data = beaches)
+broom::tidy(myModel)
+```
+
+---
+
+# Displaying model results
+
+Let's start with this model:
+
+```{r Rintro-42}
+plt_data <- broom::tidy(myModel)
+plt_data <- plt_data %>% 
+  filter(term != '(Intercept)') %>% #<<
+  mutate(term = str_replace(term, 
+                            'season_name','')) #<<
+plt_data
+```
+
+---
+
+# Displaying model results
+
+Let's start with this model:
+
+```{r Rintro-43}
+plt_data <- broom::tidy(myModel)
+plt_data <- plt_data %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = str_replace(term, 
+                            'season_name','')) %>% 
+  mutate(term = str_replace(term, 
+                            'factor\\(year\\)','')) # Brackets are "escaped" using \\ #<< 
+plt_data
+```
+
+---
+
+# Displaying model results
+
+Let's start with this model:
+
+.pull-left[
+```{r c1, eval=F}
+plt_data <- broom::tidy(myModel)
+plt_data %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = str_replace(term, 
+                    'season_name','')) %>% 
+  mutate(term = str_replace(term, 
+                    'factor\\(year\\)','')) %>% # Brackets need to be "escaped" using \\
+  ggplot(aes(x = term, y = estimate, 
+             ymin = estimate - 2 * std.error, 
+             ymax = estimate + 2 * std.error))+
+    geom_pointrange()
+
+```
+]
+.pull-right[
+```{r Rintro-44, ref.label='c1', echo=F, eval=T, fig.height=6}
+
+```
+
+]
+
+---
+
+# Displaying model results
+
+Let's start with this model:
+
+.pull-left[
+```{r c2, eval=F}
+plt_data <- broom::tidy(myModel)
+plt_data %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = str_replace(term, 
+                  'season_name','')) %>% 
+  mutate(term = str_replace(term, 
+                  'factor\\(year\\)','')) %>% # Brackets need to be "escaped" using \\
+  ggplot(aes(x = term, y = estimate, 
+             ymin = estimate - 2 * std.error, 
+             ymax = estimate + 2 * std.error))+
+    geom_pointrange() + 
+    geom_hline(yintercept = 0, linetype=2) + 
+    theme_bw() + 
+    coord_flip()
+  
+
+```
+]
+.pull-right[
+```{r Rintro-45, ref.label='c2', echo=F, eval=T, fig.height=6}
+
+```
+
+]
+---
+
+# Displaying model results
+
+Let's start with this model:
+
+.pull-left[
+```{r Rintro-46, eval=F}
+plt_data <- broom::tidy(myModel)
+plt_data %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = str_replace(term, 
+                  'season_name','')) %>% 
+  mutate(term = str_replace(term, 
+                  'factor\\(year\\)','')) %>% # Brackets need to be "escaped" using \\
+  ggplot(aes(x = term, y = estimate, 
+             ymin = estimate - 2 * std.error, 
+             ymax = estimate + 2 * std.error))+
+    geom_pointrange() + 
+    geom_hline(yintercept = 0, linetype=2) + 
+    theme_bw() + 
+    coord_flip()
+
+ggsave('results.png') # ggsave knows format from file
+  
+
+```
+
+You can also save the graph from the RStudio Plots pane, but coding it using `ggsave` is more reproducible
+
+]
+.pull-right[
+```{r Rintro-47, ref.label='c2', echo=F, eval=T, fig.height=4}
+
+```
+
+If you need to get a high-definition TIFF, your best bet is to save your graph as a PDF and then convert it using Acrobat or other scripts (ask me if interested). The TIFF printer in R only creates 72 DPI TIFF files
+]
+
+---
+
+## Showing group differences ("Figure 1")
+
+The package `ggpubr`, which extends `ggplot2`, makes this very easy. It provides the function `stat_compare_means`
+
+---
+
+## Showing group differences ("Figure 1")
+
+.pull-left[
+```{r d1, eval=F}
+library(ggpubr)
+theme_viz <- function(){ #<<
+  theme_bw() + #<<
+    theme(axis.title = element_text(size=16),#<<
+          axis.text = element_text(size=14),#<<
+          text = element_text(size = 14)) #<<
+} #<<
+ggplot(
+  data=beaches, 
+  mapping= aes(x = season_name, 
+               y = log10(enterococci), 
+               color = season_name)) +
+  geom_boxplot()+geom_jitter()+
+  labs(x = 'Season', 
+       y = expression(paste('log'['10'],'(enterococci)')), 
+       color='Season') +
+  theme_viz()
+```
+]
+.pull-right[
+```{r Rintro-48, ref.label='d1', eval=T, echo=F }
+
+```
+
+]
+
+---
+
+## Showing group differences ("Figure 1")
+
+.pull-left[
+```{r d2, eval=F}
+library(ggpubr)
+plt <- ggplot(
+  data=beaches, 
+  mapping= aes(x = season_name, 
+               y = log10(enterococci), 
+               color = season_name)) +
+  geom_boxplot() + 
+  geom_jitter(width=0.1) +
+  labs(x = 'Season', 
+       y = expression(paste('log'['10'],'(enterococci)')), 
+       color='Season')+
+  theme_viz()
+my_comparisons <- list(c('Autumn','Spring'),
+                       c('Spring','Summer'),
+                       c('Summer','Winter'),
+                       c('Spring','Winter'))
+plt + stat_compare_means() #<<
+```
+]
+.pull-right[
+```{r Rintro-49, ref.label='d2', eval=T, echo=F }
+
+```
+
+]
+
+---
+
+## Showing group differences ("Figure 1")
+
+.pull-left[
+```{r d3, eval=F}
+library(ggpubr)
+plt <- ggplot(
+  data=beaches, 
+  mapping= aes(x = season_name, 
+               y = log10(enterococci), 
+               color = season_name)) +
+  geom_boxplot() + 
+  geom_jitter(width=0.1)+
+    labs(x = 'Season', 
+         y = expression(paste('log'['10'],'(enterococci)')), 
+         color='Season') +
+  theme_viz()
+my_comparisons <- list(c('Autumn','Spring'),
+                       c('Spring','Summer'),
+                       c('Summer','Winter'),
+                       c('Spring','Winter'))
+plt + stat_compare_means() +
+  stat_compare_means(comparisons = my_comparisons) #<<
+```
+]
+.pull-right[
+```{r Rintro-50, ref.label='d3', eval=T, echo=F }
+
+```
+
+]
+
+---
+
+## Showing group differences ("Figure 1")
+
+.pull-left[
+```{r d5, eval=F}
+library(ggpubr)
+plt <- ggplot(
+  data=beaches, 
+  mapping= aes(x = season_name, 
+               y = log10(enterococci), 
+               color = season_name)) +
+  geom_boxplot() + 
+  geom_jitter(width=0.1)+
+  labs(x = 'Season', 
+       y = expression(paste('log'['10'],'(enterococci)')), color='Season')+
+  theme_viz()
+my_comparisons <- list(c('Autumn','Spring'),
+                       c('Spring','Summer'),
+                       c('Summer','Winter'),
+                       c('Spring','Winter'))
+plt + stat_compare_means(label.y = 6) + 
+  stat_compare_means(comparisons = my_comparisons) 
+```
+]
+.pull-right[
+```{r Rintro-51, ref.label='d5', eval=T, echo=F }
+
+```
+
+]
+
+---
+
+## Manipulating data for plotting
+
+We would like to get density plots of all the variables
+
+.pull-left[
+```{r Rintro-52}
+dat_spine <- rio::import('data/Dataset_spine.csv', 
+                         check.names=T)
+head(dat_spine)
+```
+]
+.pull-right[
+Facets only work by grouping on a variable. Here we have data in several columns
+]
+
+---
+
+## Manipulating data for plotting
+
+We would like to get density plots of all the variables. 
+
+.pull-left[
+```{r Rintro-53}
+dat_spine %>% 
+  tidyr::gather(variable, value, everything())
+```
+]
+.pull-right[
+The `gather` function turns this wide dataset to a long dataset, stacking all the variables on top of each other
+]
+
+---
+
+## Manipulating data for plotting
+
+We would like to get density plots of all the variables. 
+
+.pull-left[
+```{r Rintro-54, fig.height=3}
+dat_spine %>% 
+  select(pelvic_incidence:sacral_slope) %>% 
+  tidyr::gather(variable, value) %>% 
+  ggplot(aes(x = value)) + 
+  geom_density() +
+  facet_wrap(~variable) +
+  labs(x = '')
+```
+]
+.pull-right[
+This is one of my most used tricks for getting facetted plots from wide data
+]
+
+---
+
+## Re-ordering factors
+
+```{r e1, fig.height=4}
+beaches %>% 
+  ggplot(aes(x = season_name, y = temperature)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = 
+        scales::unit_format(unit = "\u00B0C")) +
+  labs(x = 'Season', y = 'Temperature') +
+  theme_bw() + 
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14))
+```
+
+---
+
+## Re-ordering factors
+
+```{r e2, fig.height=4}
+beaches %>% 
+  mutate(season_name = 
+      fct_relevel(season_name, 
+        'Autumn','Winter','Spring','Summer')) %>% #<<
+  ggplot(aes(x = season_name, y = temperature)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = 
+        scales::unit_format(unit = "\u00B0C")) +
+  labs(x = 'Season', y = 'Temperature') +
+  theme_bw() + 
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14))
+```

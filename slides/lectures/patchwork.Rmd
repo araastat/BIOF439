@@ -1,0 +1,140 @@
+---
+title: Putting plots together
+author: Abhijit Dasgupta, PhD
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE,
+                      fig.height=5)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+library(palmerpenguins)
+library(ggpubr)
+library(cowplot)
+library(patchwork)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16),
+                                plot.title = element_text(size=18),
+                                plot.subtitle = element_text(size=16),
+                                plot.caption = element_text(size=12)))
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class: middle, inverse
+
+# Putting plots together
+
+---
+
+## The packages
+
+There are three excellent packages for putting separate `ggplot` graphs together in panels.
+
+1. **ggpubr**
+1. **cowplot**
+1. **patchwork**
+
+---
+
+## The graphs
+
+```{r, eval=T, results='hide'}
+plt1 <- ggplot(penguins, aes(x = species, y = body_mass_g, fill=species)) +
+  geom_boxplot()
+
+plt2 <- ggplot(penguins, aes(x = bill_length_mm, y = body_mass_g,
+                             color = species))+
+  geom_point()
+
+plt3 <- ggplot(penguins, aes(x = bill_length_mm, y = flipper_length_mm, 
+                             color = species))+
+  geom_smooth(se=F)
+```
+
+```{r, echo=FALSE, fig.width=15, fig.height=3}
+ggarrange(plt1,plt2, plt3, nrow=1)
+```
+
+---
+
+## ggpubr
+
+```{r, fig.height=6, fig.width=15, message=F}
+ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2)
+```
+
+---
+
+## ggpubr
+
+```{r, fig.height=6, fig.width=15, message=F}
+ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2, common.legend = TRUE)
+```
+
+---
+
+## cowplot
+
+```{r, fig.height=6, fig.width=15}
+cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2)
+```
+
+---
+
+## cowplot
+
+```{r, fig.height=6, fig.width=15}
+cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2, labels = c('A','B','C'))
+```
+
+---
+
+## cowplot
+
+```{r, fig.height=6, fig.width=15}
+grid1 = cowplot::plot_grid(plt1, plt2, nrow = 1, rel_widths=c(0.3, 0.7),
+                           labels=c('A','B'))
+cowplot::plot_grid(grid1, plt3, nrow=2, labels = c('', 'C'))
+
+
+```
+
+---
+
+## patchwork
+
+```{r,fig.height=6, fig.width=15}
+plt1 | plt2 / plt3
+```
+
+---
+
+## patchwork
+
+```{r,fig.height=6, fig.width=15}
+(plt1 | plt2) / plt3
+```
+
+---
+
+## patchwork
+
+```{r,fig.height=6, fig.width=15}
+plt1 + plt2 + plt3 + plot_layout(ncol = 2)
+```
+
+
+---
+
+## Further references
+
+ggpubr: [https://rpkgs.datanovia.com/ggpubr/](https://rpkgs.datanovia.com/ggpubr/)  
+cowplot: [https://wilkelab.org/cowplot/index.html](https://wilkelab.org/cowplot/index.html) and Fundamentals of Data Visualization  
+patchwork: [https://patchwork.data-imaginist.com/index.html](https://patchwork.data-imaginist.com/index.html)

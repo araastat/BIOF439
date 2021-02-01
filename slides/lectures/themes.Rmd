@@ -1,0 +1,241 @@
+---
+title: "Themes"
+author: Abhijit Dasgupta, PhD
+abstract: ""
+---
+
+```{r setup, include=FALSE, message = F}
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', 
+                      message = F, warning = F,
+                      cache=TRUE)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+</div>
+
+---
+class: middle, center
+# Customization
+
+---
+
+## Colors
+
+ggplot2 has several ways to customize colors
+
+1. If colors are based on categorical data
+  - `scale_color_manual`
+  - `scale_fill_manual`
+1. If colors are based on continuous data
+  - `scale_{color,fill}_gradient` makes sequential gradients (specify low and high colors)
+  - `scale_{color,fill}_gradient2` makes divergent gradients (specify low, middle and high colors)
+
+---
+
+## Colors
+
+.pull-left[
+```{r a1, eval = F, echo = T}
+(g1 <- ggplot(diamonds, 
+              aes(x = cut, y = price, 
+                  color = carat))+
+   geom_jitter()
+)
+
+```
+]
+.pull-right[
+```{r 06-Lecture6-1, eval = T, echo = F, ref.label = "a1"}
+```
+]
+
+---
+
+## Colors
+
+.pull-left[
+```{r a2, eval = F, echo = T}
+g1 + scale_color_gradient(low='white',high = 'red')
+```
+]
+.pull-right[
+```{r 06-Lecture6-2, eval = T, echo = F, ref.label = "a2"}
+```
+]
+
+---
+
+## Colors
+
+.pull-left[
+```{r a3, eval = F, echo = T}
+g1 + scale_color_gradient2(low = 'blue', 
+                           mid='white', 
+                           high='red',
+                           midpoint = 2)
+```
+]
+.pull-right[
+```{r 06-Lecture6-3, eval = T, echo = F, ref.label = "a3"}
+```
+]
+---
+
+## [ggsci](https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html) #
+
+These are palettes based on scientific journals and sci-fi shows
+
+```{r , echo=TRUE, fig.height=4}
+library(ggsci)
+plt <- ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+    geom_point() 
+```
+.pull-left[
+```{r , echo=TRUE, fig.height=3}
+plt + scale_color_lancet()
+```
+]
+.pull-right[
+```{r , echo=TRUE, fig.height=3}
+plt + scale_color_npg()
+```
+]
+
+---
+
+# RColorBrewer
+
+This package is a wrapper around ColorBrewer (https://colorbrewer2.org), which is meant to create sequential and divergent color palettes for discrete classes.
+
+These palettes are available in **ggplot2** as `scale_color_brewer` and `scale_fill_brewer`
+
+There are also a variation of these for continuous data, using these color schemes to create gradients. These
+are accessed using `scale_color_distiller` and `scale_fill_distiller`
+
+```{r , echo=TRUE, fig.height=3}
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+    geom_point()+
+    scale_color_brewer(type='qual', palette=2)
+```
+---
+
+## RColorBrewer
+
+.pull-left[
+There are three kinds of palettes: sequential (_seq_), divergent (_div_) and qualitative (_qual_)
+
+Sequential palettes are good for scales that are ordered 
++ Income
++ death rates
+
+Divergent palettes are good when you want to show both extremes
++ Heatmaps
+]
+.pull-right[
+
+```{r , echo=FALSE}
+RColorBrewer::display.brewer.all()
+```
+]
+
+
+---
+
+## [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+
+The **viridis** package provides color palettes that are not only pleasing, but are robust to most forms of 
+color-blindness, including green-blind (deuteranopia), red-blind (protanopia) and blue-blind (tritanopia)
+
+```{r , echo=TRUE, fig.height=5}
+library(viridis)
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+    geom_point()+
+    scale_color_viridis(discrete=TRUE) +
+    theme_bw()
+```
+---
+
+## Text
+
+The `extrafont` package allows you to use fonts already on your computer in your graphics.
+
+.pull-left[
+```{r b1, eval = F, echo = T}
+library(extrafont)
+loadfonts()
+
+g1 + theme(text = element_text(family='Georgia'))
+```
+]
+.pull-right[
+```{r 06-Lecture6-4, eval = T, echo = F, ref.label = "b1"}
+```
+]
+
+---
+
+## Text
+
+The `extrafont` package allows you to use fonts already on your computer in your graphics.
+
+.pull-left[
+```{r b2, eval = F, echo = T}
+
+g1 + theme(text =
+               element_text(family='Lobster Two',
+                            size=14))
+```
+]
+.pull-right[
+```{r 06-Lecture6-5, eval = T, echo = F, ref.label = "b2"}
+```
+]
+
+---
+
+## Grey palettes
+
+We might want gray-scale palettes, to avoid journal color fees, for example
+
+```{r , echo=TRUE, fig.height=4}
+plt + scale_color_grey()+theme_bw()
+```
+---
+class: middle, inverse
+
+# Themes #
+
+---
+
+## ggplot2 themes
+
+There are several themes built into **ggplot2**
+
+|                |               |
+|----------------|---------------|
+| theme_minimal  | theme_bw      |
+| theme_dark     | theme_gray    |
+| theme_classic  | theme_minimal |
+| theme_linedraw | theme_classic |
+
++ You can modify any of these themes using the `theme` function
++ You can set a particular theme for a document at the very beginning using `theme_set`
+
+```{r, eval=FALSE}
+theme_set(theme_classic)
+```
+
+---
+
+## ggthemes (https://jrnold.github.io/ggthemes/) ##
+
+<iframe src="https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/" width="100%" height="800"></iframe>
+
+---
+
+

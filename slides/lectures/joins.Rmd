@@ -1,0 +1,445 @@
+---
+title: Joining datasets
+author: Abhijit Dasgupta, PhD
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE,
+                      fig.height=5)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16),
+                                plot.title = element_text(size=18),
+                                plot.subtitle = element_text(size=16),
+                                plot.caption = element_text(size=12)))
+
+## If you don't have Garrett Aden-Buie's animations, clone the repository https://github.com/gadenbuie/tidyexplain
+## or install (devtools::install_github("gadenbuie/tidy-animated-verbs"))
+
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+
+# Goals 
+
++ Learn how to join data sets (merging)
+
+???
+
+We need to 
+
++ put datasets capturing different attributes together to find a complete picture
++ evaluate different attributes to see if they contribute to our understanding
++ hedge our bets to ensure we find 
+
+---
+    
+# Data
+
+This data set is taken from a breast cancer proteome database available [here](https://www.kaggle.com/piotrgrabo/breastcancerproteomes) and modified for this exercise.
+
++ Clinical data: data/BreastCancer_Clinical.xlsx
++ Proteome data: data/BreastCancer_Expression.xlsx
+
+> These data are available in the class data folder/link, and the expectation is that you 
+save them to the `data` folder of your project.
+
+---
+class: inverse, middle, center
+
+# Joins
+
+---
+# Putting data sets together
+
++ Quite often, data on individuals lie in different tables
+
+    - Clinical, demographic and bioinformatic data
+--
+    - Drug, procedure, and payment data (think Medicare)
+--
+    - Personal health data across different healthcare entities
+
+---
+
+# Joining data sets
+
+The simplest case is when we just need to add more data to existing data 
+
+- New patients in study, with same protocol (add rows)
+- Adding pathology, imaging data for existing patients (add columns)
+
+---
+
+# Joining data sets
+
+.pull-left[
+<span style="text-align:center;">`cbind(x,y)`</span>
+```{r, fig.caption = "`cbind`", echo=FALSE}
+knitr::include_graphics('img/addcol.png')
+```
+
+Data sets have same subjects/observations, but new variables
+]
+.pull-right[
+<span style="text-align:center;">`rbind(x,y)`</span>
+```{r, fig.caption="`rbind`", echo = FALSE}
+knitr::include_graphics('img/addrow.png')
+```
+
+Data sets have same variables, but new subjects]
+
+---
+
+# Joining data sets
+
+.pull-left[
+We will talk about more general ways of joining two datasets
+
+We will assume:
+
+1. We have two rectangular data sets (so `data.frame` or `tibble`)
+1. There is at least one variable (column) in common, even if they have different names
+    - Patient ID number
+    - SSN (Social Security number)
+    - Identifiable information
+]
+
+.pull-right[
+<img src="img/merge.png" height="10%"/>
+]
+
+---
+
+# Joining data sets
+
+<img width="100%" src="img/joins.png"/>
+
+--
+
+<table width="100%">
+<tr>
+<td style="text-align:center;">inner_join</td>
+<td style="text-align:center;">left_join</td>
+<td style="text-align:center;">right_join</td>
+<td style="text-align:center;">outer_join</td>
+</tr></table>
+
+--
+
+The "join condition" are the common variables in the two datasets, i.e. rows are selected if the values of the common variables in the left dataset matches the values of the common variables in the right dataset
+
+These functions are available in the **dplyr** package.
+---
+
+## A breast cancer example
+
+```{r, echo=T}
+library(readxl)
+clinical <- read_excel('data/BreastCancer_Clinical.xlsx', 
+                       .name_repair = 'universal') 
+proteome <- read_excel('data/BreastCancer_Expression.xlsx', 
+                       .name_repair = 'universal') 
+
+```
+
+.pull-left[
+```{r}
+clinical
+```
+]
+.pull-right[
+```{r}
+proteome
+```
+
+]
+
+---
+
+## A breast cancer example
+
+```{r, eval = F, echo=T}
+library(readxl)
+clinical <- read_excel('data/BreastCancer_Clinical.xlsx',
+                       .name_repair = 'universal')
+proteome <- read_excel('data/BreastCancer_Expression.xlsx',
+                       .name_repair = 'universal')
+```
+
+.pull-left[
+```{r}
+clinical[,1:2]
+```
+]
+.pull-right[
+```{r}
+proteome[,1:2]
+```
+]
+
+--
+
+We see that both have the same ID variable, but with different names and different orders
+
+???
+
+Let's keep only the first two columns so we can see the ID variable
+
+---
+
+## A breast cancer example
+
+Let's make sure that the ID's are truly IDs, i.e. each row has a unique value
+
+```{r, echo = T}
+length(unique(clinical$Complete.TCGA.ID)) == nrow(clinical)
+```
+--
+
+```{r, echo = T}
+length(unique(proteome$TCGA_ID)) == nrow(proteome)
+```
+
+
+--
+<div style="height:25%;margins:auto;">
+<img style="display:block; margin:0 auto; height: 70%;" src="https://twitchy.com/wp-content/uploads/2015/04/screen-shot-2015-04-13-at-2-06-38-pm-300x300.png"/>
+</div>
+
+???
+
+We need the ID variables to be unique for each row. If we use multiple columns to define the "ID" then each row needs to have a unique set of values for those columns. Otherwise the joins get confused about 
+which rows go with which rows. 
+
+---
+## Data example
+
+For convenience we'll keep the first instance for each ID in the `proteome` data
+
+```{r, echo = T}
+proteome <- proteome %>% filter(!duplicated(TCGA_ID))
+```
+
+> `duplicated` = TRUE if a previous row contains the same value
+
+--
+
+```{r, echo=T}
+length(unique(proteome$TCGA_ID)) == nrow(proteome)
+```
+
+???
+
+We don't have to sort data for duplicated
+
+---
+
+## Inner join
+
+.pull-left[
+![label](img/inner-join.gif)
+]
+.pull-right[
+
++ Keep only rows that have common ids between the two data, and add columns
++ The joined data will have no more rows than either data, but more columns than each
+]
+---
+## Inner join
+
+```{r, echo=T, eval=F}
+common_rows <- inner_join(clinical[,1:6], proteome, 
+                          by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+```{r, echo=F, eval=T}
+common_rows <- inner_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+common_rows
+```
+
+--
+
+Note that we have all the columns from both datasets, but only the common set of IDs from the two datasets
+--
+
+> Without the `by` option, R will attempt to join on all column names that are common between the data sets. 
+If the ID columns have different names, you **must** use `by`. Even if they have the same names, it's 
+good practice to be explicity
+
+---
+
+## Left join
+
+.pull-left[
+![label](img/left-join.gif)
+<div style="font-size:12pt;">
+All the animations are courtesy Garrick Aden-Buie and are available <a src="https://github.com/gadenbuie/tidyexplain" target="_blank">here</a>.
+</div>
+]
+.pull-right[
++ Keep all rows of left data, add columns from right data only for rows with matching IDs
++ If a row in left data has no corresponding row in the right data, the corresponding entries in the joined data are replaced by `NA`
++ Joined data has same number of rows as left data, but more columns.
+]
+---
+## Left join
+```{r, echo=T, eval=F}
+left_rows <- left_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+```{r, echo=F, eval=T}
+options(tibble.print_min=3, dplyr.width=Inf)
+left_rows <- left_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+left_rows
+```
+
+We get `r nrow(left_rows)` rows, which is all the rows of `clinical`, combined with the rows of `proteome` with common IDs. The rest of the rows get `NA` for the proteome columns.
+
+---
+
+## Right join
+
+.pull-left[
+![label](img/right-join.gif)
+]
+.pull-right[
++ Keep all the rows of the _right_ data, add corresponding rows of left data _on the left_
++ Once again, if there are rows of right data that do not have corresponding rows in left data, the entries are filled with `NA`
++ The joined data has the same number of rows as the right data, but more columns (attached to its left). The order of the columns is the columns of the left data followed by the columns of the right data
+]
+---
+## Right join
+```{r, echo=T, eval=F}
+right_rows <- right_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+```{r, echo=F, eval=T}
+options(tibble.print_min=3, dplyr.width=Inf)
+right_rows <- right_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+right_rows
+```
+
+--
+
+Here we get `r nrow(right_rows)` rows, which is all the rows of `proteome`, along with the rows of `clinical` with common IDs, but with the columns of `clinical` appearing first.
+
+---
+## Outer/Full Join
+
+.pull-left[
+![label](img/full-join.gif)
+]
+.pull-right[
+This is the _kitchen sink_ join
+
++ All rows of the left and right data are included
++ Non-corresponding entries are filled with `NA`
++ The joined data set has at least as many rows as the larger of the two data, and more columns than either data.
+
+]
+---
+## Outer/Full Join
+
+```{r, echo=T, eval=F}
+full_rows <- full_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+```{r, echo=F, eval=T}
+options(tibble.print_min=3, dplyr.width=Inf)
+full_rows <- full_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+full_rows
+```
+
+--
+
+Here we obtain `r nrow(full_rows)` rows and `r ncol(full_rows)` columns. So we've expanded the data in both rows and columns, putting missing values in where needed.
+
+---
+# Joins
+
+In each of `inner_join`, `left_join`, `right_join` and `full_join`, the number of columns always increases 
+
+There are also two joins where the number of columns don't increase. They aren't really "joins" in that sense, but really fancy filters on a dataset
+
+```{r}
+tbl <- tribble(~Join,~Use,~Description,
+               "semi_join", "semi_join(A,B)", "Keep rows in A where ID matches some ID value in B",
+               'anti_join', 'anti_join(A,B)', 'Keep rows in A where ID does NOT match any ID value in B')
+knitr::kable(tbl, format='html')
+```
+
+These just filter the rows of `A` without adding any columns of `B`. These can be faster than `dplyr::filter` when dealing with large data sets
+
+---
+
+# Putting it in a pipe
+
+```{r, echo=T}
+final_data <- clinical %>% 
+  inner_join(proteome, by=c("Complete.TCGA.ID"="TCGA_ID")) %>% 
+  filter(Gender =='FEMALE') %>% 
+  select(Complete.TCGA.ID, Age.at.Initial.Pathologic.Diagnosis, ER.Status,
+         starts_with("NP")) # grabs all the protein data
+```
+```{r, echo=F}
+final_data
+```
+
+---
+
+## Some notes
+
++ Joins are very much in the spirit of using SQL in databases
++ In SAS, if you use `MERGE` in the `DATA` step to create merged variables, you need to 
+sort the data by the common variables
+    - This is a very expensive operation computationally
+    - In SAS, you can avoid this by using `PROC SQL`
+    - In R, this sorting is not necessary
++ Learning to join data sets efficiently is one of the coolest skills of a data scientist, and 
+makes life infinitely easier
+
+---
+
+## Example code: Joining many datasets together
+
+**Requirement:** Pull together over 200 datasets of variant alleles and expressions (1 per subject/cell line) 
+
+```{r, eval=FALSE}
+library(dplyr)
+
+fnames <- dir('~/Desktop/Sreya', full.names = TRUE) # Grab and store the paths to the individual files
+ids <- stringr::str_extract(fnames, '[:alnum:]+') # The file names have the subject ids in them 
+                                                  # as first bit of the string
+
+## Data ingestion
+data_corpus <- purrr::map(fnames, read_delim, delim='\t') # Creates a list of raw datasets
+
+## Data munging
+for (i in 1:length(data_corpus)){
+  data_corpus[[i]] <- data_corpus[[i]] %>% # Note [[]] since I'm manipulating lists
+    select(`Variant Allele`, HF) %>% # Keep only allele name and expression
+    set_names("variant_allele", ids[i]) %>% # change column names to `variant_allele` and subject ID
+    mutate(variant_allele = str_trim(variant_allele)) # Getting rid of extra spaces
+}
+
+## Data joining
+data_merged <- Reduce(full_join, data_corpus) # Here is the join. This works since 
+                                              # all the data sets have only `variant_allele` in common
+
+```
+
+> We haven't seen two functions here: `purrr::map` and `Reduce`. I won't go into details here, but see the short version on next slide.
+Also notice that the number of files to be joined is never specified in the code. This could work for any number
+of files
+
+---
+
+## Example code: Joining many datasets together
+
++ The `map` function acts on a list (first argument) and applies a function (2nd argument) to each element, storing the result in a list the same size as the first argument. You could replace the map function with a for loop, but map is provably more efficient computationally. It is worth thinking about map like a for loop, though. [Nice tutorial](https://jennybc.github.io/purrr-tutorial/index.html)
++ `Reduce` is a very powerful function that is one of the functional programming functions in R, i.e., it is a function that acts on functions. It takes as inputs a function (in our case, `full_join`), and a list (in our case, data_corpus). The input function should take two arguments of the same type, as `full_join` does, and Reduce goes through the list, applying the function to the first two elements of the list, then to the result and the 3rd element, then to the result and 4th element,and so on.

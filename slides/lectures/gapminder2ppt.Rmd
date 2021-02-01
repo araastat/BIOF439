@@ -1,0 +1,34 @@
+---
+title: "Gapminder data"
+author: "Abhijit Dasgupta"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo=FALSE)
+library(tidyverse)
+library(gapminder)
+```
+
+```{r, echo=FALSE, eval=TRUE,results='asis' }
+for(n in unique(gapminder$country)){
+#    cat(paste('##', n))
+#    cat('\\n\\n')
+    cat(sprintf("\n\n---\n"))
+    plt <- ggplot(gapminder %>% filter(country==n),
+                  aes(x = year, y = lifeExp))+
+        geom_line()+
+        theme_bw()+
+        labs(x = 'Year',
+             y = 'Life expectancy at birth',
+             title = n,
+             caption = 'Gapminder data')+
+        theme(axis.text = element_text(size=12),
+              axis.title = element_text(size=14))
+    print(plt)
+}
+
+```
+

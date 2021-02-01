@@ -1,0 +1,502 @@
+---
+title: "Manipulating categorical variables"
+author: Abhijit Dasgupta, PhD
+abstract: We explore categorical variables
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16)))
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class: middle,center
+
+# Categorical variables
+
+---
+
+## What are categorical variables?
+
+Categorical variables are variables that
+
++ have values defining categories of things
++ typically have a few unique values
++ may or may not be ordered
++ are not interval-scaled, i.e., their differences don't make sense _per se_
+
+
+
+---
+
+## What are categorical variables?
+
+.pull-left[
+#### Non-ordered
+
+1. Race (White, Black, Hispanic, Asian, Native American)
+1. Gender (Male, Female, Other)
+1. Geographic regions (Africa, Asia, Europe, North America, South America)
+1. Genes/Proteins
+]
+.pull-right[
+#### Ordered
+
+1. Income levels (< $10K, $10K - $25K, $25K - $75K, $75K - $100K)
+1. BMI categories (Underweight, Normal, Overweight, Obese)
+1. Number of bedrooms in houses (1 BR, 2BR, 3BR, 4BR)
+]
+
+---
+class: middle, center
+
+# Cateogical variables in R
+
+---
+
+## The `factor` data type
+
+R stores categorical variables as type `factor`.
+
++ You can coerce a character or numeric object into a factor using `as.factor`.
++ You can check if an object is a factor with `is.factor`.
++ You can create a factor with the function `factor`.
+
+
+---
+
+## The `factor` data type
+
+> `factor(x = character(), levels, labels = levels,
+       exclude = NA, ordered = is.ordered(x), nmax = NA)`
+>
+> factor returns an object of class "factor" which has a set of integer codes the length of x with a "levels" attribute of mode character and unique
+
+----
+
++ Internally, each level of a factor is coded as an integer
++ Each such integer has a corresponding `level` which is a character, describing the level. 
++ You can add `labels` to each level to change the printed form of the factor. 
+
+
+---
+
+## The `factor` data type
+
+```{r}
+x <- c('Maryland','Virginia', 'District', 'Maryland','Virginia')  # a character vector
+xf <- as.factor(x)
+xf
+```
+
+There are three levels, that by default are in alphabetical order
+
+----
+
+.pull-left[
+```{r}
+as.integer(xf)
+```
+
++ District = 1, Maryland = 2, Virginia = 3
+]
+.pull-right[
+```{r}
+as.character(xf)
+```
+
++ Get original characters back
+]
+
+
+
+---
+
+## The `factor` data type
+
+```{r}
+y <- c(5, 3, 9, 4, 5, 3)
+yf <- as.factor(y)
+yf
+```
+
+Levels are still in alphanumeric order
+
+----
+
+.pull-left[
+```{r}
+as.numeric(yf)
+```
+
++ Note, we don't get original integers back!!
++ 3 = 1, 4 = 2, 5 = 3, 9 = 4
+]
+.pull-right[
+```{r}
+as.numeric(as.character(yf))
+```
+
++ This is how you get numbers back
+]
+
+---
+
+## The `factor` data type
+
+
+.pull-left[
+```{r}
+x <- c('MD','DC','VA','MD','DC')
+xf <- factor(x)
+unclass(xf)
+```
+
+]
+.pull-right[
+```{r}
+x <- c('MD','DC','VA','MD','DC')
+xf <- factor(x, levels = c('MD','DC','VA'))
+unclass(xf)
+```
+
+]
+
+----
+
++ If I change the level designation, the underlying coding changes
++ This is important when a factor is an independent variable in a regression model
+
+---
+
+## The `factor` data type
+
+The `drv` variable in the `mpg` dataset tells us the kind of drive (front, rear or 4-wheel) each car has. However
+it's coded as `f`, `r`, and `4`, which is not great for display purposes. We can re-label these levels, but we have to be a bit careful
+
+.pull-left[
+```{r, error=TRUE}
+x <- mpg$drv
+xf <- factor(x, 
+              levels = c('4-wheel','Front wheel',
+                         'Rear wheel'))
+head(xf)
+```
+
+]
+.pull-right[
+```{r}
+x <- mpg$drv
+xf <- factor(x, 
+              levels = c('4', 'f','r'), #<<
+              labels = c('4-wheel','Front wheel',#<<
+                         'Rear wheel'))#<<
+head(xf)
+```
+
+]
+
+----
+
+Levels have to match what's actually in the original data, but you can re-label the levels.
+
+---
+class: middle, center
+
+# Why factors?
+
+---
+
+## Factors are R's discrete data type
+
++ Factors are interpreted as discrete by R's functions
+
+.pull-left[
+```{r, message=TRUE, warning=TRUE, fig.height=3}
+ggplot(mpg,
+       aes(year, cty))+
+  geom_boxplot()
+```
+]
+.pull-right[
+```{r, fig.height=3}
+ggplot(mpg, 
+       aes(as.factor(year), cty))+
+  geom_boxplot()
+```
+]
+
+---
+
+## Dummy variables are automatically created from factors
+
+.pull-left[
+```{r, eval=F}
+model.matrix(~species, data = palmerpenguins::penguins)
+```
+```{r, echo = F}
+palmerpenguins::penguins %>% 
+  group_by(species) %>% 
+  slice_head(n=2) %>% 
+  ungroup() %>% 
+  model.matrix(~species, data = .)
+```
+]
+.pull-right[
++ If a factor has _n_ levels, you get _n-1_ dummy variables
++ The level corresponding to integer code 1 is omitted as the reference level
+]
+
+----
+
+Changing the base level (integer code 1) changes model interpretation since
+it changes the reference level against which all other levels are compared.
+
+---
+class: middle, center
+
+# Manipulating factors<br/><br/>The `forcats` package (part of `tidyverse`)
+
+---
+
+## Effect in models
+
+.pull-left[
+```{r}
+library(palmerpenguins)
+m <- lm(body_mass_g ~ species, data = penguins)
+broom::tidy(m)
+```
+Compare with Adele
+]
+.pull-right[
+```{r}
+p1 <- penguins %>% 
+  mutate(species = fct_relevel(species, 'Gentoo'))
+m1 <- lm(body_mass_g ~ species, data=p1 )
+broom::tidy(m1)
+```
+Compare with Gentoo
+]
+
+----
+
+Providing only one level to `fct_relevel` makes that the base level (integer code 1).  
+You can also fully specify all the levels in order, or partially specify them. If you 
+partially specify them, the remaining levels will be put in alphabetical order after the
+ones you specify.
+
+---
+
+## Effect in plots
+
+.pull-left[
+```{r, fig.height=4}
+ggplot(penguins, 
+       aes(x = species))+
+  geom_bar()
+```
+
+]
+.pull-right[
+```{r, fig.height=4}
+ggplot(p1, 
+       aes(x = species))+
+  geom_bar()
+```
+
+]
+
+Changes the order in which bars are plotted
+
+---
+
+## Extra levels
+
+.pull-left[
+```{r}
+x <- factor(str_split('statistics', '')[[1]], 
+            levels = letters)
+x
+```
+```{r}
+p1 <- penguins %>% filter(species != 'Gentoo')
+fct_count(p1$species)
+```
+
+]
+.pull-right[
+```{r}
+fct_drop(x)
+```
+```{r}
+p1 <- p1 %>% mutate(species = fct_drop(species))
+fct_count(p1$species)
+```
+
+]
+
+Getting rid of extra levels<br/><br/>
+Sometimes levels with no data show up in summaries or plots
+
+---
+
+# Ordering levels by frequency
+
+.pull-left[
+```{r, fig.height=4}
+ggplot(penguins, 
+       aes(x = species))+
+  geom_bar()
+```
+
+]
+.pull-right[
+```{r, fig.height=4}
+ggplot(penguins,
+       aes(x = fct_infreq(species)))+
+  geom_bar()
+```
+
+]
+
+Ordering levels from most to least frequent
+
+---
+
+## Ordering levels by values of another variable
+
+.pull-left[
+```{r, fig.height=4}
+ggplot(penguins, 
+       aes(x = species,
+           y = bill_length_mm))+
+  geom_boxplot()
+```
+]
+.pull-right[
+```{r, fig.height=4}
+ggplot(penguins, 
+       aes(x = fct_reorder(species, bill_length_mm, 
+                           .fun=median, na.rm=T),
+           y = bill_length_mm))+
+  geom_boxplot() + labs(x = 'species')
+```
+
+]
+
+`fct_reorder` is useful for ordering a plot by ascending or descending levels. This 
+makes the plot easier to read. 
+
+---
+
+## Ordering levels by values of another variable
+
+```{r, echo=FALSE}
+if('USArrests' %in% ls()) rm(USArrests)
+if(!('State' %in% names(USArrests))) USArrests <- USArrests %>% rownames_to_column('State')
+
+```
+
+
+```{r, eval=F}
+USArrests <- USArrests %>% rownames_to_column('State')
+```
+
+
+
+.pull-left[
+```{r, fig.height=5}
+ggplot(USArrests, aes(x=State, y = Murder))+
+  geom_bar(stat = 'identity') + 
+  theme(axis.text = element_text(size=6))+
+  coord_flip()
+```
+
+]
+.pull-right[
+```{r, fig.height=5}
+ggplot(USArrests, aes(
+  x = fct_reorder(State, Murder),
+  y = Murder))+
+  geom_bar(stat = 'identity')+
+  theme(axis.text = element_text(size=6))+
+  coord_flip()
+```
+
+]
+
+---
+
+## Order levels based on last values when plotting 2 variables
+
+The level ordering also shows up in the order of levels in the legends of plots. 
+Suppose you are plotting two variables, grouped by a factor.
+
+.pull-left[
+```{r, fig.height=4}
+ggplot(iris, aes(
+  x = Sepal.Length, 
+  y = Sepal.Width, 
+  color = Species))+
+  geom_smooth(se=F)
+```
+
+]
+.pull-right[
+```{r, fig.height=4}
+ggplot(iris, aes(
+  x = Sepal.Length, 
+  y = Sepal.Width, 
+  color = fct_reorder2(Species,
+                       Sepal.Length, Sepal.Width)))+
+  geom_smooth(se=F) + labs(color = 'Species')
+```
+
+]
+
+---
+
+## Further exploration
+
+1. [forcats cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/factors.pdf)
+1. [Chapter 15](https://r4ds.had.co.nz/factors.html) of R4DS
+
+
+---
+
+## Pie chart
+
+.pull-left[
+```{r pie, eval = F, echo = T}
+penguins %>% count(species) %>% 
+  ggplot(aes(x=1,y=n, fill=species))+
+    geom_bar(stat='identity')+
+    coord_polar('y') + #<<
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(), 
+          axis.ticks=element_blank(), 
+          panel.grid = element_blank(),
+          axis.line = element_blank())
+```
+
+See [here](https://homepage.divms.uiowa.edu/~luke/classes/STAT4580/catone.html#pie-charts-and-doughnut-charts) and
+[here](https://www.r-graph-gallery.com/piechart-ggplot2.html) for more examples.
+]
+.pull-right[
+```{r, eval=T, echo = F, ref.label="pie"}
+```
+]
+
+
