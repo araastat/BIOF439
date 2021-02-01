@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>syllabus.utf8</title>
+
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Visualization using R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="syllabus.html">Syllabus</a>
+</li>
+<li>
+  <a href="bio.html">Instructor bio</a>
+</li>
+<li>
+  <a href="slides/">Lectures</a>
+</li>
+<li>
+  <a href="assignments/">Homework</a>
+</li>
+<li>
+  <a href="resources.html">Resources</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="FinalProjects/2020Summer/index.html">Final Projects</a>
+</li>
+<li>
+  <a href="notes/">Course Notes</a>
+</li>
+<li>
+  <a href="https://www.github.com/araastat/BIOF439">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<style type="text/css">
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+h4 {
+  font-family: Charter, serif;
+  font-weight: bold;
+}
+</style>
+<p><img class='center' height="80" src='img/faes.png'></p>
+<div style="text-align: center;">
+<p>
+BIOF 439: Data Visualization using R
+<p>
+Number of credits : 1
+<p>
+Spring 2021 Term A
+<p>
+Syllabus
+</div>
+<div id="instructor" class="section level4">
+<h4>Instructor</h4>
+<p>Abhijit Dasgupta, PhD</p>
+</div>
+<div id="contact-information" class="section level4">
+<h4>Contact information:</h4>
+<ul>
+<li>E-mail: <a href="mailto:dasgupta.faes@gmail.com">dasgupta.faes@gmail.com</a></li>
+<li>Preferred method of communcation: via <a href="https://biof439.slack.com" target="_blank">Slack</a>.
+<ul>
+<li>Sign up via <a href="https://join.slack.com/t/biof439/shared_invite/zt-l64dr6hh-vfQUIjYId_E~akztoDm~Fg" target="_blank">this link</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="course-information" class="section level3">
+<h3>Course information</h3>
+<p>Prerequisites, if any: None</p>
+<div id="course-description" class="section level4">
+<h4>Course description</h4>
+<p>This course will demonstrate and practice the use of R in creating and presenting data visualizations. After a short introduction to R tools, especially the tidyverse packages, we will look at good principles for data visualization, examples of good and bad visualizations, and the use of ggplot2 to create static publication-quality graphs. We will also explore modern web-based interactive graphics using the htmlwidgets packages as well as dynamic graphics and dashboards that can be created using flexdashboard and Shiny. We will explore ways in which bioinformatics data can be presented using static and dynamic visualizations. Finally, we will use RMarkdown and several packages to develop web pages for presenting data visualizations as self-explanatory, and possibly interactive, storyboards.</p>
+</div>
+<div id="course-materials" class="section level4">
+<h4>Course materials</h4>
+<p>All course materials (lectures, videos, homework, discussions) will be available on the class <a href="https://faes.instructure.com" target="_blank">Canvas</a> site.</p>
+</div>
+<div id="learning-materials" class="section level4">
+<h4>Learning Materials</h4>
+<p>Required and Recommended Texts: There are no required texts for this class. However, the following texts, freely available online, will be used for reference:</p>
+<ol style="list-style-type: decimal">
+<li><em>R for Data Science</em> [R4DS] by Hadley Wickham and Garrett Grolemund (available <a href="https://r4ds.had.co.nz/" target="_blank">online</a>)</li>
+<li><em>Principles of Data Visualization</em> [PDV] by Claus O. Wilke (available <a href="https://serialmentor.com/dataviz/index.html" target="_blank">online</a>)</li>
+<li><em>Data Visualization: A Practical Introduction</em> [DV] by Keiran Healy (available <a href="https://socviz.co/" target="_blank">online</a>)</li>
+</ol>
+<p>Required Journal Articles: There are no required journal articles for this class</p>
+</div>
+<div id="course-goals" class="section level4">
+<h4>Course Goals</h4>
+<p>When you complete the course successfully, you will be able to:</p>
+<ul>
+<li>Understand principles of good data visualization; avoid poor or inappropriate data visualization</li>
+<li>Practical short introduction to R to enable data visualization; Manipulating data to enable good visualizations</li>
+<li>Appropriate use of color, symbols and small multiples</li>
+<li>Static and dynamic data visualizations</li>
+<li>Using the web as a presentation medium</li>
+</ul>
+</div>
+<div id="communication" class="section level4">
+<h4>Communication</h4>
+<p>This class will communicate primarily via Slack.</p>
+<p>You will see a channel <code>#spring2021-a</code>. Please join this channel. Please use Slack for broadcasting messages, answering questions and the like. When you ask a question, please ask it under the <code>#general</code> or `#spring2021-a channels, so others can learn as well. I should respond within 24 hours.</p>
+<p>The Canvas Discussion forum will be used for graded class discussions.</p>
+<p>I will also hold virtual office hours on Zoom, time TBD, one evening a week.</p>
+</div>
+<div id="structure-of-the-course" class="section level4">
+<h4>Structure of the course</h4>
+<p>This course will run for 7 weeks. Of these, there will be instructional material, including videos, lectures, slides, discussion, tutorials and homework, for 6 of the weeks. The seventh week will be dedicated to a culminating project that will be submitted by the end of the seventh week. Your grade will be determined by class participation, i.e., discussions &amp; Slack participation (30%), homework assignments (50%) and the final project (20%).</p>
+<p><strong>Detailed course outline</strong></p>
+</div>
+</div>
+<div id="week-1" class="section level3">
+<h3>Week 1</h3>
+<ul>
+<li>Introduction to the class</li>
+<li>Principles of good data visualization</li>
+<li>An understanding of bad data visualizations</li>
+<li>Introduction to RStudio, RStudio Cloud and R</li>
+<li>Introduction to the <code>flexdashboard</code> package</li>
+</ul>
+</div>
+<div id="week-2" class="section level3">
+<h3>Week 2</h3>
+<p><strong>Readings:</strong> R4DS Chapters 4 and 27<br />
+<strong>Resource:</strong> PDV Chapters 2-4</p>
+<p><strong>Theme:</strong> Descriptive plots</p>
+<ul>
+<li>Introduction to ggplot2</li>
+<li>Layering components</li>
+<li>Basic graphs</li>
+<li>Grouped graphs</li>
+<li>Facets (small multiples)</li>
+<li>Thematic personalization</li>
+<li>Easy animation</li>
+</ul>
+</div>
+<div id="week-3" class="section level3">
+<h3>Week 3</h3>
+<p><strong>Theme:</strong> Analytic plots</p>
+<ul>
+<li>Using R for analysis
+<ul>
+<li>Data manipulation</li>
+<li>Statistics</li>
+<li>Hypothesis tests</li>
+</ul></li>
+<li>Producing graphs from analysis
+<ul>
+<li>Effect sizes</li>
+<li>Group differences</li>
+<li>Annotations</li>
+<li>Networks</li>
+<li>Maps</li>
+</ul></li>
+</ul>
+</div>
+<div id="week-4" class="section level3">
+<h3>Week 4</h3>
+<p><strong>Theme:</strong> R for Bioinformatics</p>
+<ul>
+<li>Visualizations for Bioinformatics
+<ul>
+<li>Manhattan plots</li>
+<li>Heatmaps</li>
+<li>Dendrograms</li>
+<li>Phylogenetic trees</li>
+<li>Linkage maps</li>
+</ul></li>
+<li>Visualizations for RNA-seq and NGS analyses</li>
+</ul>
+</div>
+<div id="week-5" class="section level3">
+<h3>Week 5</h3>
+<p><strong>Theme:</strong> Dynamic visualization</p>
+<ul>
+<li>Introduction to htmlwidgets
+<ul>
+<li>plotly, rbokeh, highcharts, dygraphs</li>
+</ul></li>
+<li>Interactive heatmaps
+<ul>
+<li>d3heatmap</li>
+</ul></li>
+<li>3-D visualization
+<ul>
+<li>threejs</li>
+</ul></li>
+</ul>
+</div>
+<div id="week-6" class="section level3">
+<h3>Week 6</h3>
+<p><strong>Theme:</strong> Presenting your graphs</p>
+<p><strong>Reference:</strong> <em>R Markdown: The Definitive Guide</em> by Yihui Xie, J.J. Allaire and Garrett Grolemund (available <a href="https://bookdown.org/yihui/rmarkdown/" target="_blank">online</a>)</p>
+<ul>
+<li>R Markdown presentation tools
+<ul>
+<li>Presentations</li>
+<li>Dashboards (using <code>flexdashboard</code>)</li>
+<li>Posters</li>
+</ul></li>
+<li>Shiny for interactive widgets</li>
+</ul>
+</div>
+<div id="week-7" class="section level3">
+<h3>Week 7</h3>
+<p>Class presentations and discussion</p>
+<div id="the-learning-process" class="section level4">
+<h4>The Learning Process</h4>
+<p>I believe in teaching practical methods for using R as a tool in achieving informative data-driven visualizations. As such, this course is opinionated, in that I make certain choices of what parts of R to teach to make things most accessible and useful. The course will be a mixture of didactic lessons, interactive tutorials and exercises, culminating in a final project that brings different aspects of the course together into a single dashboard.</p>
+<p>R is a tool to be used, not studied, and so I promote active learning by doing in order to become familiar with R, its advantages and disadvantages, and using R regularly through the course to learn its capabilities to visualize data. Students will be expected to create simple dashboards to show their data story from the first day, thus learning how to apply their learning to their own workflows and work environments.</p>
+<p>Methods for students to achieve success</p>
+<ol style="list-style-type: decimal">
+<li>Practice programming and coding with R</li>
+<li>See high quality online examples provided by members of the R community and learn</li>
+<li>Participate in class discussions on Slack</li>
+<li>Determine a target visualization they would like to create for presentation to their labs and work towards creating that.</li>
+</ol>
+<p>Time commitment Daily practice for even 30 minutes is good, but for particular class work I don’t expect more than a couple of hours a week.</p>
+<p>Students can be successful in this course through following the teaching materials, participating in discussions on Slack, and practice. R is a language in the same way that French or Japanese is a language (you’re just talking to a computer), and so the only way to retain the knowledge gained in this class is to use it. The exercises and tutorials are meant to get you used to using R for different purposes, so please do them diligently.</p>
+<p>This course should take around 4-6 hours of time weekly, depending on the week.</p>
+</div>
+<div id="etiquette" class="section level4">
+<h4>Etiquette</h4>
+<p>The most important thing is to be polite, considerate and empathetic in all communications and discussions. There are different levels of knowledge about R in this class, and so some questions may appear trivial to some but are essential for others. Be kind, and if you can help a classmate, do so with grace and civility. The class learns best if we all help and support each other.</p>
+</div>
+</div>
+<div id="policies" class="section level3">
+<h3>Policies</h3>
+<div id="academic-policies" class="section level4">
+<h4>Academic Policies</h4>
+<p>This course adheres to all FAES policies described in the academic catalog and student handbook, including the Academic Integrity policy listed on page 11 of the academic catalog and student handbook. Be certain that you are knowledgeable about all of the policies listed in this syllabus, in the academic catalog and student handbook, and on the FAES website. As a student in this program, you are bound by those policies.</p>
+</div>
+<div id="copyright" class="section level4">
+<h4>Copyright</h4>
+<p>All course materials are the property of FAES and are to be used for the student’s individual academic purpose only. Any dissemination, copying, reproducing, modification, displaying, or transmitting of any course material for any other purpose is prohibited, will be considered misconduct, and may be cause for disciplinary action. In addition, encouraging academic dishonesty by distributing information about course materials or assignments which would give an unfair advantage to others may violate the FAES Academic Integrity policy. Course materials may not be exchanged or distributed for commercial purposes, for compensation, or for any purpose other than use by students enrolled in the course. Distributions of course materials may be subject to disciplinary action.</p>
+</div>
+<div id="guidelines-for-disability-accommodations" class="section level4">
+<h4>Guidelines for Disability Accommodations</h4>
+<p>FAES is committed to providing reasonable and appropriate accommodations to students with disabilities. Students with documented disabilities should contact Dr. Mindy Maris, Assistant Dean of Academic Programs.</p>
+</div>
+<div id="dropping-the-course" class="section level4">
+<h4>Dropping the Course</h4>
+<p>Students are responsible for understanding FAES policies, procedures, and deadlines regarding dropping or withdrawing from the course or switching to audit status.</p>
+</div>
+<div id="harassment" class="section level4">
+<h4>Harassment</h4>
+<p>FAES adheres to the NIH’s harassment policies, which can be found at the following link: <a href="https://hr.nih.gov/working-nih/civil/statement-workplace-harassment" class="uri">https://hr.nih.gov/working-nih/civil/statement-workplace-harassment</a> Faculty and students in FAES courses are responsible for being familiar with the NIH’s harassment policies and adhering to them.</p>
+</div>
+<div id="attendance" class="section level4">
+<h4>Attendance</h4>
+<p>It is in your best interest to use, utilize, question and understand all the instructional material provided, and to submit questions and homework in a timely manner. Since this course is completely asynchronous, there is no attendance required at particular times.</p>
+</div>
+<div id="participation" class="section level4">
+<h4>Participation</h4>
+<p>Participation will be judged through the assigned discussions as well as through activity on Slack.</p>
+</div>
+<div id="assignment-submission" class="section level4">
+<h4>Assignment Submission</h4>
+<p>Assignment submission is through Canvas. Each submission will consist of a R Markdown file and the corresponding HTML file. <strong>Both are required</strong>. Just submitting the R Markdown doesn’t let us see the results easily, and just submitting the HTML doesn’t let us evaluate your code. If you have trouble knitting the R Markdown to HTML, let me know and I can help. If it’s really impossible and you’re tearing your hair out, reach out to me at least by Saturday so I can see if (a) I can help, or (b) I can see if reasonable accommodation can be made. The latter will be a rarity, generally.</p>
+</div>
+<div id="due-dates" class="section level4">
+<h4>Due Dates</h4>
+<p>Homework is assigned at 10am each Monday and is due by 11:59pm the following Sunday.</p>
+</div>
+<div id="late-submission-policies" class="section level4">
+<h4>Late Submission Policies</h4>
+<p>No late submissions of homework or discussion are allowed. However, for homework, I will only use the top 4 scores for your grade, so you will have the option of not submitting or doing poorly on 2 of them.</p>
+</div>
+<div id="step-by-step-guidelines-for-submitting-assignments" class="section level4">
+<h4>Step-by-Step Guidelines for Submitting Assignments:</h4>
+<p>The guidelines for submitting assignments will be posted as a screencast during the first week of class.</p>
+</div>
+<div id="expectations-for-instructors-feedback-on-assignments" class="section level4">
+<h4>Expectations for instructor’s feedback on assignments:</h4>
+<p>We will get your assignment grades and feedback to you within a week of submission.</p>
+</div>
+<div id="major-assignments" class="section level4">
+<h4>Major Assignments</h4>
+<p>Grades will be based on the following requirements:</p>
+<ol style="list-style-type: decimal">
+<li>Homeworks for each week are due Sunday at 11:59pm (50%)
+<ul>
+<li>No late homeworks</li>
+<li>We’ll have 6 homeworks, I’ll score the top 4 for grade</li>
+</ul></li>
+<li>Final project: A R Markdown report/presentation demonstrating an end-to-end data analysis in R using your own data, from data ingestion to munging to analyses and graphics, with a brief introduction and conclusion (30%)</li>
+<li>Class participation (20%): Discussion topics in weeks 2-6</li>
+</ol>
+<p><strong>Final project</strong></p>
+<ul>
+<li>Create a R Markdown document or presentation</li>
+<li>Use your own data, or data available on the web (legally)</li>
+<li>Show me that you can
+<ul>
+<li>import data into R</li>
+<li>manipulate (munge) the data</li>
+<li>perform some analysis on the data</li>
+<li>create a visualization</li>
+<li>create a report in R Markdown</li>
+</ul></li>
+<li>5 minute lightning talks that can be recorded using Quicktime or <a href="https://www.screencastify.com" target="_blank">Screencastify</a>, which requires the Chrome browser</li>
+</ul>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

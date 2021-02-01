@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>BIOF 439: Data Visualization using R</title>
+
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Visualization using R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="syllabus.html">Syllabus</a>
+</li>
+<li>
+  <a href="bio.html">Instructor bio</a>
+</li>
+<li>
+  <a href="slides/">Lectures</a>
+</li>
+<li>
+  <a href="assignments/">Homework</a>
+</li>
+<li>
+  <a href="resources.html">Resources</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="FinalProjects/2020Summer/index.html">Final Projects</a>
+</li>
+<li>
+  <a href="notes/">Course Notes</a>
+</li>
+<li>
+  <a href="https://www.github.com/araastat/BIOF439">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">BIOF 439: Data Visualization using R</h1>
+
+</div>
+
+
+<div id="instructor" class="section level2">
+<h2>Instructor</h2>
+<p>Abhijit Dasgupta<br />
+Contact: via email (<a href="adasgupta@araastat.com">adasgupta@araastat.com</a>) or via Slack channel</p>
+</div>
+<div id="course-description" class="section level2">
+<h2>Course description</h2>
+<p>This course will demonstrate and practice the use of R in creating and presenting data visualizations. After a short introduction to R tools, especially the tidyverse packages, we will look at good principles for data visualization, examples of good and bad visualizations, and the use of ggplot2 to create static publication-quality graphs. We will also explore modern web-based interactive graphics using the htmlwidgets packages as well as dynamic graphics and dashboards that can be created using flexdashboard and Shiny. We will explore ways in which bioinformatics data can be presented using static and dynamic visualizations. Finally, we will use RMarkdown and several packages to develop web pages for presenting data visualizations as self-explanatory, and possibly interactive, storyboards.</p>
+</div>
+<div id="learning-objectives" class="section level2">
+<h2>Learning objectives</h2>
+<ul>
+<li>Understand principles of good data visualization; avoid poor or inappropriate data visualization</li>
+<li>Practical short introduction to R to enable data visualization; Manipulating data to enable good visualizations</li>
+<li>Appropriate use of color, symbols and small multiples</li>
+<li>Static and dynamic data visualizations</li>
+<li>Using the web as a presentation medium</li>
+</ul>
+</div>
+<div id="books-and-learning-materials" class="section level2">
+<h2>Books and Learning Materials</h2>
+<ol style="list-style-type: decimal">
+<li><em>R for Data Science</em> [R4DS] by Hadley Wickham and Garrett Grolemund (available <a href="https://r4ds.had.co.nz/" target="_blank">online</a>)</li>
+<li><em>Principles of Data Visualization</em> [PDV] by Claus O. Wilke (available <a href="https://serialmentor.com/dataviz/index.html" target="_blank">online</a>)</li>
+</ol>
+</div>
+<div id="grades" class="section level2">
+<h2>Grades</h2>
+<p>Grades will be based on the following requirements:</p>
+<ol style="list-style-type: decimal">
+<li>Homeworks, available Friday after class, due by midnight the following Tuesday. See <a href="assignments/">instructions</a>. (50%)</li>
+<li>Final project: A presentation demonstrating visualizations in R using your own data (20%)</li>
+<li>Class participation (30%)</li>
+</ol>
+</div>
+<div id="academic-policy-regarding-plagiarism" class="section level2">
+<h2>Academic policy regarding plagiarism</h2>
+<p>See <a href="https://faes.org/sites/default/files/Student_Handbook_2016-17.pdfhttps://faes.org/sites/default/files/Student_Handbook_2016-17.pdf" target="_blank">this link</a> for FAES policy on academic plagiarism.</p>
+</div>
+<div id="lessons" class="section level2">
+<h2>Lessons</h2>
+<div id="february-04-2020-day-1" class="section level3">
+<h3>February 04, 2020 (Day 1)</h3>
+<ul>
+<li>Introduction to the class</li>
+<li>Principles of good data visualization</li>
+<li>An understanding of bad data visualizations</li>
+<li>Introduction to RStudio, RStudio Cloud and R</li>
+<li>Introduction to the <code>flexdashboard</code> package</li>
+</ul>
+</div>
+<div id="february-11-2020-day-2" class="section level3">
+<h3>February 11, 2020 (Day 2)</h3>
+<p><strong>Readings:</strong> R4DS Chapters 4 and 27<br />
+<strong>Resource:</strong> PDV Chapters 2-4</p>
+<p><strong>Theme:</strong> Descriptive plots</p>
+<ul>
+<li>Introduction to ggplot2</li>
+<li>Layering components</li>
+<li>Basic graphs</li>
+<li>Grouped graphs</li>
+<li>Facets (small multiples)</li>
+<li>Thematic personalization</li>
+<li>Easy animation</li>
+</ul>
+</div>
+<div id="february-18-2020-day-3" class="section level3">
+<h3>February 18, 2020 (Day 3)</h3>
+<p><strong>Theme:</strong> Analytic plots</p>
+<ul>
+<li>Using R for analysis
+<ul>
+<li>Data manipulation</li>
+<li>Statistics</li>
+<li>Hypothesis tests</li>
+</ul></li>
+<li>Producing graphs from analysis
+<ul>
+<li>Effect sizes</li>
+<li>Group differences</li>
+<li>Annotations</li>
+<li>Networks</li>
+<li>Maps</li>
+</ul></li>
+</ul>
+</div>
+<div id="february-25-2020-day-4" class="section level3">
+<h3>February 25, 2020 (Day 4)</h3>
+<p><strong>Theme:</strong> R for Bioinformatics</p>
+<ul>
+<li>Visualizations for Bioinformatics
+<ul>
+<li>Manhattan plots</li>
+<li>Heatmaps</li>
+<li>Dendrograms</li>
+<li>Phylogenetic trees</li>
+<li>Linkage maps</li>
+</ul></li>
+<li>Visualizations for RNA-seq and NGS analyses</li>
+</ul>
+</div>
+<div id="march-03-2020-day-5" class="section level3">
+<h3>March 03, 2020 (Day 5)</h3>
+<p><strong>Theme:</strong> Dynamic visualization</p>
+<ul>
+<li>Introduction to htmlwidgets
+<ul>
+<li>plotly, rbokeh, highcharts, dygraphs</li>
+</ul></li>
+<li>Interactive heatmaps
+<ul>
+<li>d3heatmap</li>
+</ul></li>
+<li>3-D visualization
+<ul>
+<li>threejs</li>
+</ul></li>
+</ul>
+</div>
+<div id="march-10-2020-day-6" class="section level3">
+<h3>March 10, 2020 (Day 6)</h3>
+<p><strong>Theme:</strong> Presenting your graphs</p>
+<p><strong>Reference:</strong> <em>R Markdown: The Definitive Guide</em> by Yihui Xie, J.J. Allaire and Garrett Grolemund (available <a href="https://bookdown.org/yihui/rmarkdown/" target="_blank">online</a>)</p>
+<ul>
+<li>R Markdown presentation tools
+<ul>
+<li>Presentations</li>
+<li>Dashboards (using <code>flexdashboard</code>)</li>
+<li>Posters</li>
+</ul></li>
+<li>Shiny for interactive widgets</li>
+</ul>
+</div>
+<div id="march-17-2020-day-7" class="section level3">
+<h3>March 17, 2020 (Day 7)</h3>
+<p>Class presentations and discussion</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
