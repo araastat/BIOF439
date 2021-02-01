@@ -1,0 +1,31 @@
+p {
+  font-size: 12pt;
+}
+ul:not(.nav) {
+  font-size: 12pt;
+}
+.caption {
+  color: #777;
+  margin-top: 10px;
+}
+p code {
+  white-space: inherit;
+}
+pre {
+  word-break: normal;
+  word-wrap: normal;
+}
+pre code {
+  white-space: inherit;
+}
+
+h1, h2, p {
+  font-family: Charter, serif;
+}
+blockquote {
+  font-size: 90%;
+  margin-left: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: beige;
+}
