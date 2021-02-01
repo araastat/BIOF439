@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Joining datasets</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <link href="joins_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Joining datasets
+### Abhijit Dasgupta, PhD
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+
+# Goals today 
+
++ Learn how to join data sets (merging)
+
+???
+
+We need to 
+
++ put datasets capturing different attributes together to find a complete picture
++ evaluate different attributes to see if they contribute to our understanding
++ hedge our bets to ensure we find 
+
+---
+    
+# Data
+
+This data set is taken from a breast cancer proteome database available [here](https://www.kaggle.com/piotrgrabo/breastcancerproteomes) and modified for this exercise.
+
++ Clinical data: data/BreastCancer_Clinical.xlsx
++ Proteome data: data/BreastCancer_Expression.xlsx
+
+&gt; These data are available in the class data folder/link, and the expectation is that you 
+save them to the `data` folder of your project.
+
+---
+class: inverse, middle, center
+
+# Joins
+
+---
+# Putting data sets together
+
++ Quite often, data on individuals lie in different tables
+
+    - Clinical, demographic and bioinformatic data
+--
+    - Drug, procedure, and payment data (think Medicare)
+--
+    - Personal health data across different healthcare entities
+
+---
+
+# Joining data sets
+
+The simplest case is when we just need to add more data to existing data 
+
+- New patients in study, with same protocol (add rows)
+- Adding pathology, imaging data for existing patients (add columns)
+
+---
+
+# Joining data sets
+
+.pull-left[
+&lt;span style="text-align:center;"&gt;`cbind(x,y)`&lt;/span&gt;
+&lt;img src="img/addcol.png" width="640" /&gt;
+
+Data sets have same subjects/observations, but new variables
+]
+.pull-right[
+&lt;span style="text-align:center;"&gt;`rbind(x,y)`&lt;/span&gt;
+&lt;img src="img/addrow.png" width="640" /&gt;
+
+Data sets have same variables, but new subjects]
+
+---
+
+# Joining data sets
+
+.pull-left[
+We will talk about more general ways of joining two datasets
+
+We will assume:
+
+1. We have two rectangular data sets (so `data.frame` or `tibble`)
+1. There is at least one variable (column) in common, even if they have different names
+    - Patient ID number
+    - SSN (Social Security number)
+    - Identifiable information
+]
+
+.pull-right[
+&lt;img src="img/merge.png" height="10%"/&gt;
+]
+
+---
+
+# Joining data sets
+
+&lt;img width="100%" src="img/joins.png"/&gt;
+
+--
+
+&lt;table width="100%"&gt;
+&lt;tr&gt;
+&lt;td style="text-align:center;"&gt;inner_join&lt;/td&gt;
+&lt;td style="text-align:center;"&gt;left_join&lt;/td&gt;
+&lt;td style="text-align:center;"&gt;right_join&lt;/td&gt;
+&lt;td style="text-align:center;"&gt;outer_join&lt;/td&gt;
+&lt;/tr&gt;&lt;/table&gt;
+
+--
+
+The "join condition" are the common variables in the two datasets, i.e. rows are selected if the values of the common variables in the left dataset matches the values of the common variables in the right dataset
+
+These functions are available in the **dplyr** package.
+---
+
+## A breast cancer example
+
+
+```r
+library(readxl)
+clinical &lt;- read_excel('data/BreastCancer_Clinical.xlsx', 
+                       .name_repair = 'universal') 
+proteome &lt;- read_excel('data/BreastCancer_Expression.xlsx', 
+                       .name_repair = 'universal') 
+```
+
+.pull-left[
+
+```r
+clinical
+```
+
+```
+  # A tibble: 105 x 30
+     Complete.TCGA.ID Gender Age.at.Initial.… ER.Status PR.Status HER2.Final.Stat… Tumor Tumor..T1.Coded
+     &lt;chr&gt;            &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;          
+   1 TCGA-A2-A0T2     FEMALE               66 Negative  Negative  Negative         T3    T_Other        
+   2 TCGA-A2-A0CM     FEMALE               40 Negative  Negative  Negative         T2    T_Other        
+   3 TCGA-BH-A18V     FEMALE               48 Negative  Negative  Negative         T2    T_Other        
+   4 TCGA-BH-A18Q     FEMALE               56 Negative  Negative  Negative         T2    T_Other        
+   5 TCGA-BH-A0E0     FEMALE               38 Negative  Negative  Negative         T3    T_Other        
+   6 TCGA-A7-A0CE     FEMALE               57 Negative  Negative  Negative         T2    T_Other        
+   7 TCGA-D8-A142     FEMALE               74 Negative  Negative  Negative         T3    T_Other        
+   8 TCGA-A2-A0D0     FEMALE               60 Negative  Negative  Negative         T2    T_Other        
+   9 TCGA-AO-A0J6     FEMALE               61 Negative  Negative  Negative         T2    T_Other        
+  10 TCGA-A2-A0YM     FEMALE               67 Negative  Negative  Negative         T2    T_Other        
+  # … with 95 more rows, and 22 more variables: Node &lt;chr&gt;, Node.Coded &lt;chr&gt;, Metastasis &lt;chr&gt;,
+  #   Metastasis.Coded &lt;chr&gt;, AJCC.Stage &lt;chr&gt;, Converted.Stage &lt;chr&gt;, Survival.Data.Form &lt;chr&gt;,
+  #   Vital.Status &lt;chr&gt;, Days.to.Date.of.Last.Contact &lt;dbl&gt;, Days.to.date.of.Death &lt;dbl&gt;, OS.event &lt;dbl&gt;,
+  #   OS.Time &lt;dbl&gt;, PAM50.mRNA &lt;chr&gt;, SigClust.Unsupervised.mRNA &lt;dbl&gt;, SigClust.Intrinsic.mRNA &lt;dbl&gt;,
+  #   miRNA.Clusters &lt;dbl&gt;, methylation.Clusters &lt;dbl&gt;, RPPA.Clusters &lt;chr&gt;, CN.Clusters &lt;dbl&gt;,
+  #   Integrated.Clusters..with.PAM50. &lt;dbl&gt;, Integrated.Clusters..no.exp. &lt;dbl&gt;,
+  #   Integrated.Clusters..unsup.exp. &lt;dbl&gt;
+```
+]
+.pull-right[
+
+```r
+proteome
+```
+
+```
+  # A tibble: 83 x 11
+     TCGA_ID NP_958782 NP_958785 NP_958786 NP_000436 NP_958781 NP_958780 NP_958783 NP_958784 NP_112598
+     &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+   1 TCGA-A…     1.10      1.11      1.11      1.11      1.12      1.11      1.11      1.11     -1.52 
+   2 TCGA-C…     2.61      2.65      2.65      2.65      2.65      2.65      2.65      2.65      3.91 
+   3 TCGA-A…    -0.660    -0.649    -0.654    -0.632    -0.640    -0.654    -0.649    -0.649    -0.618
+   4 TCGA-B…     0.195     0.215     0.215     0.205     0.215     0.215     0.215     0.215    -1.04 
+   5 TCGA-C…    -0.494    -0.504    -0.501    -0.510    -0.504    -0.504    -0.501    -0.501    -1.85 
+   6 TCGA-C…     2.77      2.78      2.78      2.80      2.79      2.78      2.78      2.78      2.21 
+   7 TCGA-E…     0.863     0.870     0.870     0.866     0.870     0.870     0.870     0.870     1.92 
+   8 TCGA-C…     1.41      1.41      1.41      1.41      1.41      1.41      1.41      1.41      3.20 
+   9 TCGA-A…     1.19      1.19      1.19      1.19      1.20      1.19      1.19      1.19      1.05 
+  10 TCGA-A…     1.10      1.10      1.10      1.10      1.09      1.10      1.10      1.10     -2.41 
+  # … with 73 more rows, and 1 more variable: NP_001611 &lt;dbl&gt;
+```
+
+]
+
+---
+
+## A breast cancer example
+
+
+```r
+library(readxl)
+clinical &lt;- read_excel('data/BreastCancer_Clinical.xlsx',
+                       .name_repair = 'universal')
+proteome &lt;- read_excel('data/BreastCancer_Expression.xlsx',
+                       .name_repair = 'universal')
+```
+
+.pull-left[
+
+```r
+clinical[,1:2]
+```
+
+```
+  # A tibble: 105 x 2
+     Complete.TCGA.ID Gender
+     &lt;chr&gt;            &lt;chr&gt; 
+   1 TCGA-A2-A0T2     FEMALE
+   2 TCGA-A2-A0CM     FEMALE
+   3 TCGA-BH-A18V     FEMALE
+   4 TCGA-BH-A18Q     FEMALE
+   5 TCGA-BH-A0E0     FEMALE
+   6 TCGA-A7-A0CE     FEMALE
+   7 TCGA-D8-A142     FEMALE
+   8 TCGA-A2-A0D0     FEMALE
+   9 TCGA-AO-A0J6     FEMALE
+  10 TCGA-A2-A0YM     FEMALE
+  # … with 95 more rows
+```
+]
+.pull-right[
+
+```r
+proteome[,1:2]
+```
+
+```
+  # A tibble: 83 x 2
+     TCGA_ID      NP_958782
+     &lt;chr&gt;            &lt;dbl&gt;
+   1 TCGA-AO-A12D     1.10 
+   2 TCGA-C8-A131     2.61 
+   3 TCGA-AO-A12B    -0.660
+   4 TCGA-BH-A18Q     0.195
+   5 TCGA-C8-A130    -0.494
+   6 TCGA-C8-A138     2.77 
+   7 TCGA-E2-A154     0.863
+   8 TCGA-C8-A12L     1.41 
+   9 TCGA-A2-A0EX     1.19 
+  10 TCGA-AO-A12D     1.10 
+  # … with 73 more rows
+```
+]
+
+--
+
+We see that both have the same ID variable, but with different names and different orders
+
+???
+
+Let's keep only the first two columns so we can see the ID variable
+
+---
+
+## A breast cancer example
+
+Let's make sure that the ID's are truly IDs, i.e. each row has a unique value
+
+
+```r
+length(unique(clinical$Complete.TCGA.ID)) == nrow(clinical)
+```
+
+```
+  [1] TRUE
+```
+--
+
+
+```r
+length(unique(proteome$TCGA_ID)) == nrow(proteome)
+```
+
+```
+  [1] FALSE
+```
+
+
+--
+&lt;div style="height:25%;margins:auto;"&gt;
+&lt;img style="display:block; margin:0 auto; height: 70%;" src="https://twitchy.com/wp-content/uploads/2015/04/screen-shot-2015-04-13-at-2-06-38-pm-300x300.png"/&gt;
+&lt;/div&gt;
+
+???
+
+We need the ID variables to be unique for each row. If we use multiple columns to define the "ID" then each row needs to have a unique set of values for those columns. Otherwise the joins get confused about 
+which rows go with which rows. 
+
+---
+## Data example
+
+For convenience we'll keep the first instance for each ID in the `proteome` data
+
+
+```r
+proteome &lt;- proteome %&gt;% filter(!duplicated(TCGA_ID))
+```
+
+&gt; `duplicated` = TRUE if a previous row contains the same value
+
+--
+
+
+```r
+length(unique(proteome$TCGA_ID)) == nrow(proteome)
+```
+
+```
+  [1] TRUE
+```
+
+???
+
+We don't have to sort data for duplicated
+
+---
+
+## Inner join
+
+.pull-left[
+![label](img/inner-join.gif)
+]
+.pull-right[
+
++ Keep only rows that have common ids between the two data, and add columns
++ The joined data will have no more rows than either data, but more columns than each
+]
+---
+## Inner join
+
+
+```r
+common_rows &lt;- inner_join(clinical[,1:6], proteome, 
+                          by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+
+```
+  # A tibble: 77 x 16
+     Complete.TCGA.ID Gender Age.at.Initial.… ER.Status PR.Status HER2.Final.Stat… NP_958782 NP_958785
+     &lt;chr&gt;            &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;
+   1 TCGA-A2-A0CM     FEMALE               40 Negative  Negative  Negative             0.683     0.694
+   2 TCGA-BH-A18Q     FEMALE               56 Negative  Negative  Negative             0.195     0.215
+   3 TCGA-A7-A0CE     FEMALE               57 Negative  Negative  Negative            -1.12     -1.12 
+   4 TCGA-D8-A142     FEMALE               74 Negative  Negative  Negative             0.539     0.542
+   5 TCGA-AO-A0J6     FEMALE               61 Negative  Negative  Negative             0.831     0.857
+   6 TCGA-A2-A0YM     FEMALE               67 Negative  Negative  Negative             0.656     0.658
+   7 TCGA-A2-A0D2     FEMALE               45 Negative  Negative  Negative             0.107     0.104
+   8 TCGA-A2-A0SX     FEMALE               48 Negative  Negative  Negative            -0.399    -0.393
+   9 TCGA-AO-A0JL     FEMALE               59 Negative  Negative  Negative            -0.107    -0.107
+  10 TCGA-AO-A12F     FEMALE               36 Negative  Negative  Negative            -1.95     -1.95 
+  # … with 67 more rows, and 8 more variables: NP_958786 &lt;dbl&gt;, NP_000436 &lt;dbl&gt;, NP_958781 &lt;dbl&gt;,
+  #   NP_958780 &lt;dbl&gt;, NP_958783 &lt;dbl&gt;, NP_958784 &lt;dbl&gt;, NP_112598 &lt;dbl&gt;, NP_001611 &lt;dbl&gt;
+```
+
+--
+
+Note that we have all the columns from both datasets, but only the common set of IDs from the two datasets
+--
+
+&gt; Without the `by` option, R will attempt to join on all column names that are common between the data sets. 
+If the ID columns have different names, you **must** use `by`. Even if they have the same names, it's 
+good practice to be explicity
+
+---
+
+## Left join
+
+.pull-left[
+![label](img/left-join.gif)
+&lt;div style="font-size:12pt;"&gt;
+All the animations are courtesy Garrick Aden-Buie and are available &lt;a src="https://github.com/gadenbuie/tidyexplain" target="_blank"&gt;here&lt;/a&gt;.
+&lt;/div&gt;
+]
+.pull-right[
++ Keep all rows of left data, add columns from right data only for rows with matching IDs
++ If a row in left data has no corresponding row in the right data, the corresponding entries in the joined data are replaced by `NA`
++ Joined data has same number of rows as left data, but more columns.
+]
+---
+## Left join
+
+```r
+left_rows &lt;- left_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+
+```
+  # A tibble: 105 x 16
+    Complete.TCGA.ID Gender Age.at.Initial.Pathologic.Diagnosis ER.Status PR.Status HER2.Final.Status
+    &lt;chr&gt;            &lt;chr&gt;                                &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;            
+  1 TCGA-A2-A0T2     FEMALE                                  66 Negative  Negative  Negative         
+  2 TCGA-A2-A0CM     FEMALE                                  40 Negative  Negative  Negative         
+  3 TCGA-BH-A18V     FEMALE                                  48 Negative  Negative  Negative         
+    NP_958782 NP_958785 NP_958786 NP_000436 NP_958781 NP_958780 NP_958783 NP_958784 NP_112598 NP_001611
+        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1    NA        NA        NA        NA        NA        NA        NA        NA         NA       NA    
+  2     0.683     0.694     0.698     0.687     0.687     0.698     0.698     0.698     -2.65    -0.984
+  3    NA        NA        NA        NA        NA        NA        NA        NA         NA       NA    
+  # … with 102 more rows
+```
+
+We get 105 rows, which is all the rows of `clinical`, combined with the rows of `proteome` with common IDs. The rest of the rows get `NA` for the proteome columns.
+
+---
+
+## Right join
+
+.pull-left[
+![label](img/right-join.gif)
+]
+.pull-right[
++ Keep all the rows of the _right_ data, add corresponding rows of left data _on the left_
++ Once again, if there are rows of right data that do not have corresponding rows in left data, the entries are filled with `NA`
++ The joined data has the same number of rows as the right data, but more columns (attached to its left). The order of the columns is the columns of the left data followed by the columns of the right data
+]
+---
+## Right join
+
+```r
+right_rows &lt;- right_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+
+```
+  # A tibble: 80 x 16
+    Complete.TCGA.ID Gender Age.at.Initial.Pathologic.Diagnosis ER.Status PR.Status HER2.Final.Status
+    &lt;chr&gt;            &lt;chr&gt;                                &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;            
+  1 TCGA-A2-A0CM     FEMALE                                  40 Negative  Negative  Negative         
+  2 TCGA-BH-A18Q     FEMALE                                  56 Negative  Negative  Negative         
+  3 TCGA-A7-A0CE     FEMALE                                  57 Negative  Negative  Negative         
+    NP_958782 NP_958785 NP_958786 NP_000436 NP_958781 NP_958780 NP_958783 NP_958784 NP_112598 NP_001611
+        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1     0.683     0.694     0.698     0.687     0.687     0.698     0.698     0.698     -2.65    -0.984
+  2     0.195     0.215     0.215     0.205     0.215     0.215     0.215     0.215     -1.04    -0.517
+  3    -1.12     -1.12     -1.12     -1.13     -1.13     -1.12     -1.12     -1.12       2.24    -2.58 
+  # … with 77 more rows
+```
+
+--
+
+Here we get 80 rows, which is all the rows of `proteome`, along with the rows of `clinical` with common IDs, but with the columns of `clinical` appearing first.
+
+---
+## Outer/Full Join
+
+.pull-left[
+![label](img/full-join.gif)
+]
+.pull-right[
+This is the _kitchen sink_ join
+
++ All rows of the left and right data are included
++ Non-corresponding entries are filled with `NA`
++ The joined data set has at least as many rows as the larger of the two data, and more columns than either data.
+
+]
+---
+## Outer/Full Join
+
+
+```r
+full_rows &lt;- full_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
+```
+
+```
+  # A tibble: 108 x 16
+    Complete.TCGA.ID Gender Age.at.Initial.Pathologic.Diagnosis ER.Status PR.Status HER2.Final.Status
+    &lt;chr&gt;            &lt;chr&gt;                                &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;            
+  1 TCGA-A2-A0T2     FEMALE                                  66 Negative  Negative  Negative         
+  2 TCGA-A2-A0CM     FEMALE                                  40 Negative  Negative  Negative         
+  3 TCGA-BH-A18V     FEMALE                                  48 Negative  Negative  Negative         
+    NP_958782 NP_958785 NP_958786 NP_000436 NP_958781 NP_958780 NP_958783 NP_958784 NP_112598 NP_001611
+        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1    NA        NA        NA        NA        NA        NA        NA        NA         NA       NA    
+  2     0.683     0.694     0.698     0.687     0.687     0.698     0.698     0.698     -2.65    -0.984
+  3    NA        NA        NA        NA        NA        NA        NA        NA         NA       NA    
+  # … with 105 more rows
+```
+
+--
+
+Here we obtain 108 rows and 16 columns. So we've expanded the data in both rows and columns, putting missing values in where needed.
+
+---
+# Joins
+
+In each of `inner_join`, `left_join`, `right_join` and `full_join`, the number of columns always increases 
+
+There are also two joins where the number of columns don't increase. They aren't really "joins" in that sense, but really fancy filters on a dataset
+
+
+```r
+tbl &lt;- tribble(~Join,~Use,~Description,
+               "semi_join", "semi_join(A,B)", "Keep rows in A where ID matches some ID value in B",
+               'anti_join', 'anti_join(A,B)', 'Keep rows in A where ID does NOT match any ID value in B')
+knitr::kable(tbl, format='html')
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Join &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Use &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Description &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; semi_join &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; semi_join(A,B) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Keep rows in A where ID matches some ID value in B &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; anti_join &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; anti_join(A,B) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Keep rows in A where ID does NOT match any ID value in B &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+These just filter the rows of `A` without adding any columns of `B`. These can be faster than `dplyr::filter` when dealing with large data sets
+
+---
+
+# Putting it in a pipe
+
+
+```r
+final_data &lt;- clinical %&gt;% 
+  inner_join(proteome, by=c("Complete.TCGA.ID"="TCGA_ID")) %&gt;% 
+  filter(Gender =='FEMALE') %&gt;% 
+  select(Complete.TCGA.ID, Age.at.Initial.Pathologic.Diagnosis, ER.Status,
+         starts_with("NP")) # grabs all the protein data
+```
+
+```
+  # A tibble: 75 x 13
+    Complete.TCGA.ID Age.at.Initial.Pathologic.Diagnosis ER.Status NP_958782 NP_958785 NP_958786 NP_000436
+    &lt;chr&gt;                                          &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1 TCGA-A2-A0CM                                      40 Negative      0.683     0.694     0.698     0.687
+  2 TCGA-BH-A18Q                                      56 Negative      0.195     0.215     0.215     0.205
+  3 TCGA-A7-A0CE                                      57 Negative     -1.12     -1.12     -1.12     -1.13 
+    NP_958781 NP_958780 NP_958783 NP_958784 NP_112598 NP_001611
+        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1     0.687     0.698     0.698     0.698     -2.65    -0.984
+  2     0.215     0.215     0.215     0.215     -1.04    -0.517
+  3    -1.13     -1.12     -1.12     -1.12       2.24    -2.58 
+  # … with 72 more rows
+```
+
+---
+
+## Some notes
+
++ Joins are very much in the spirit of using SQL in databases
++ In SAS, if you use `MERGE` in the `DATA` step to create merged variables, you need to 
+sort the data by the common variables
+    - This is a very expensive operation computationally
+    - In SAS, you can avoid this by using `PROC SQL`
+    - In R, this sorting is not necessary
++ Learning to join data sets efficiently is one of the coolest skills of a data scientist, and 
+makes life infinitely easier
+
+---
+
+## Example code: Joining many datasets together
+
+**Requirement:** Pull together over 200 datasets of variant alleles and expressions (1 per subject/cell line) 
+
+
+```r
+library(dplyr)
+
+fnames &lt;- dir('~/Desktop/Sreya', full.names = TRUE) # Grab and store the paths to the individual files
+ids &lt;- stringr::str_extract(fnames, '[:alnum:]+') # The file names have the subject ids in them 
+                                                  # as first bit of the string
+
+## Data ingestion
+data_corpus &lt;- purrr::map(fnames, read_delim, delim='\t') # Creates a list of raw datasets
+
+## Data munging
+for (i in 1:length(data_corpus)){
+  data_corpus[[i]] &lt;- data_corpus[[i]] %&gt;% # Note [[]] since I'm manipulating lists
+    select(`Variant Allele`, HF) %&gt;% # Keep only allele name and expression
+    set_names("variant_allele", ids[i]) %&gt;% # change column names to `variant_allele` and subject ID
+    mutate(variant_allele = str_trim(variant_allele)) # Getting rid of extra spaces
+}
+
+## Data joining
+data_merged &lt;- Reduce(full_join, data_corpus) # Here is the join. This works since 
+                                              # all the data sets have only `variant_allele` in common
+```
+
+&gt; We haven't seen two functions here: `purrr::map` and `Reduce`. I won't go into details here, but see the short version on next slide.
+Also notice that the number of files to be joined is never specified in the code. This could work for any number
+of files
+
+---
+
+## Example code: Joining many datasets together
+
++ The `map` function acts on a list (first argument) and applies a function (2nd argument) to each element, storing the result in a list the same size as the first argument. You could replace the map function with a for loop, but map is provably more efficient computationally. It is worth thinking about map like a for loop, though. [Nice tutorial](https://jennybc.github.io/purrr-tutorial/index.html)
++ `Reduce` is a very powerful function that is one of the functional programming functions in R, i.e., it is a function that acts on functions. It takes as inputs a function (in our case, `full_join`), and a list (in our case, data_corpus). The input function should take two arguments of the same type, as `full_join` does, and Reduce goes through the list, applying the function to the first two elements of the list, then to the result and the 3rd element, then to the result and 4th element,and so on.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

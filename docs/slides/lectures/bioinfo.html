@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Visualization in bioinformatics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <link href="bioinfo_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Visualization in bioinformatics
+### Abhijit Dasgupta, PhD
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle, inverse
+
+# Networks
+
+---
+
+## Visualizing a proteomic network
+
+.left-column70[
+We read a dataset that contains the network relationships between different proteins
+
+```r
+library(ggnetwork)
+datf &lt;- rio::import('data/string_graph.txt')
+head(datf)
+```
+
+```
+      node1  node2 node1_string_id node2_string_id node1_external_id
+  1   CXCR3   CCR7         1855969         1843829   ENSP00000362795
+  2   ITGA4    EED         1858446         1845338   ENSP00000380227
+  3    SMC3  CENPK         1854200         1843648   ENSP00000354720
+  4 HNRNPA1 LUC7L3         1852510         1843556   ENSP00000341826
+  5    SMC2    RB1         1847012         1845924   ENSP00000286398
+  6   RBBP4  CENPK         1855919         1843648   ENSP00000362592
+    node2_external_id neighborhood fusion cooccurence homology coexpression
+  1   ENSP00000246657            0      0           0    0.847        0.000
+  2   ENSP00000263360            0      0           0    0.000        0.000
+  3   ENSP00000242872            0      0           0    0.000        0.000
+  4   ENSP00000240304            0      0           0    0.000        0.000
+  5   ENSP00000267163            0      0           0    0.000        0.136
+  6   ENSP00000242872            0      0           0    0.000        0.000
+    experimental knowledge textmining combined_score
+  1        0.000       0.9      0.878          0.913
+  2        0.566       0.0      0.312          0.688
+  3        0.000       0.9      0.081          0.904
+  4        0.309       0.0      0.394          0.563
+  5        0.000       0.9      0.097          0.915
+  6        0.000       0.9      0.046          0.900
+```
+]
+
+---
+ 
+ ## Visualizing a proteomic network
+ 
+.left-column70[
+The **igraph** package allows the creation of network graphs. 
+
+However, here, we're only using it for data ingestion
+
+```r
+pacman::p_load(igraph)
+grs &lt;- graph_from_data_frame(datf[,c('node1','node2')], 
+                             directed = F)
+grs
+```
+
+```
+  IGRAPH 473d753 UN-- 37 58 -- 
+  + attr: name (v/c)
+  + edges from 473d753 (vertex names):
+   [1] CXCR3  --CCR7    ITGA4  --EED     SMC3   --CENPK   HNRNPA1--LUC7L3 
+   [5] SMC2   --RB1     RBBP4  --CENPK   CXCR5  --CXCL13  CD44   --RUNX2  
+   [9] CXCR5  --PF4     PF4    --THBD    SMARCA1--EZH2    HMMR   --BARD1  
+  [13] MBP    --MMP7    CCL19  --CCR7    RBBP4  --EZH2    RUNX2  --RB1    
+  [17] RB1    --HSPA8   DHX9   --BARD1   CXCL13 --CCR7    SMC2   --KIF23  
+  [21] CD44   --HMMR    ITGA4  --CD44    RB1    --SMARCE1 ITGA4  --CCR7   
+  [25] MBP    --STK4    RBBP4  --LIN9    RB1    --EED     CXCR5  --CCR7   
+  [29] PSMA1  --HSPA8   RBBP4  --SMARCA1 CXCR3  --ITGA4   MBP    --CDK12  
+  + ... omitted several edges
+```
+
+We see that this object holds the different connections. 
+]
+
+---
+
+## Visualizing a proteomic network
+
+.pull-left[
+We can then transform this data into `ggplot`-friendly data, to use `ggplot` for the plotting
+
+
+
+```r
+library(intergraph)
+ggdf &lt;- ggnetwork(asNetwork(grs),
+                  layout='fruchtermanreingold')
+ggplot(ggdf, aes(x = x, y = y, 
+                 xend = xend, yend = yend)) +
+* geom_edges(color = "black",
+*            curvature = 0.1,
+*            size = 0.95, alpha = 0.8)+
+* geom_nodes(aes(x = x, y = y),
+*            size = 3,
+*            alpha = 0.5,
+*            color = "orange") +
+* geom_nodelabel_repel(aes(label = vertex.names),
+*                    size=4, color="#8856a7") +
+  theme_blank() + theme(legend.position = "none")
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+]
+
+---
+class: middle, inverse
+
+# Composing different genomic data into tracks
+
+---
+
+## The `ggbio` package
+
+The **ggbio** package has several functions that allow graphical representations of different genomic entities.
+
+You will see a lot of use of `autoplot`, which is a software technique to create default visualizations based on the type of
+entry. 
+
+.pull-left[
+
+An ideogram
+
+
+```r
+library(ggbio) # p_install('ggbio', try.bioconductor=TRUE)
+p.ideo &lt;- Ideogram(genome = 'hg19')
+p.ideo
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## The `ggbio` package
+
+.pull-left[
+
+Visualizing the gene model
+
+
+```r
+pacman::p_load(Homo.sapiens)
+data(genesymbol, package='biovizBase')
+wh &lt;- genesymbol[c('BRCA1','NBR1')]
+wh &lt;- range(wh, ignore.strand=T)
+p.txdb &lt;- autoplot(Homo.sapiens, which = wh)
+p.txdb
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## The `ggbio` package
+
+A reference track
+
+.pull-left[
+
+```r
+library(BSgenome.Hsapiens.UCSC.hg19)
+bg &lt;- BSgenome.Hsapiens.UCSC.hg19
+p.bg &lt;- autoplot(bg, which=wh)
+p.bg + zoom(1/1000)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+]
+---
+
+## The `ggbio` package
+
+An alignment track with mismatch proportions
+
+.pull-left[
+
+```r
+library(BSgenome.Hsapiens.UCSC.hg19)
+fl.bam &lt;- system.file("extdata", "wg-brca1.sorted.bam", package  = "biovizBase")
+wh &lt;- keepSeqlevels(wh, "chr17")
+bg &lt;- BSgenome.Hsapiens.UCSC.hg19
+p.mis &lt;- autoplot(fl.bam, bsgenome = bg, which = wh, stat = "mismatch")
+p.mis
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## The `ggbio` package
+
+.pull-left[
+
+Putting it into tracks
+
+
+```r
+pacman::p_load(GenomicRanges)
+gr17 &lt;- GRanges("chr17", IRanges(41234415, 41234569))
+tks &lt;-  tracks(p.ideo,  
+               ref=p.bg, 
+               mismatch=p.mis, 
+               gene=p.txdb, 
+               heights=c(2,1,3,4))+
+  xlim(gr17) + 
+  theme_tracks_sunset()
+print(tks)
+```
+]
+.pull-right[
+&lt;img src="img/tracks.png" width="1144" /&gt;
+
+]
+
+---
+
+## The `ggbio` package
+
+A karyogram
+
+.pull-left[
+
+```r
+data(ideoCyto, package = "biovizBase")
+autoplot(ideoCyto$hg19, layout = "karyogram", 
+         cytobands = TRUE)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle,inverse
+
+# P-values and Manhattan plots
+
+---
+
+## A very simple example
+
+
+
+
+```r
+library(tidyverse)
+clinical &lt;- rio::import('data/BreastCancer_Clinical.xlsx') %&gt;% janitor::clean_names() 
+proteome &lt;- rio::import('data/BreastCancer_Expression.xlsx') %&gt;% janitor::clean_names()
+final_data &lt;- clinical %&gt;% 
+    inner_join(proteome, by = c('complete_tcga_id' = 'tcga_id')) %&gt;% 
+    dplyr::filter(gender == 'FEMALE') %&gt;% 
+    dplyr::select(complete_tcga_id, age_at_initial_pathologic_diagnosis, er_status, starts_with("np"))
+head(final_data)
+```
+
+```
+    complete_tcga_id age_at_initial_pathologic_diagnosis er_status  np_958782  np_958785  np_958786  np_000436
+  1     TCGA-A2-A0CM                                  40  Negative  0.6834035  0.6944241  0.6980976  0.6870771
+  2     TCGA-BH-A18Q                                  56  Negative  0.1953407  0.2154129  0.2154129  0.2053768
+  3     TCGA-A7-A0CE                                  57  Negative -1.1231731 -1.1231731 -1.1168605 -1.1294857
+  4     TCGA-D8-A142                                  74  Negative  0.5385958  0.5422105  0.5422105  0.5349810
+  5     TCGA-AO-A0J6                                  61  Negative  0.8311317  0.8565398  0.8565398  0.8367780
+  6     TCGA-A2-A0YM                                  67  Negative  0.6558497  0.6581426  0.6558497  0.6558497
+     np_958781  np_958780  np_958783  np_958784  np_112598  np_001611
+  1  0.6870771  0.6980976  0.6980976  0.6980976 -2.6521501 -0.9843733
+  2  0.2154129  0.2154129  0.2154129  0.2154129 -1.0357599 -0.5172257
+  3 -1.1294857 -1.1200168 -1.1231731 -1.1231731  2.2445844 -2.5750648
+  4  0.5422105  0.5422105  0.5422105  0.5422105 -0.1482049  0.2674902
+  5  0.8650092  0.8565398  0.8508936  0.8508936 -0.9671961  2.8383705
+  6  0.6512639  0.6581426  0.6558497  0.6558497 -1.9695337  1.3070365
+```
+
+---
+
+## A very simple example
+
+
+```r
+results &lt;- final_data %&gt;% 
+*   summarise_at(vars(starts_with('np')),
+*                ~wilcox.test(. ~ er_status)$p.value)
+results
+```
+
+```
+    np_958782 np_958785 np_958786 np_000436 np_958781 np_958780 np_958783 np_958784 np_112598    np_001611
+  1 0.6988415 0.6910103 0.6832121 0.6910103 0.6832121 0.6910103 0.6910103 0.6832121 0.9957714 0.0001218627
+```
+
+`.` is the placeholder for what's specified inside the `vars()`. 
+
+--
+
+This isn't in the right format for me to plot
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+results %&gt;% tidyr::pivot_longer(cols=everything(), 
+                                names_to='protein', 
+                                values_to='pvalue')
+```
+
+```
+  # A tibble: 10 x 2
+     protein     pvalue
+     &lt;chr&gt;        &lt;dbl&gt;
+   1 np_958782 0.699   
+   2 np_958785 0.691   
+   3 np_958786 0.683   
+   4 np_000436 0.691   
+   5 np_958781 0.683   
+   6 np_958780 0.691   
+   7 np_958783 0.691   
+   8 np_958784 0.683   
+   9 np_112598 0.996   
+  10 np_001611 0.000122
+```
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+theme_439 &lt;- theme_bw() + 
+    theme(axis.title = element_text(size=16),
+          axis.text = element_text(size=8))
+
+
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to='protein', 
+  values_to='pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+  theme_439
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-4-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+pacman::p_load('ggalt')
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+* geom_lollipop(point.colour='blue', point.size=4)+
+  coord_flip()+
+  theme_439 
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-5-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+      geom_point() +
+      geom_lollipop(point.colour='blue', point.size=4)+ 
+*     geom_hline(yintercept = 0.05, linetype=2)+
+      coord_flip() + 
+      theme_439 
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-6-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+
+
+## Manhattan plot
+
+A Manhattan plot is used to visualize a set of p-values from unit-based tests
+
+It plots the negative log p-value at each unit
+
+.pull-left[
+
+```r
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = -log10(pvalue))) +
+    geom_point() + 
+    geom_lollipop() + 
+    geom_hline(yintercept = 8, linetype=2)+
+    labs(x = 'Protein',
+         y = expression(log[10](p-value))) +
+    theme_439
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-7-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Manhattan plot
+
+There is a specialized package for doing Manhattan plots and quantile plots for GWAS data
+
+This package is meant to work with PLINK output, but the function is generic
+
+.pull-left[
+
+```r
+*library(qqman)
+manhattan(gwasResults)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-8-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Manhattan plot
+
+.pull-left[
+
+```r
+library(qqman) 
+manhattan(gwasResults, 
+          annotatePval = 1e-6, 
+          annotateTop=F)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-9-1.png)&lt;!-- --&gt;
+]
+
+???
+
+Look at the help for manhattan
+
+---
+class: middle,inverse
+
+# Heatmaps
+
+---
+
+## Let us count the ways
+
+There are several ways of doing heatmaps in R:
+
++ [https://jokergoo.github.io/ComplexHeatmap-reference/book/](ComplexHeatmap)
++ [http://sebastianraschka.com/Articles/heatmaps_in_r.html](http://sebastianraschka.com/Articles/heatmaps_in_r.html)
++ [https://plot.ly/r/heatmaps/](https://plot.ly/r/heatmaps/)
++ [http://moderndata.plot.ly/interactive-heat-maps-for-r/](http://moderndata.plot.ly/interactive-heat-maps-for-r/)
++ [http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2](http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2)
++ [https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/](https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/)
+
+---
+
+## Some example data
+
+
+```r
+library(Biobase)
+#data(sample.ExpressionSet)
+exdat &lt;-  readRDS('data/exprset.rds')
+library(limma)
+design1 &lt;- model.matrix(~type, data=pData(exdat))
+lm1 &lt;- lmFit(exprs(exdat), design1)
+lm1 &lt;- eBayes(lm1) # compute linear model for each probeset
+geneID &lt;- rownames(topTable(lm1, coef = 2, number = 100, 
+                            adjust.method = 'none',
+                            p.value = 0.05))
+exdat2 &lt;- exdat[geneID,] # Keep features with p-values &lt; 0.05
+
+head(exdat2)
+```
+
+```
+  ExpressionSet (storageMode: lockedEnvironment)
+  assayData: 1 features, 26 samples 
+    element names: exprs, se.exprs 
+  protocolData: none
+  phenoData
+    sampleNames: A B ... Z (26 total)
+    varLabels: sex type score
+    varMetadata: labelDescription
+  featureData: none
+  experimentData: use 'experimentData(object)'
+  Annotation: hgu95av2
+```
+
+---
+
+## Using Heatplus
+
+.pull-left[
+
+```r
+# BiocManager::install('Heatplus')
+library(Heatplus)
+reg1 &lt;- regHeatmap(exprs(exdat2), legend=2, col=heat.colors, 
+                   breaks=-3:3)
+plot(reg1)
+```
+
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-24-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Using Heatplus
+
+.pull-left[
+
+```r
+corrdist &lt;- function(x) as.dist(1-cor(t(x)))
+hclust.avl &lt;- function(x) hclust(x, method='average')
+reg2 &lt;- regHeatmap(exprs(exdat2), legend=2, 
+                   col=heat.colors,
+                   breaks=-3:3, 
+                   dendrogram = 
+                       list(clustfun=hclust.avl, 
+                            distfun=corrdist))
+plot(reg2)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-25-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+
+```r
+ann1 &lt;- annHeatmap(exprs(exdat2), 
+*                  ann=pData(exdat2),
+                   col = heat.colors)
+plot(ann1)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-26-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+
+```r
+ann2 &lt;- annHeatmap(exprs(exdat2), 
+                   ann=pData(exdat2), 
+                   col = heat.colors,
+        cluster = 
+            list(cuth=7500,
+                 label=c('Control-like','Case-like')))
+plot(ann2)
+```
+]
+.pull-right[
+
+
+&lt;img src="img/heatmap.png" style="height:4.5in;vertical-align:top;"&gt;&lt;/img&gt;
+
+
+]
+
+---
+
+## Using ComplexHeatmap
+
+.left-column70[
+![](bioinfo_files/figure-html/complexhm-1.png)&lt;!-- --&gt;
+]
+.right-column70[
+  Source code [here](complexhm.R)
+]
+
+---
+
+## UpSet plots
+
+UpSet plots are nice visualizations for looking at commonalities (complex intersections) between sets
+of objects. 
+
+We used UpSet plots to look at missing value patterns
+
+![](bioinfo_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+## UpSet plots
+
+
+
+![](img/upset1.png)
+
+---
+
+
+# clusterProfiler
+
+Enrichment network based on GSEA
+
+![](bioinfo_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+
+
+class:middle, center
+
+# Playing with Seurat
+
+
+
+---
+
+## Example data
+
+
+```r
+library(Seurat)
+# pbmc.data &lt;- Read10X(data.dir='data/hg19/')
+# pbmc &lt;- CreateSeuratObject(counts = pbmc.data, project='pbmc3k', min.cells=3, min.features=200)
+pbmc &lt;- readRDS('data/pbmc.rds')
+pbmc
+```
+
+```
+  An object of class Seurat 
+  13714 features across 2700 samples within 1 assay 
+  Active assay: RNA (13714 features, 0 variable features)
+```
+
+```r
+names(pbmc)
+```
+
+```
+  [1] "RNA"
+```
+
+```r
+slotNames(pbmc)
+```
+
+```
+   [1] "assays"       "meta.data"    "active.assay" "active.ident" "graphs"       "neighbors"    "reductions"  
+   [8] "project.name" "misc"         "version"      "commands"     "tools"
+```
+
+---
+
+## Adding QC metrics and plotting
+
+We'll calculate mitochondrial QC metrics (percentage counts originating from mitochondrial genes)
+
+
+```r
+pbmc[['percent.mt']] &lt;- PercentageFeatureSet(pbmc, pattern = '^MT-')
+*head(pbmc@meta.data)
+```
+
+```
+                 orig.ident nCount_RNA nFeature_RNA percent.mt
+  AAACATACAACCAC     pbmc3k       2419          779  3.0177759
+  AAACATTGAGCTAC     pbmc3k       4903         1352  3.7935958
+  AAACATTGATCAGC     pbmc3k       3147         1129  0.8897363
+  AAACCGTGCTTCCG     pbmc3k       2639          960  1.7430845
+  AAACCGTGTATGCG     pbmc3k        980          521  1.2244898
+  AAACGCACTGGTAC     pbmc3k       2163          781  1.6643551
+```
+
+---
+
+## Visualizing metrics
+
+.pull-left[
+
+```r
+# plt &lt;- VlnPlot(object = pbmc, 
+#   features = c('nFeature_RNA',
+#                'nCount_RNA',
+#                'percent.mt'))
+
+plot_data &lt;- pbmc@meta.data %&gt;%
+  tidyr::gather(variable, value, -orig.ident)
+
+ggplot(plot_data, aes(orig.ident, value)) +
+  geom_violin(fill = 'red') +
+  geom_jitter(width=0.5, alpha = 0.1) +
+  facet_wrap(~variable, nrow = 1, 
+*            scales = 'free_y') +
+  labs(x = 'Identity',y = 'Expression Level') +
+  theme_classic()
+```
+
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-30-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+
+```r
+plot1 &lt;- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "percent.mt")
+plot2 &lt;- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "nFeature_RNA")
+CombinePlots(plots = list(plot1, plot2))
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-31-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+
+```r
+cormatrix &lt;- cor(pbmc@meta.data %&gt;% dplyr::select(-orig.ident))
+plt1 &lt;-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = percent.mt, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+    theme_classic() +
+    labs(color = 'Identity',
+         title=as.character(round(cormatrix['nCount_RNA','percent.mt'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+plt2 &lt;-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = nFeature_RNA, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+  theme_classic() +
+  labs(color = 'Identity',
+       title=as.character(round(cormatrix['nCount_RNA','nFeature_RNA'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+ggpubr::ggarrange(plt1, plt2, nrow = 1, ncol=2)
+```
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-32-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+pbmc &lt;- subset(x = pbmc, 
+    subset = nFeature_RNA &gt; 200 &amp; nFeature_RNA &lt; 2500 &amp; percent.mt &lt; 5)
+pbmc &lt;- NormalizeData(object = pbmc, 
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 10000)
+# This is stored in pbmc[['RNA']]@meta.features
+
+pbmc &lt;- FindVariableFeatures(object = pbmc, 
+                             selection.method = "vst", 
+                             nfeatures = 2000)
+
+
+# Identify the 10 most highly variable genes
+top10 &lt;- head(x = VariableFeatures(object = pbmc), 10)
+
+# plot variable features with and without labels
+plot1 &lt;- VariableFeaturePlot(object = pbmc)
+plot1
+```
+
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-33-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+plt_data &lt;- pbmc[['RNA']]@meta.features %&gt;% 
+    rownames_to_column(var='id')
+topvars &lt;- pbmc[['RNA']]@var.features
+plt_data &lt;- plt_data %&gt;% 
+    mutate(indic = ifelse(id %in% topvars, 
+                          'Variable count',
+                          'Non-variable count'))
+bl &lt;- plt_data %&gt;% 
+    dplyr::count(indic) %&gt;% 
+    glue::glue_data("{indic}: {n}")
+names(bl) &lt;- c('Non-variable count','Variable count')
+plt_data &lt;- plt_data %&gt;%
+  mutate(indic = bl[indic])
+plt11 &lt;- ggplot(plt_data, 
+                aes(x = vst.mean, 
+                    y = vst.variance.standardized, 
+                    color = indic)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_color_manual(values = c('black','red')) +
+  labs(x = 'Average Expression', y = 'Standardized Variance', color = '')+
+  theme_classic()
+plt11
+```
+
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-34-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+# plot2 &lt;- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plt12 &lt;- plt11 + ggrepel::geom_text_repel(data = plt_data %&gt;% filter(id %in% top10),
+                                          aes(label = id),
+                                          color = 'black')
+plt12
+```
+
+]
+.pull-right[
+![](bioinfo_files/figure-html/04-bioinformatics-35-1.png)&lt;!-- --&gt;
+]
+---
+
+## There's a lot more
+
+We'll stop our sampling here. 
+
++ Many Bioconductor packages do use ggplot, however some use base graphics
+    - Faster
++ Key is to find where the data is stored, and use that to create visualizations
++ Bioconductor tends to create
+    - One monolithic object
+    - Containing different information in slots 
+    - combined by lists
++ `slotNames` and `names` are your friends
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

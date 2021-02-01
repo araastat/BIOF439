@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Plotting systems in R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <link href="plot_families_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Plotting systems in R
+### Abhijit Dasgupta, PhD
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+---
+
+## Plotting systems in R
+
+There are three basic plotting systems in R
+
++ Base plotting (what comes with R)
++ ggplot2
++ lattice
+
+The latter two are related, in that both are based on the package **grid** that implements a system called
+_grid graphics_. This actually allows ggplot2 and lattice graphics to be put together in panels using 
+functions from packages like **gridExtra** and **ggpubr**
+
+---
+
+## ggplot2
+
+Since we've learned **ggplot2** in this class, lets start with a plot using it
+
+
+```r
+library(ggplot2)
+library(palmerpenguins)
+
+ggplot(penguins,
+       aes(x = bill_length_mm, y = body_mass_g, color=species))+  geom_point()
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+---
+
+## lattice
+
+The **lattice** package was built by Deepayan Sarkar, one of the R core members
+
+
+```r
+library(lattice)
+
+xyplot(body_mass_g ~ bill_length_mm, groups =  species, auto.key=TRUE, data=penguins)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+
+## Base graphics
+
+Base graphics allow you to build up a plot, but the process is much more granular, in that you 
+have to specify everything instead of a package making choices for you like **ggplot2** or **lattice**
+
+
+```r
+plot(body_mass_g ~ bill_length_mm, data = penguins, col=species)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+class: middle, inverse
+
+# Facets
+
+---
+
+## Facets
+
+Facets is where the grid-based graphics has a significant advantage over base graphics.
+
+.pull-left[
+
+```r
+ggplot(penguins,
+       aes(bill_length_mm, body_mass_g))+
+    geom_point()+
+    facet_wrap(~species)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+
+```r
+xyplot(body_mass_g ~ bill_length_mm | species,
+       data=penguins)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Facets
+
+
+```r
+op &lt;- par(mfrow = c(1,3))
+for(n in unique(penguins$species)){
+    plot(body_mass_g ~ bill_length_mm, data=subset(penguins, species==n),
+         main=n, #&lt;&lt; Title
+         ylim = range(penguins$body_mass_g, na.rm=T),
+         xlim = range(penguins$bill_length_mm, na.rm=T)) #&lt;&lt; making scales the same
+}
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+```r
+par(op) #&lt;&lt; have to return back to original graphical parameters    
+```
+
+---
+
+## Facets
+
+Let's consider 2-dimensional faceting
+
+.pull-left[
+
+```r
+ggplot(penguins)+
+geom_point(aes(bill_length_mm,
+               body_mass_g))+
+    facet_wrap(species~island)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+
+```r
+xyplot(body_mass_g ~ bill_length_mm |
+           species+island,
+       data = penguins)
+```
+
+![](plot_families_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Facets
+
+.pull-left[
+
+```r
+op &lt;- par(mfrow=c(3,3))
+for(i in unique(penguins$island)){
+    for(j in unique(penguins$species)){
+        plot(body_mass_g ~ bill_length_mm,
+             data=subset(penguins, island==i &amp; species==j),
+             xlim = range(penguins$bill_length_mm,na.rm=T),
+             ylim = range(penguins$body_mass_g, na.rm=T),
+             main = paste(paste('Species =',j),paste('Island =',i), collapse='\n'))
+    }
+}
+```
+
+We basically have to do a lot of detail in base graphics
+]
+.pull-right[
+![](plot_families_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Facets
+
++ Both ggplot2 and lattice automatically title the panels and maintain the same x- and y-axis for all theplots
+- Base graphics requires a for-loop and explicitly forcing the axes to be the same. Titling is also explicitly done
+
+
+---
+
+## Why are there still 3 systems?
+
++ ggplot2 has traditionally been the slowest of the bunch
+    + Don't try and plot 1M points
++ Base plots and lattice are a lot faster
++ Base plots and lattice aren't pipe-friendly
++ People still like base plots for the control
+    + You can control almost every single aspect of a plot
+    + margins, annotations and labels, aspect ratio, ...
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
