@@ -13,7 +13,8 @@ slides_web: FORCE ## Create website for slides
 
 toplevel: FORCE ## Create top level website
 	Rscript -e "rmarkdown::render_site('.')"
-	cp -r docs/toplevel/* docs
+	cp  docs/toplevel/*.html docs
+	cp -r docs/toplevel/site_libs docs
 
 all: lectures slides_web toplevel
 

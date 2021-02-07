@@ -1,6 +1,6 @@
 name: BIOF 439
 output_dir: docs/toplevel
-exclude: ['Personal','slides','assignments','notes', 'R', 'README.Rmd']
+exclude: ['Personal','docs','ForCanvas','slides','assignments','notes', 'R', 'README.Rmd']
 navbar:
   title: Data Visualization using R
   left:

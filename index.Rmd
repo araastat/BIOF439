@@ -27,12 +27,6 @@ in preparation for subsequent classes. This will be a rather intense 7-week cour
 Students can also work together to facilitate understanding, and share questions and
 answers on the class [Slack channel](https://biof439dataviz.slack.com){target=_blank}. 
 
-We will be working on [RStudio Cloud](http://rstudio.cloud), a cloud-based 
-implementation of R and the RStudio IDE, which has all the packages required for this
-course pre-installed. Homework assignments will be done on RStudio Cloud as 
-RMarkdown documents, and both the RMarkdown and resultant HTML documents will be 
-submitted
-
 Grades are based on completing homework, class participation, and a final presentation
 based on your own data and your own work, showing how you can use data visualizations to help
 express the (scientific) story. 
