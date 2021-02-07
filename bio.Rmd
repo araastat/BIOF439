@@ -21,10 +21,10 @@ machine learning and visualization. He currently serves as co-chair of the
 [Bioinformatics and Data Science](https://faes.org/content/bioinformatics-and-data-science){target=_blank} department at 
 [FAES/NIH](https://faes.org){target=_blank}.
 
-Dr. Dasgupta serves as a consultant to the [National Institute of Arthritis,
+Dr. Dasgupta currently is Principal Data Scientist at AstraZeneca. Previously, he served as a consultant to the [National Institute of Arthritis,
 Musculoskeletal and Skin
 Disorders](https://www.niams.nih.gov/about/directory/abhijit-dasgupta-phd){target=_blank},
-part of the NIH, where he works on complex analyses of healthcare databases as
+part of the NIH, where he worked on complex analyses of healthcare databases as
 well as outcomes research. He also is Co-Founder and Chief Data Scientist at
 [Zansors](http://www.zansors.com){target=_blank}, a healthcare wearable and
 analytics company based in Arlington, Virginia. He maintains his clinical trial chops 
