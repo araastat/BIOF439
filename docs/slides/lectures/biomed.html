@@ -4,6 +4,7 @@
     <title>Visualization in different applications</title>
     <meta charset="utf-8" />
     <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="biomed_files/header-attrs-2.6/header-attrs.js"></script>
     <link href="biomed_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
     <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
@@ -290,12 +291,12 @@ fit_cox &lt;- coxph(Surv(OS.Time,OS.event) ~ ER.Status + PR.Status + HER2.Final.
 ```
 
 ```
-  # A tibble: 3 x 7
-    term                      estimate std.error statistic p.value conf.low conf.high
-    &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-  1 ER.StatusPositive          -0.0428     0.909   -0.0471   0.962    -1.82     1.74 
-  2 PR.StatusPositive          -1.00       0.923   -1.08     0.278    -2.81     0.808
-  3 HER2.Final.StatusPositive  -1.55       1.12    -1.39     0.166    -3.75     0.644
+  # A tibble: 3 x 5
+    term                      estimate std.error statistic p.value
+    &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+  1 ER.StatusPositive          -0.0428     0.909   -0.0471   0.962
+  2 PR.StatusPositive          -1.00       0.923   -1.08     0.278
+  3 HER2.Final.StatusPositive  -1.55       1.12    -1.39     0.166
 ```
 
 Notice that a Cox regression does not have an intercept term

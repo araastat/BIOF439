@@ -1,7 +1,6 @@
 SUBDIRS = slides/lectures
 OUTDIR=docs
 
-
 lectures: $(SUBDIRS) ## Compile lecture slides
 $(SUBDIRS):
 	cp make_subdirs $@/Makefile; $(MAKE) -C $@
@@ -9,7 +8,6 @@ $(SUBDIRS):
 slides_web: FORCE ## Create website for slides
 	Rscript -e "rmarkdown::render_site('slides')"
 	cp -r docs/slides_top/* docs/slides
-
 
 toplevel: FORCE ## Create top level website
 	Rscript -e "rmarkdown::render_site('.')"

@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A sampling of bioinformatics using R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="05-bioinformatics_files/header-attrs-2.6/header-attrs.js"></script>
+    <link href="05-bioinformatics_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# A sampling of bioinformatics using R
+### Abhijit Dasgupta, PhD
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span style="left: 15px; bottom:2px;"&gt;BIOF 439: Data Visualization with R&lt;/span&gt;
+&lt;span style='right:15px; bottom:2px;'&gt;Abhijit Dasgupta&lt;/span&gt;
+&lt;/div&gt;
+
+
+---
+
+## Expectations
+
+1. We will explore
+    - the basics of using Bioconductor packages for bioinformatics
+    - visualizations useful for bioinformatics
+    - ways to annotate our graphics
+1. We will not explore
+    - how to do bioinformatics using R
+    - bioinformatic workflows
+    - data cleaning, modeling, analytics
+
+This area is too broad and interests too varied to cover this with any sort of breadth or depth. 
+
+---
+
+## A very simple example
+
+
+```r
+clinical &lt;- rio::import('data/BreastCancer_Clinical.xlsx') %&gt;% janitor::clean_names() 
+proteome &lt;- rio::import('data/BreastCancer_Expression.xlsx') %&gt;% janitor::clean_names()
+final_data &lt;- clinical %&gt;% 
+    inner_join(proteome, by = c('complete_tcga_id' = 'tcga_id')) %&gt;% 
+    filter(gender == 'FEMALE') %&gt;% 
+    select(complete_tcga_id, age_at_initial_pathologic_diagnosis, er_status, starts_with("np"))
+head(final_data)
+```
+
+```
+#&gt;    complete_tcga_id age_at_initial_pathologic_diagnosis er_status  np_958782
+#&gt;  1     TCGA-A2-A0CM                                  40  Negative  0.6834035
+#&gt;  2     TCGA-BH-A18Q                                  56  Negative  0.1953407
+#&gt;  3     TCGA-A7-A0CE                                  57  Negative -1.1231731
+#&gt;  4     TCGA-D8-A142                                  74  Negative  0.5385958
+#&gt;  5     TCGA-AO-A0J6                                  61  Negative  0.8311317
+#&gt;  6     TCGA-A2-A0YM                                  67  Negative  0.6558497
+#&gt;     np_958785  np_958786  np_000436  np_958781  np_958780  np_958783  np_958784
+#&gt;  1  0.6944241  0.6980976  0.6870771  0.6870771  0.6980976  0.6980976  0.6980976
+#&gt;  2  0.2154129  0.2154129  0.2053768  0.2154129  0.2154129  0.2154129  0.2154129
+#&gt;  3 -1.1231731 -1.1168605 -1.1294857 -1.1294857 -1.1200168 -1.1231731 -1.1231731
+#&gt;  4  0.5422105  0.5422105  0.5349810  0.5422105  0.5422105  0.5422105  0.5422105
+#&gt;  5  0.8565398  0.8565398  0.8367780  0.8650092  0.8565398  0.8508936  0.8508936
+#&gt;  6  0.6581426  0.6558497  0.6558497  0.6512639  0.6581426  0.6558497  0.6558497
+#&gt;     np_112598  np_001611
+#&gt;  1 -2.6521501 -0.9843733
+#&gt;  2 -1.0357599 -0.5172257
+#&gt;  3  2.2445844 -2.5750648
+#&gt;  4 -0.1482049  0.2674902
+#&gt;  5 -0.9671961  2.8383705
+#&gt;  6 -1.9695337  1.3070365
+```
+
+---
+
+## A very simple example
+
+
+```r
+results &lt;- final_data %&gt;% 
+*   summarise_at(vars(starts_with('np')),
+*                ~wilcox.test(. ~ er_status)$p.value)
+results
+```
+
+```
+#&gt;    np_958782 np_958785 np_958786 np_000436 np_958781 np_958780 np_958783
+#&gt;  1 0.6988415 0.6910103 0.6832121 0.6910103 0.6832121 0.6910103 0.6910103
+#&gt;    np_958784 np_112598    np_001611
+#&gt;  1 0.6832121 0.9957714 0.0001218627
+```
+
+`.` is the placeholder for what's specified inside the `vars()`. 
+
+--
+
+This isn't in the right format for me to plot
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+results %&gt;% tidyr::pivot_longer(cols=everything(), 
+                                names_to='protein', 
+                                values_to='pvalue')
+```
+
+```
+#&gt;  # A tibble: 10 x 2
+#&gt;     protein     pvalue
+#&gt;     &lt;chr&gt;        &lt;dbl&gt;
+#&gt;   1 np_958782 0.699   
+#&gt;   2 np_958785 0.691   
+#&gt;   3 np_958786 0.683   
+#&gt;   4 np_000436 0.691   
+#&gt;   5 np_958781 0.683   
+#&gt;   6 np_958780 0.691   
+#&gt;   7 np_958783 0.691   
+#&gt;   8 np_958784 0.683   
+#&gt;   9 np_112598 0.996   
+#&gt;  10 np_001611 0.000122
+```
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+theme_439 &lt;- theme_bw() + 
+    theme(axis.title = element_text(size=16),
+          axis.text = element_text(size=8))
+
+
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to='protein', 
+  values_to='pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+  theme_439
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-4-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+  geom_point() +
+* geom_segment(aes(x = protein, xend = protein,
+*                  y = 0, yend = pvalue))+
+  theme_439 
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-5-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## A very simple example
+
+.pull-left[
+
+```r
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = pvalue)) + 
+      geom_point() +
+    geom_segment(aes(x = protein, xend = protein, 
+                     y = 0, yend = pvalue))+
+*   geom_hline(yintercept = 0.05, linetype=2)+
+    theme_439 
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-6-1.png)&lt;!-- --&gt;
+
+]
+
+???
+
+This is basically the beginnings of a Manhattan plot
+
+---
+
+## Manhattan plot
+
+A Manhattan plot is used to visualize a set of p-values from unit-based tests
+
+It plots the negative log p-value at each unit
+
+.pull-left[
+
+```r
+results %&gt;% pivot_longer(
+  cols=everything(),
+  names_to = 'protein', 
+  values_to = 'pvalue') %&gt;% 
+  ggplot(aes(x = protein, y = -log10(pvalue))) +
+    geom_point() + 
+    geom_segment(aes(xend = protein, yend = 0))+
+    geom_hline(yintercept = 8, linetype=2)+
+    labs(x = 'Protein',
+         y = expression(log[10](p-value))) +
+    theme_439
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-7-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Manhattan plot
+
+There is a specialized package for doing Manhattan plots and quantile plots for GWAS data
+
+This package is meant to work with PLINK output, but the function is generic
+
+.pull-left[
+
+```r
+*library(qqman)
+manhattan(gwasResults)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-8-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Manhattan plot
+
+.pull-left[
+
+```r
+*library(qqman)
+manhattan(gwasResults, 
+          annotatePval = 1e-6, 
+          annotateTop=F)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-9-1.png)&lt;!-- --&gt;
+]
+
+???
+
+Look at the help for manhattan
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+
+```r
+head(gwasResults)
+```
+]
+.pull-right[
+
+```
+#&gt;    SNP CHR BP         P
+#&gt;  1 rs1   1  1 0.9148060
+#&gt;  2 rs2   1  2 0.9370754
+#&gt;  3 rs3   1  3 0.2861395
+#&gt;  4 rs4   1  4 0.8304476
+#&gt;  5 rs5   1  5 0.6417455
+#&gt;  6 rs6   1  6 0.5190959
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+
+```r
+plt_x_position &lt;- gwasResults %&gt;% 
+    group_by(CHR) %&gt;% 
+    summarize(chr_len = max(BP)) %&gt;% 
+    mutate(tot = cumsum(chr_len) - chr_len)
+head(plt_x_position)
+```
+
+]
+.pull-right[
+
+```
+#&gt;  # A tibble: 6 x 3
+#&gt;      CHR chr_len   tot
+#&gt;    &lt;int&gt;   &lt;int&gt; &lt;int&gt;
+#&gt;  1     1    1500     0
+#&gt;  2     2    1191  1500
+#&gt;  3     3    1040  2691
+#&gt;  4     4     945  3731
+#&gt;  5     5     877  4676
+#&gt;  6     6     825  5553
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data prep
+
+.pull-left[
+
+```r
+plt_dat &lt;- gwasResults %&gt;% 
+    left_join(plt_x_position %&gt;% select(-chr_len), 
+              by = c('CHR'='CHR')) %&gt;% 
+    arrange(CHR, BP) %&gt;% 
+    mutate(BPcumul = BP + tot)
+tail(plt_dat)
+```
+
+]
+.pull-right[
+
+```
+#&gt;            SNP CHR  BP         P   tot BPcumul
+#&gt;  16465 rs16465  22 530 0.5643702 15935   16465
+#&gt;  16466 rs16466  22 531 0.1382863 15935   16466
+#&gt;  16467 rs16467  22 532 0.3936999 15935   16467
+#&gt;  16468 rs16468  22 533 0.1778749 15935   16468
+#&gt;  16469 rs16469  22 534 0.2393020 15935   16469
+#&gt;  16470 rs16470  22 535 0.2630441 15935   16470
+```
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Data for plotting x-axis labels
+
+.pull-left[
+
+```r
+axisdf &lt;- plt_dat %&gt;% 
+    group_by(CHR) %&gt;% 
+    summarize(center = (max(BPcumul)+min(BPcumul))/2)
+axisdf
+```
+
+]
+.pull-right[
+
+```
+#&gt;  # A tibble: 22 x 2
+#&gt;       CHR center
+#&gt;   * &lt;int&gt;  &lt;dbl&gt;
+#&gt;   1     1   750.
+#&gt;   2     2  2096 
+#&gt;   3     3  3212.
+#&gt;   4     4  4204 
+#&gt;   5     5  5115 
+#&gt;   6     6  5966 
+#&gt;   7     7  6770.
+#&gt;   8     8  7538.
+#&gt;   9     9  8273 
+#&gt;  10    10  8982.
+#&gt;  # … with 12 more rows
+```
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point() 
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-14-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+*   geom_point(aes(color = as.factor(CHR)),
+*              alpha = 0.8, size=1.3)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-15-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-16-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+*   scale_x_continuous(
+*       name = 'Chromosome',
+*       breaks = axisdf$center,
+*       labels = axisdf$CHR
+*   )
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-17-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+*   scale_y_continuous(expand = c(0,0)) +
+    theme_bw()
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-18-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+*   scale_y_continuous(expand = c(0,0)) +
+    theme_bw() + 
+*   geom_point(data = plt_dat %&gt;% filter(P &lt; 1e-5),
+               color = 'orange', 
+               size=2)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-19-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Plotting
+
+.pull-left[
+
+```r
+(plt_manhattan &lt;- ggplot(plt_dat, 
+       aes(x = BPcumul, y = -log10(P)))+
+    geom_point(aes(color = as.factor(CHR)), 
+               alpha = 0.8, size=1.3) +
+    scale_color_manual(
+        values = rep(c('grey','skyblue'), 22))+
+    scale_x_continuous(
+        name = 'Chromosome',
+        breaks = axisdf$center,
+        labels = axisdf$CHR
+    ) +
+    scale_y_continuous(expand = c(0,0)) + 
+    theme_bw() + 
+*   geom_point(data = plt_dat %&gt;% filter(P &lt; 1e-5),
+               color = 'orange', 
+               size=2)+
+    geom_hline(yintercept = -log10(5e-8), linetype=2)+
+    theme(legend.position='none',
+          panel.grid.major.x=element_blank(),
+          panel.grid.minor.x = element_blank())
+)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-20-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## ggplot tours Manhattan
+
+### Annotation
+
+.pull-left[
+
+```r
+*library(ggrepel)
+plt_manhattan +
+    geom_label_repel(
+        data = plt_dat %&gt;% filter(P &lt; 1e-5),
+        aes(label = SNP),
+        size = 2)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-21-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Circular Manhattan plots
+
+.pull-left[
+
+```r
+library(CMplot)
+CMplot(gwasResults, plot.type = 'c',
+       r = 1.6,
+       cir.legend = T, 
+       outward=T,
+       cir.legend.col='black',
+       cir.chr.h=.1,
+       chr.den.col='orange',
+       file.output=F)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-22-1.png)&lt;!-- --&gt;
+
+```
+#&gt;   Circular-Manhattan Plotting P.
+```
+
+]
+
+
+---
+class: middle,center
+
+# Heatmaps
+
+---
+
+## Let us count the ways
+
+There are several ways of doing heatmaps in R:
+
++ [https://jokergoo.github.io/ComplexHeatmap-reference/book/](ComplexHeatmap)
++ [http://sebastianraschka.com/Articles/heatmaps_in_r.html](http://sebastianraschka.com/Articles/heatmaps_in_r.html)
++ [https://plot.ly/r/heatmaps/](https://plot.ly/r/heatmaps/)
++ [http://moderndata.plot.ly/interactive-heat-maps-for-r/](http://moderndata.plot.ly/interactive-heat-maps-for-r/)
++ [http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2](http://www.siliconcreek.net/r/simple-heatmap-in-r-with-ggplot2)
++ [https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/](https://rud.is/b/2016/02/14/making-faceted-heatmaps-with-ggplot2/)
+
+---
+
+## Some example data
+
+
+```r
+library(Biobase)
+#data(sample.ExpressionSet)
+exdat &lt;-  readRDS('data/exprset.rds')
+library(limma)
+design1 &lt;- model.matrix(~type, data=pData(exdat))
+lm1 &lt;- lmFit(exprs(exdat), design1)
+lm1 &lt;- eBayes(lm1) # compute linear model for each probeset
+geneID &lt;- rownames(topTable(lm1, coef = 2, number = 100, 
+                            adjust.method = 'none',
+                            p.value = 0.05))
+exdat2 &lt;- exdat[geneID,] # Keep features with p-values &lt; 0.05
+
+head(exdat2)
+```
+
+```
+#&gt;  ExpressionSet (storageMode: lockedEnvironment)
+#&gt;  assayData: 6 features, 26 samples 
+#&gt;    element names: exprs, se.exprs 
+#&gt;  protocolData: none
+#&gt;  phenoData
+#&gt;    sampleNames: A B ... Z (26 total)
+#&gt;    varLabels: sex type score
+#&gt;    varMetadata: labelDescription
+#&gt;  featureData: none
+#&gt;  experimentData: use 'experimentData(object)'
+#&gt;  Annotation: hgu95av2
+```
+
+---
+
+## Using Heatplus
+
+.pull-left[
+
+```r
+# BiocManager::install('Heatplus')
+library(Heatplus)
+reg1 &lt;- regHeatmap(exprs(exdat2), legend=2, col=heat.colors, 
+                   breaks=-3:3)
+plot(reg1)
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-24-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Using Heatplus
+
+.pull-left[
+
+```r
+corrdist &lt;- function(x) as.dist(1-cor(t(x)))
+hclust.avl &lt;- function(x) hclust(x, method='average')
+reg2 &lt;- regHeatmap(exprs(exdat2), legend=2, 
+                   col=heat.colors,
+                   breaks=-3:3, 
+                   dendrogram = 
+                       list(clustfun=hclust.avl, 
+                            distfun=corrdist))
+plot(reg2)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-25-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+
+```r
+ann1 &lt;- annHeatmap(exprs(exdat2), 
+*                  ann=pData(exdat2),
+                   col = heat.colors)
+plot(ann1)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-26-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Using Heatplus
+
+### Adding annotations
+
+.pull-left[
+
+```r
+ann2 &lt;- annHeatmap(exprs(exdat2), 
+                   ann=pData(exdat2), 
+                   col = heat.colors,
+        cluster = 
+            list(cuth=7500,
+                 label=c('Control-like','Case-like')))
+plot(ann2)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-27-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Using ComplexHeatmap
+
+![](05-bioinformatics_files/figure-html/complexhm-1.png)&lt;!-- --&gt;
+
+---
+
+## UpSet plots
+
+UpSet plots are nice visualizations for looking at commonalities (complex intersections) between sets
+of objects. 
+
+In BIOF339 we used UpSet plots to look at missing value patterns
+
+![](05-bioinformatics_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+---
+
+## UpSet plots
+
+
+
+![](img/upset1.png)
+
+
+---
+
+# clusterProfiler
+
+Enrichment network based on GSEA
+
+![](05-bioinformatics_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+
+class:middle, center
+
+# Playing with Seurat
+
+---
+
+## Example data
+
+
+```r
+library(Seurat)
+# pbmc.data &lt;- Read10X(data.dir='data/hg19/')
+# pbmc &lt;- CreateSeuratObject(counts = pbmc.data, project='pbmc3k', min.cells=3, min.features=200)
+pbmc &lt;- readRDS('data/pbmc.rds')
+pbmc
+```
+
+```
+#&gt;  An object of class Seurat 
+#&gt;  13714 features across 2700 samples within 1 assay 
+#&gt;  Active assay: RNA (13714 features, 0 variable features)
+```
+
+```r
+names(pbmc)
+```
+
+```
+#&gt;  [1] "RNA"
+```
+
+```r
+slotNames(pbmc)
+```
+
+```
+#&gt;   [1] "assays"       "meta.data"    "active.assay" "active.ident" "graphs"      
+#&gt;   [6] "neighbors"    "reductions"   "images"       "project.name" "misc"        
+#&gt;  [11] "version"      "commands"     "tools"
+```
+
+---
+
+## Adding QC metrics and plotting
+
+We'll calculate mitochondrial QC metrics (percentage counts originating from mitochondrial genes)
+
+
+```r
+pbmc[['percent.mt']] &lt;- PercentageFeatureSet(pbmc, pattern = '^MT-')
+*head(pbmc@meta.data)
+```
+
+```
+#&gt;                 orig.ident nCount_RNA nFeature_RNA percent.mt
+#&gt;  AAACATACAACCAC     pbmc3k       2419          779  3.0177759
+#&gt;  AAACATTGAGCTAC     pbmc3k       4903         1352  3.7935958
+#&gt;  AAACATTGATCAGC     pbmc3k       3147         1129  0.8897363
+#&gt;  AAACCGTGCTTCCG     pbmc3k       2639          960  1.7430845
+#&gt;  AAACCGTGTATGCG     pbmc3k        980          521  1.2244898
+#&gt;  AAACGCACTGGTAC     pbmc3k       2163          781  1.6643551
+```
+
+---
+
+## Visualizing metrics
+
+.pull-left[
+
+```r
+# plt &lt;- VlnPlot(object = pbmc, 
+#   features = c('nFeature_RNA',
+#                'nCount_RNA',
+#                'percent.mt'))
+
+plot_data &lt;- pbmc@meta.data %&gt;%
+  tidyr::gather(variable, value, -orig.ident)
+
+ggplot(plot_data, aes(orig.ident, value)) +
+  geom_violin(fill = 'red') +
+  geom_jitter(width=0.5, alpha = 0.1) +
+  facet_wrap(~variable, nrow = 1, 
+*            scales = 'free_y') +
+  labs(x = 'Identity',y = 'Expression Level') +
+  theme_classic()
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-30-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+
+```r
+plot1 &lt;- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "percent.mt")
+plot2 &lt;- FeatureScatter(object = pbmc, 
+                        feature1 = "nCount_RNA", 
+                        feature2 = "nFeature_RNA")
+CombinePlots(plots = list(plot1, plot2))
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-31-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Visualizing feature-feature relationships
+
+.pull-left[
+
+```r
+cormatrix &lt;- cor(pbmc@meta.data %&gt;% select(-orig.ident))
+plt1 &lt;-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = percent.mt, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+    theme_classic() +
+    labs(color = 'Identity',
+         title=as.character(round(cormatrix['nCount_RNA','percent.mt'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+plt2 &lt;-
+  ggplot(pbmc@meta.data, 
+         aes(x = nCount_RNA, 
+             y = nFeature_RNA, 
+             group = orig.ident, 
+             color = orig.ident)) +
+  geom_point() +
+  theme_classic() +
+  labs(color = 'Identity',
+       title=as.character(round(cormatrix['nCount_RNA','nFeature_RNA'],2)))+
+  theme(plot.title = element_text(face = 'bold', hjust = 0.5))
+
+ggpubr::ggarrange(plt1, plt2, nrow = 1, ncol=2)
+```
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-32-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+pbmc &lt;- subset(x = pbmc, 
+    subset = nFeature_RNA &gt; 200 &amp; nFeature_RNA &lt; 2500 &amp; percent.mt &lt; 5)
+pbmc &lt;- NormalizeData(object = pbmc, 
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 10000)
+# This is stored in pbmc[['RNA']]@meta.features
+
+pbmc &lt;- FindVariableFeatures(object = pbmc, 
+                             selection.method = "vst", 
+                             nfeatures = 2000)
+
+
+# Identify the 10 most highly variable genes
+top10 &lt;- head(x = VariableFeatures(object = pbmc), 10)
+
+# plot variable features with and without labels
+plot1 &lt;- VariableFeaturePlot(object = pbmc)
+plot1
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-33-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+plt_data &lt;- pbmc[['RNA']]@meta.features %&gt;% 
+    rownames_to_column(var='id')
+topvars &lt;- pbmc[['RNA']]@var.features
+plt_data &lt;- plt_data %&gt;% 
+    mutate(indic = ifelse(id %in% topvars, 
+                          'Variable count',
+                          'Non-variable count'))
+bl &lt;- plt_data %&gt;% 
+    count(indic) %&gt;% 
+    glue::glue_data("{indic}: {n}")
+names(bl) &lt;- c('Non-variable count','Variable count')
+plt_data &lt;- plt_data %&gt;%
+  mutate(indic = bl[indic])
+plt11 &lt;- ggplot(plt_data, 
+                aes(x = vst.mean, 
+                    y = vst.variance.standardized, 
+                    color = indic)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_color_manual(values = c('black','red')) +
+  labs(x = 'Average Expression', y = 'Standardized Variance', color = '')+
+  theme_classic()
+plt11
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-34-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Feature selection
+
+.pull-left[
+
+```r
+# plot2 &lt;- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plt12 &lt;- plt11 + ggrepel::geom_text_repel(data = plt_data %&gt;% filter(id %in% top10),
+                                          aes(label = id),
+                                          color = 'black')
+plt12
+```
+
+]
+.pull-right[
+![](05-bioinformatics_files/figure-html/04-bioinformatics-35-1.png)&lt;!-- --&gt;
+]
+---
+
+## There's a lot more
+
+We'll stop our sampling here. 
+
++ Many Bioconductor packages do use ggplot, however some use base graphics
+    - Faster
++ Key is to find where the data is stored, and use that to create visualizations
++ Bioconductor tends to create
+    - One monolithic object
+    - Containing different information in slots 
+    - combined by lists
++ `slotNames` and `names` are your friends
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

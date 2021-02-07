@@ -3,7 +3,7 @@ title: |
   | BIOF 439: Data Visualization using R
   | Lectures
 author: Abhijit Dasgupta, PhD
-date: Spring 2019
+date: Spring 2021
 
 ---
 
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ### Contents
 
-```{r top-table, echo = F, message=F}
+```{r top-table, echo = F, message=F, warning=FALSE}
 library(tidyverse)
 library(fs)
 library(glue)
@@ -30,9 +30,9 @@ parse_abstract <- function(f){
   if(is.na(f)) return(NA)
   rmarkdown::yaml_front_matter(f)$abstract
 }
-setwd(here::here('docs','slides'))
-htmls <- dir_ls('lectures',regex = '\\d{2}.*html')
-pdfs <- dir_ls('lectures', regex = '\\d{2}.*pdf')
+rmdfiles <- dir_ls(here::here('slides/lectures'), regex = '\\d{2}-.*.Rmd')
+htmls <- dir_ls(here::here('docs/slides/lectures'),regex = '\\d{2}-.*.html')
+pdfs <- dir_ls('lectures', regex = '\\d{2}-.*pdf')
 rmds <- dir_ls('lectures', regex = '\\d{2}.*.Rmd')
 htmls <- tibble(HTML = htmls) %>% 
   mutate(base = path_file(HTML) %>% str_replace('.html',''))

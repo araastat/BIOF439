@@ -4,6 +4,7 @@
     <title>Visualization in bioinformatics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="bioinfo_files/header-attrs-2.6/header-attrs.js"></script>
     <link href="bioinfo_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
     <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
@@ -86,9 +87,9 @@ grs
 ```
 
 ```
-  IGRAPH 473d753 UN-- 37 58 -- 
+  IGRAPH 26435cb UN-- 37 58 -- 
   + attr: name (v/c)
-  + edges from 473d753 (vertex names):
+  + edges from 26435cb (vertex names):
    [1] CXCR3  --CCR7    ITGA4  --EED     SMC3   --CENPK   HNRNPA1--LUC7L3 
    [5] SMC2   --RB1     RBBP4  --CENPK   CXCR5  --CXCL13  CD44   --RUNX2  
    [9] CXCR5  --PF4     PF4    --THBD    SMARCA1--EZH2    HMMR   --BARD1  
@@ -295,20 +296,27 @@ head(final_data)
 ```
 
 ```
-    complete_tcga_id age_at_initial_pathologic_diagnosis er_status  np_958782  np_958785  np_958786  np_000436
-  1     TCGA-A2-A0CM                                  40  Negative  0.6834035  0.6944241  0.6980976  0.6870771
-  2     TCGA-BH-A18Q                                  56  Negative  0.1953407  0.2154129  0.2154129  0.2053768
-  3     TCGA-A7-A0CE                                  57  Negative -1.1231731 -1.1231731 -1.1168605 -1.1294857
-  4     TCGA-D8-A142                                  74  Negative  0.5385958  0.5422105  0.5422105  0.5349810
-  5     TCGA-AO-A0J6                                  61  Negative  0.8311317  0.8565398  0.8565398  0.8367780
-  6     TCGA-A2-A0YM                                  67  Negative  0.6558497  0.6581426  0.6558497  0.6558497
-     np_958781  np_958780  np_958783  np_958784  np_112598  np_001611
-  1  0.6870771  0.6980976  0.6980976  0.6980976 -2.6521501 -0.9843733
-  2  0.2154129  0.2154129  0.2154129  0.2154129 -1.0357599 -0.5172257
-  3 -1.1294857 -1.1200168 -1.1231731 -1.1231731  2.2445844 -2.5750648
-  4  0.5422105  0.5422105  0.5422105  0.5422105 -0.1482049  0.2674902
-  5  0.8650092  0.8565398  0.8508936  0.8508936 -0.9671961  2.8383705
-  6  0.6512639  0.6581426  0.6558497  0.6558497 -1.9695337  1.3070365
+    complete_tcga_id age_at_initial_pathologic_diagnosis er_status  np_958782
+  1     TCGA-A2-A0CM                                  40  Negative  0.6834035
+  2     TCGA-BH-A18Q                                  56  Negative  0.1953407
+  3     TCGA-A7-A0CE                                  57  Negative -1.1231731
+  4     TCGA-D8-A142                                  74  Negative  0.5385958
+  5     TCGA-AO-A0J6                                  61  Negative  0.8311317
+  6     TCGA-A2-A0YM                                  67  Negative  0.6558497
+     np_958785  np_958786  np_000436  np_958781  np_958780  np_958783  np_958784
+  1  0.6944241  0.6980976  0.6870771  0.6870771  0.6980976  0.6980976  0.6980976
+  2  0.2154129  0.2154129  0.2053768  0.2154129  0.2154129  0.2154129  0.2154129
+  3 -1.1231731 -1.1168605 -1.1294857 -1.1294857 -1.1200168 -1.1231731 -1.1231731
+  4  0.5422105  0.5422105  0.5349810  0.5422105  0.5422105  0.5422105  0.5422105
+  5  0.8565398  0.8565398  0.8367780  0.8650092  0.8565398  0.8508936  0.8508936
+  6  0.6581426  0.6558497  0.6558497  0.6512639  0.6581426  0.6558497  0.6558497
+     np_112598  np_001611
+  1 -2.6521501 -0.9843733
+  2 -1.0357599 -0.5172257
+  3  2.2445844 -2.5750648
+  4 -0.1482049  0.2674902
+  5 -0.9671961  2.8383705
+  6 -1.9695337  1.3070365
 ```
 
 ---
@@ -324,8 +332,10 @@ results
 ```
 
 ```
-    np_958782 np_958785 np_958786 np_000436 np_958781 np_958780 np_958783 np_958784 np_112598    np_001611
-  1 0.6988415 0.6910103 0.6832121 0.6910103 0.6832121 0.6910103 0.6910103 0.6832121 0.9957714 0.0001218627
+    np_958782 np_958785 np_958786 np_000436 np_958781 np_958780 np_958783
+  1 0.6988415 0.6910103 0.6832121 0.6910103 0.6832121 0.6910103 0.6910103
+    np_958784 np_112598    np_001611
+  1 0.6832121 0.9957714 0.0001218627
 ```
 
 `.` is the placeholder for what's specified inside the `vars()`. 
@@ -549,7 +559,7 @@ head(exdat2)
 
 ```
   ExpressionSet (storageMode: lockedEnvironment)
-  assayData: 1 features, 26 samples 
+  assayData: 6 features, 26 samples 
     element names: exprs, se.exprs 
   protocolData: none
   phenoData
@@ -729,8 +739,9 @@ slotNames(pbmc)
 ```
 
 ```
-   [1] "assays"       "meta.data"    "active.assay" "active.ident" "graphs"       "neighbors"    "reductions"  
-   [8] "project.name" "misc"         "version"      "commands"     "tools"
+   [1] "assays"       "meta.data"    "active.assay" "active.ident" "graphs"      
+   [6] "neighbors"    "reductions"   "images"       "project.name" "misc"        
+  [11] "version"      "commands"     "tools"
 ```
 
 ---

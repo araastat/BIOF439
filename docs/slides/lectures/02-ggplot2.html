@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Starting DataViz using R: ggplot2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="02-ggplot2_files/header-attrs-2.6/header-attrs.js"></script>
+    <link href="02-ggplot2_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Starting DataViz using R: ggplot2
+### Abhijit Dasgupta, PhD
+
+---
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span style="left: 15px; bottom:2px;"&gt;BIOF 439: Data Visualization with R&lt;/span&gt;
+&lt;/div&gt;
+
+
+
+
+---
+
+## What is ggplot2?
+
+- A second (and final) iteration of the ggplot
+- Implementation of Wilkerson's Grammar of Graphics in R
+- Conceptually, a way to layer different elements onto a canvas to create a data visualization
+- Started as Dr. Hadley Wickham's PhD thesis (with Dr. Dianne Cook)
+- Won the John M. Chambers Statistical Software Award in 2006
+
+- Mimicked in other software platforms
+  - `ggplot` and `seaborn` in Python
+  - Translated in `plotly`
+
+---
+
+## ggplot2 uses the __grammar__ of __graphics__
+
+.pull-left[
+### A grammar ...
+
+- compose and re-use small parts
+- build complex structures from simpler units
+
+]
+
+--
+
+.pull-right[
+### of graphics ...
+
+- Think of yourself as a painter
+- Build a visualization  using layers on a canvas
+- Draw layers on top of each other
+]
+
+---
+
+## A dataset
+
+
+```r
+library(tidyverse) # do this once per session
+beaches &lt;- read_csv('data/sydneybeaches3.csv')
+```
+
+```
+#&gt;  # A tibble: 344 x 12
+#&gt;     date        year month   day season rainfall temperature enterococci day_num
+#&gt;     &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;   1 2013-01-02  2013     1     2      1      0          23.4         6.7       2
+#&gt;   2 2013-01-06  2013     1     6      1      0          30.3         2         6
+#&gt;   3 2013-01-12  2013     1    12      1      0          31.4        69.1      12
+#&gt;   4 2013-01-18  2013     1    18      1      0          46.4         9        18
+#&gt;   5 2013-01-24  2013     1    24      1      0          27.5        33.9      24
+#&gt;   6 2013-01-30  2013     1    30      1      0.6        26.6        26.5      30
+#&gt;   7 2013-02-05  2013     2     5      1      0.1        25.7        66.9      36
+#&gt;   8 2013-02-11  2013     2    11      1      8          22.2       118.       42
+#&gt;   9 2013-02-17  2013     2    17      1     13.6        26.3        75        48
+#&gt;  10 2013-02-23  2013     2    23      1      7.2        24.8       311.       54
+#&gt;  # … with 334 more rows, and 3 more variables: month_num &lt;dbl&gt;,
+#&gt;  #   month_name &lt;chr&gt;, season_name &lt;chr&gt;
+```
+
+&lt;p align="right" style="font-size: 10pt;"&gt;Credit: D. J. Navarro&lt;/p&gt;
+
+&gt; Download the `sydneybeaches3.csv` file from the website and save it in your project's data folder
+
+---
+class: middle, center
+
+# Building a graph
+
+---
+
+.pull-left[
+### Start with a blank canvas
+
+
+```r
+ggplot()
+```
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Add a data set
+
+
+```r
+ggplot(
+* data = beaches # Tell ggplot the data you're using
+)
+```
+
+&gt; Nothing has really happened yet, since we haven't said what we want to plot from the data set
+
+&gt; The `#` symbol tells R that anything after it is a *comment* and should be ignored. We'll make a lot of use of comments in our code.
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+
+]
+
+
+---
+
+.pull-left[
+### Add a mapping from data to elements
+
+
+```r
+ggplot(
+  data = beaches,
+* mapping = aes(
+*   x = temperature,
+*   y = rainfall
+  )
+)
+```
+
+What goes in 
+
+- the x and y axes
+- the color of markers
+- the shape of markers
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+&gt; Now we've said what we want to plot, so axes get drawn. We haven't yet specified how we want to plot it
+
+]
+
+---
+
+.pull-left[
+### Add a geometry to draw
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+* geom_point()
+```
+
+What to draw:
+
+- Points, lines
+- histogram, bars, pies
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+&gt; Now we've said **how** we want to plot the things we want from the data
+]
+
+---
+
+.pull-left[
+### Add options for the geom
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+* geom_point(size = 4)
+```
+
+&gt; Options pertaining to how we want things drawn are usually put in the function for the geometry, e.g. `geom_point`, `geom_line`, etc. If the option is based on any element from the dataset, we have to wrap it in a `aes()` function. We'll see this later
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Add a mapping to modify the geom
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+*   mapping = aes(color = season_name),
+    size = 4
+  )
+```
+
+&gt; Anything data-driven has to be a mapping, driven by the `aes` function
+
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+]
+
+---
+class:middle, center
+
+# A side note on `aes`
+
+---
+
+## The `aes` function
+
+The `aes` function and when it needs to be used creates quite a bit of confusion initially. Let's start with the documentation for this function
+
+
+```r
+?aes
+```
+
+&gt; #### Description
+Aesthetic mappings describe how variables in the data are mapped to visual properties (aesthetics) of geoms. Aesthetic mappings can be set in ggplot2() and in individual layers.
+
+So, anytime we want to represent some aspect of the data on the plot in some form (color, shape, etc.), we have to use the `aes` function to *map* the data to the plot
+---
+
+## The `aes` function
+
+The `aes` function can occur in one of two places:
+
+.pull-left[
+Within the `ggplot` function:
+
+
+```r
+ggplot(
+  data=beaches,
+  mapping=aes(
+    x = temperature,
+    y = rainfall
+  )
+) + 
+  geom_point()
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+In the actual `geom` layer:
+
+
+```r
+ggplot(
+  data = beaches
+) +
+  geom_point(
+    mapping = aes(
+      x = temperature,
+      y = rainfall
+    )
+  )
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## The `aes` function
+
+The `aes` function can occur in one of two places:
+
+.pull-left[
+Within the `ggplot` function:
+
++ You do this if the same mapping will be common to **all** the subsequent geometry layers
+]
+.pull-right[
+In the actual `geom` layer:
+
++ You do this if the mapping will apply **only** to that layer
++ You do it if it makes more sense to put it in the `geom`. 
+]
+---
+class: middle, center
+
+# Facets / Trellis / Small multiples
+
+---
+.pull-left[
+### Split into facets
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4
+  ) +
+* facet_wrap( ~ season_name)
+```
+
+&gt; Create separate plots based on unique values of some variable (`season_name`) in your dataset
+
+&gt; Typically this variable should a few distinct values
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Remove the legend
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+*   show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) 
+```
+
+&gt; Now we're getting more into the look of the plot and how much information should be on it
+
+&gt; `show.legend` option is in `geom_point` here since it would be based on the colors of the points. If you had a different geometry like `geom_line`, you would put the `show.legend` option there if the legend was based on that geom.
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Change the background
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+* theme_bw()
+```
+
+&gt; Again, a look-and-feel choice
+
+&gt; In-built `ggplot` themes are described [here](https://ggplot2.tidyverse.org/reference/ggtheme.html). Other themes are availabe via packages [`ggthemes`](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) and others.
+
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Update the labels
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+* labs(x = 'Temperature (C)', y = 'Rainfall (mm)')
+```
+
+&gt; This is **important**. Make sure the information in your plot is self-contained by putting appropriate labels and titles on it.
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Add titles
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+  labs(x = 'Temperature (C)', 
+       y = 'Rainfall (mm)',
+*      title = 'Sydney weather by season',
+*      subtitle = "Data from 2013 to 2018")
+```
+
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+### Customize
+
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = temperature,
+    y = rainfall
+  )
+) +
+  geom_point(
+    mapping = aes(color = season_name),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap( ~ season_name) +
+  theme_bw() +
+  labs(x = 'Temperature (C)', 
+       y = 'Rainfall (mm)',
+       title = 'Sydney weather by season', 
+       subtitle = "Data from 2013 to 2018") +
+* theme(axis.title = element_text(size = 14),
+*       axis.text = element_text(size = 12),
+*       strip.text = element_text(size = 12))
+```
+
+]
+.pull-right[
+
+### 
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+&gt; Once again, a look-and-feel choice, but this is very useful for publications when the actual figure will be smaller but we need the labels to be legible.
+]
+
+---
+class: middle, center
+
+# Understanding the structure of ggplot
+
+---
+
+## The grammar
+.left-column70[
+- Data
+- Aesthetics (or aesthetic mappings)
+- Geometries (as layers)
+- Facets
+- Themes
+- (Coordinates)
+- (Scales)
+]
+.right-column70[
+&gt; Data, Aesthetics and Geometries are **required** to actually create a plot
+]
+
+---
+class: middle, center
+
+# Peeking under the hood
+
+---
+.pull-left[
+### If I write...
+
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = temperature,
+      y = rainfall)
+) + 
+  geom_point()
+```
+
+]
+--
+.pull-right[
+### what's really run is ...
+
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = temperature, y = rainfall)) + 
+layer(
+  geom = "point",
+  stat = "identity",
+  position = "identity") + 
+facet_null() +
+theme_grey() + 
+coord_cartesian() + 
+scale_x_continuous() + 
+scale_y_continuous()
+```
+
+]
+
+--
+
+### Each element can be adapted and tweaked to create graphs
+
+---
+class: middle, center
+
+# Exploring aesthetics, mappings and their uses
+
+---
+
+## Let's start
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci
+  )
+) + 
+  geom_density()
+```
+
+&gt; This is looking at the distribution of enterococci concentration (x-axis) in this dataset
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Bacteria growth should depend on temperature....
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci,
+*   group = season_name
+  )
+) + 
+  geom_density()
+```
+
+&gt; Can't really parse the seasons out from the graph. 
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Add some color
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci, 
+    group = season_name,
+*   color = season_name
+  )
+) + 
+  geom_density()
+```
+
+&gt; This does better distinguish the seasons (and we get a legend as a by-product). 
+
+&gt; But.... things are too crammed on the left of the plot. This is because the bacterial concentrations are low, with some high values. A transformation may be nice.
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## A better choice of scale
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+    color = season_name
+  )
+) + 
+  geom_density() + 
+* scale_x_log10()
+```
+
+&gt; This makes things a bit clearer, but still a bunch of squiggly lines
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## A better choice of where to put the color
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+*   fill = season_name
+  )
+) +
+  geom_density() + 
+  scale_x_log10()
+```
+
+&gt; Things are covered up!
+
+&gt; For geometries with "insides", `color` puts color on the outlines, and `fill` puts color on the insides.
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Let's play peek-a-boo
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+*   fill = season_name
+  )
+) +
+* geom_density(alpha = 0.3) +
+  scale_x_log10()
+```
+
+&gt; A bit better, but not great
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Let's break things out
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    group = season_name,
+*   fill = season_name
+  )
+) +
+  geom_density(alpha = 0.3) + 
+  scale_x_log10() + 
+* facet_wrap(~ season_name)
+```
+
+&gt; A lot clearer!!
+
+&gt; There's stuff we don't need now, like the legend
+&gt; Also, can we please make the numbers human-readable
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Cleaning up
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches, 
+  mapping = aes(
+    x = enterococci,
+    fill = season_name
+  )
+) +
+  geom_density(show.legend = FALSE) + 
+  scale_x_log10(labels = scales::label_number()) + 
+  facet_wrap(~season_name) 
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+]
+---
+
+
+## Fixing the legend ordering
+
+.pull-left[
+
+```r
+*beaches &lt;- beaches %&gt;%
+* mutate(season_name = fct_relevel(season_name,
+*                                  c('Spring','Summer','Autumn','Winter')))
+ggplot(
+  data=beaches,
+  aes(x = enterococci,
+*     fill = season_name
+  )
+) + 
+  geom_density(show.legend = F) + 
+  facet_wrap(~ season_name) + 
+  scale_x_log10(labels = scales::label_number())
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+]
+
+
+---
+class: center, middle
+
+# Exploring geometries
+
+---
+class: center, middle
+
+# Univariate plots
+
+---
+
+## Histograms
+
+.pull-left[
+
+```r
+library(tidyverse)
+library(rio)
+dat_spine &lt;- import('data/Dataset_spine.csv', 
+                    check.names = T)
+
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+  geom_histogram()
+```
+]
+.pull-right[
+
+```
+#&gt;  `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+
+## Histograms
+
+.pull-left[
+
+```r
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+* geom_histogram(bins = 100)
+```
+
+This gives a very different view of the data
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+]
+
+---
+## Density plots
+
+.pull-left[
+
+```r
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+* geom_density()
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Density plots
+
+.pull-left[
+
+```r
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis))+
+* geom_density(adjust = 1/5) # Use 1/5 the bandwidth
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Layering geometries
+
+.pull-left[
+
+```r
+ggplot(
+  data=dat_spine,
+  aes(x = degree_spondylolisthesis,
+*     y = stat(density)))+  # Re-scales histogram
+  geom_histogram(bins = 100, fill='yellow') +
+  geom_density(adjust = 1/5, color = 'orange', size = 2)
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+
+```r
+dat_brca &lt;- rio::import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor))+
+  geom_bar()
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+
+```r
+dat_brca &lt;- import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor,
+*     fill = ER.Status))+
+  geom_bar()
+```
+
+Add additional information via mapping
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Bar plots (categorical variable)
+
+.pull-left[
+
+```r
+dat_brca &lt;- import('data/clinical_data_breast_cancer_modified.csv', 
+                   check.names = T)
+ggplot(
+  data=dat_brca,
+  aes(x = Tumor,
+      fill = ER.Status))+ 
+* geom_bar(position = 'dodge')
+    # Default is position = "stack"
+```
+
+Change the nature of the geometry
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+]
+
+???
+
+It is not easy to do patterns in R. Its been considered a bug rather than a feature,
+since you can induce cognitive problems using patterns. It is suggested to use 
+different palettes for distinguishing groups
+
+---
+
+## Graphing tabulated data
+
+.pull-left[
+
+```r
+tabulated &lt;- dat_brca %&gt;% count(Tumor)
+tabulated
+```
+
+```
+#&gt;    Tumor  n
+#&gt;  1    T1 15
+#&gt;  2    T2 65
+#&gt;  3    T3 19
+#&gt;  4    T4  6
+```
+
+```r
+ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar()
+```
+
+```
+#&gt;  Error: stat_count() can only have an x or y aesthetic.
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Graphing tabulated data
+
+.pull-left[
+
+```r
+tabulated &lt;- dat_brca %&gt;% count(Tumor)
+tabulated
+
+ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+* geom_bar(stat = 'identity')
+```
+
+Here we need to change the default computation    
+
+The barplot usually computes the counts (`stat_count`)  
+
+We suppress that here since we have already   
+done the computation
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Peeking under the hood
+
+.pull-left[
+
+```r
+plt &lt;- ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar()
+
+plt$layers
+```
+
+```
+#&gt;  [[1]]
+#&gt;  geom_bar: width = NULL, na.rm = FALSE, orientation = NA
+#&gt;  stat_count: width = NULL, na.rm = FALSE, orientation = NA
+#&gt;  position_stack
+```
+
+]
+.pull-right[
+
+```r
+plt &lt;- ggplot(
+  data = tabulated,
+  aes(x = Tumor, y = n)) +
+  geom_bar(stat = 'identity')
+
+plt$layers
+```
+
+```
+#&gt;  [[1]]
+#&gt;  geom_bar: width = NULL, na.rm = FALSE, orientation = NA
+#&gt;  stat_identity: na.rm = FALSE
+#&gt;  position_stack
+```
+
+]
+
+--
+
+&gt; Each layer has a geometry, statistic and position associated with it
+
+---
+class: middle, center
+
+# Bivariate plots
+
+---
+
+## Scatter plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_point()
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-41-1.png)&lt;!-- --&gt;
+
+]
+
+---
+## Scatter plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+* geom_line()
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Scatter plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+  geom_point(color='black', size = 3) +
+  geom_line(color='red',size=2)
+```
+
+Layer points and lines
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-43-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Scatter plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature))+
+* geom_line(color='red',size=2) +
+* geom_point(color='black', size = 3)
+```
+
+Order of laying down geometries matters
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-44-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Doing some computations
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature)) +
+  geom_point() +
+* geom_smooth()
+```
+
+Averages over 75% of the data
+]
+.pull-right[
+
+```
+#&gt;  `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-45-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Doing some computations
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = temperature)) +
+  geom_point() +
+* geom_smooth(span = 0.1)
+```
+
+Averages over 10% of the data
+]
+.pull-right[
+
+```
+#&gt;  `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](02-ggplot2_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+  geom_smooth()
+```
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-47-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis,
+*     color = class_attribute)) +
+  geom_point() +
+  geom_smooth()
+```
+
+Computation is done by groups
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-48-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis,
+      color = class_attribute)) + 
+  geom_point() +
+  geom_smooth() +
+* xlim(0, 100)
+```
+
+Ignore the outlier for now
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-49-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+* geom_smooth(aes(color = class_attribute)) +
+  xlim(0, 100)
+```
+
+Only color-code the smoothers   
+
+You can change the plot based on where you map the aesthetic
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-50-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Computations over groups
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, 
+      y = degree_spondylolisthesis)) +
+  geom_point() +
+  geom_smooth(aes(color = class_attribute),
+*             se = F) +
+  xlim(0, 100)
+```
+
+Remove the confidence bands    
+
+Maybe a cleaner look
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-51-1.png)&lt;!-- --&gt;
+
+]
+
+
+---
+
+## Box Plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-52-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Box Plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_boxplot()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-54-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Violin plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+* geom_violin()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-55-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+  geom_point()
+```
+
+Points are overlayed on each other
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-56-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+* geom_jitter()
+```
+
+Jittering allows all points to be seen
+
+Maybe too much
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-57-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Strip plots
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+* geom_jitter(width = 0.2)
+```
+
+Jittering allows all points to be seen
+
+Maybe too much
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-58-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Layers, again
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+* geom_boxplot() +
+  geom_jitter(width = 0.2)
+```
+
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-59-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Layers, again
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = season_name, 
+      y = temperature)) + 
+* geom_violin() +
+  geom_jitter(width = 0.2)
+```
+
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-60-1.png)&lt;!-- --&gt;
+]
+
+
+
+
+---
+class: middle, center
+
+# Scales
+
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point()
+```
+
+All the action is happening in the bottom bit
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-61-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point() + 
+* scale_y_log10()
+```
+
+Log-transforming an axis can make things easier to see
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-62-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci)) + 
+  geom_point() + 
+* scale_y_log10(
+*   labels = scales::number_format(digits=3))
+```
+
+Making the labels a bit easier to read
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-63-1.png)&lt;!-- --&gt;
+
+]
+
+???
+
+`scales::number_format` is calling the function `number_format` from the 
+package `scales`
+
+---
+class: middle, center
+
+# Order and orientation
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+
+```r
+arrests &lt;- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = State, 
+      y = Murder)) + 
+  geom_bar(stat = 'identity')
+```
+
+This plot is very hard to read
+
+There is no ordering, and states can't be read
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-64-1.png)&lt;!-- --&gt;
+
+]
+
+---
+# Arrests in the USA in 1973
+
+.pull-left[
+
+```r
+arrests &lt;- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+* aes(x = fct_reorder(State, Murder), # Order by murder rate
+      y = Murder)) + 
+  geom_bar(stat = 'identity')
+```
+
+We see the pattern, but its still unreadable
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-65-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+
+```r
+arrests &lt;- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = fct_reorder(State, Murder), # Order by murder rate 
+      y = Murder)) + 
+  geom_bar(stat = 'identity') + 
+* coord_flip()
+```
+
+Flipping the axes makes the states readable
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-66-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Arrests in the USA in 1973
+
+.pull-left[
+
+```r
+arrests &lt;- import('data/USArrests.csv')
+ggplot(
+  data = arrests,
+  aes(x = fct_reorder(State, Murder), # Order by murder rate 
+      y = Murder)) + 
+  geom_bar(stat = 'identity') + 
+* labs(x = 'State', y = 'Murder rate') +
+* theme_bw() +
+* theme(panel.grid.major.y = element_blank(),
+*       panel.grid.minor.y = element_blank()) +
+  coord_flip()
+```
+
+Cleaning it up a little
+
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-67-1.png)&lt;!-- --&gt;
+
+]
+
+???
+
+Note that we flip after we've done all the manipulation
+
+---
+class: middle, center
+
+# Themes
+
+---
+
+# Color schemes
+
+ggplot comes with a default color scheme. There are several other schemes available
+
+- `scale_*_brewer` uses the [ColorBrewer](http://colorbrewer2.org) palettes
+- `scale_*_gradient` uses gradients
+- `scale_*_distill` uses the ColorBrewer palettes, for continuous outcomes
+
+&gt; Here * can be `color` or `fill`, depending on what you want to color
+&gt;
+&gt; Note `color` refers to the outline, and `fill` refers to the inside
+
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-68-1.png)&lt;!-- --&gt;
+]
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))+
+  scale_color_gradient(low = 'white', high='red') + 
+  theme_dark()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-69-1.png)&lt;!-- --&gt;
+]
+---
+
+.pull-left[
+
+```r
+ggplot(
+  data = beaches,
+  aes(x = date, y = enterococci,
+      color = temperature)) + 
+  geom_point() +
+  scale_y_log10(name = 'Enterococci',
+                label = scales::number_format(digits=3))+
+  scale_color_gradient(low = 'blue', high='red') + 
+  theme_bw()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-70-1.png)&lt;!-- --&gt;
+]
+---
+
+## Specifying colors
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), ylim = c(0,200))
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-71-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Specifying colors
+
+.pull-left[
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), ylim = c(0,200)) + 
+  scale_color_manual(values = c("Normal"="blue", 'Abnormal' = 'red'))
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-72-1.png)&lt;!-- --&gt;
+
+]
+
+---
+## Themes
+
+You can create your own custom themes to keep a unified look to your graphs
+
+ggplot comes with
+
+- theme_classic
+- theme_bw
+- theme_void
+- theme_dark
+- theme_gray
+- theme_light
+- theme_minimal
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+
+```r
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), 
+                  ylim = c(0,200))
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-73-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+
+```r
+my_theme &lt;- function(){
+  theme_bw()
+}
+
+ggplot(
+  data = dat_spine,
+  aes(x = sacral_slope, y = degree_spondylolisthesis,
+      color = class_attribute)) +
+  geom_point() + 
+  geom_smooth(se = F) + 
+  coord_cartesian(xlim = c(0, 100), 
+                  ylim = c(0,200)) +
+* my_theme()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-74-1.png)&lt;!-- --&gt;
+]
+
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+
+```r
+my_theme &lt;- function(){
+  theme_bw() +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size=14),
+        strip.background = element_blank())
+}
+
+ggplot(
+  data = dat_brca,
+  aes(x = Tumor))+
+  geom_bar() + 
+  facet_grid(rows = vars(ER.Status),
+             cols = vars(PR.Status))
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-75-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Themes
+
+.pull-left[
+### Create your own
+
+
+```r
+my_theme &lt;- function(){
+  theme_bw() +
+  theme(axis.text = element_text(size = 14),
+        axis.title = element_text(size = 16),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size=14),
+        strip.background = element_blank())
+}
+
+ggplot(
+  data = dat_brca,
+  aes(x = Tumor))+
+  geom_bar() + 
+  facet_grid(rows = vars(ER.Status),
+             cols = vars(PR.Status)) +
+* my_theme()
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-76-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle, center
+
+# Animations
+
+---
+
+## gganimate
+
+The new `gganimate` package has made it very easy to create animations
+
+It's literally a few lines
+
+---
+
+.pull-left[
+
+```r
+library(gganimate)
+plt &lt;- ggplot(beaches,
+              aes(date, temperature))+
+  geom_path(aes(color = season_name, group = 1))+
+  geom_point()
+
+plt
+```
+
+]
+.pull-right[
+![](02-ggplot2_files/figure-html/unnamed-chunk-77-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+.pull-left[
+
+```r
+library(gganimate)
+plt &lt;- ggplot(beaches,
+              aes(date, temperature))+
+  geom_path(aes(color = season_name, group = 1))+
+  geom_point()
+
+plt + transition_reveal(date)
+```
+
+]
+.pull-right[
+
+![](img/anime-1.gif)
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

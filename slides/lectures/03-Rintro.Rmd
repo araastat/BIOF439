@@ -399,7 +399,7 @@ install.packages("tidyverse")
 ### From Bioconductor
 ```{r Rintro-11, eval = F}
 install.packages("BiocManager") # do once 
-BioManager::install('limma')
+BioCManager::install('limma')
 ```
 
 ### From GitHub

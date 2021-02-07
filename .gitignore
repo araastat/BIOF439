@@ -14,6 +14,7 @@ docs/notes/*
 .nojekyll
 **/*_cache/*
 **/data/*
+renv/*
 
 slides/**/*.html
 slides/**/*_files/*

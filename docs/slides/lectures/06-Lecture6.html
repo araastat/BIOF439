@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Putting it together</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="06-Lecture6_files/header-attrs-2.6/header-attrs.js"></script>
+    <link href="06-Lecture6_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Putting it together
+### Abhijit Dasgupta, PhD
+
+---
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span style="left: 15px; bottom:2px;"&gt;BIOF 439: Data Visualization with R&lt;/span&gt;
+&lt;span style='right:15px; bottom:2px;'&gt;Abhijit Dasgupta&lt;/span&gt;
+&lt;/div&gt;
+
+---
+class: middle, center
+
+# Customization
+
+---
+
+## Colors
+
+ggplot2 has several ways to customize colors
+
+1. If colors are based on categorical data
+  - `scale_color_manual`
+  - `scale_fill_manual`
+1. If colors are based on continuous data
+  - `scale_{color,fill}_gradient` makes sequential gradients (specify low and high colors)
+  - `scale_{color,fill}_gradient2` makes divergent gradients (specify low, middle and high colors)
+
+---
+
+## Colors
+
+.pull-left[
+
+```r
+(g1 &lt;- ggplot(diamonds, 
+              aes(x = cut, y = price, 
+                  color = carat))+
+   geom_jitter()
+)
+```
+]
+.pull-right[
+![](06-Lecture6_files/figure-html/06-Lecture6-1-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Colors
+
+.pull-left[
+
+```r
+g1 + scale_color_gradient(low='white',high = 'red')
+```
+]
+.pull-right[
+![](06-Lecture6_files/figure-html/06-Lecture6-2-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Colors
+
+.pull-left[
+
+```r
+g1 + scale_color_gradient2(low = 'blue', 
+                           mid='white', 
+                           high='red',
+                           midpoint = 2)
+```
+]
+.pull-right[
+![](06-Lecture6_files/figure-html/06-Lecture6-3-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Text
+
+The `extrafont` package allows you to use fonts already on your computer in your graphics.
+
+.pull-left[
+
+```r
+library(extrafont)
+loadfonts()
+
+g1 + theme(text = element_text(family='Georgia'))
+```
+]
+.pull-right[
+![](06-Lecture6_files/figure-html/06-Lecture6-4-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Text
+
+The `extrafont` package allows you to use fonts already on your computer in your graphics.
+
+.pull-left[
+
+```r
+g1 + theme(text = element_text(family='Comic Sans MS', size=14))
+```
+]
+.pull-right[
+![](06-Lecture6_files/figure-html/06-Lecture6-5-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle, center
+
+# Saving your work
+
+---
+
+## File types
+
+.pull-left[
+### Raster 
+
+- PNG, TIFF, JPEG
+- Have to specify a resolution (dots per inch or dpi)
+- Enlarging a file can create pixelation
+- Preferred for web
+]
+.pull-right[
+### Vector
+
+- PDF, SVG, EMF
+- Infinite resolution
+- No pixelation
+- Preferred for print
+
+]
+
+---
+
+## Saving your work
+
+Generally, in `ggplot2`, you can use the `ggsave` function with a file name. It figures out the file type from the last  letters
+
+
+```r
+ggsave('test1.pdf', plot = g1)
+ggsave('test1.tiff', plot = g1)
+```
+
+If you're saving the last graph rendered, you don't need the `plot = g1` part. 
+
+You can also specify height and width of the graph.
+
+---
+
+## A note about TIFF files
+
+TIFF files are not saved with the proper resolution from R. It defaults to 72 dpi, which is inadequate for publication. 
+
+Save your graph as PDF, and then use Acrobat or Illustrator to change it to a TIFF file with appropriate resolution. Also, make sure that you use __LZW__ compression, otherwise the TIFF file will be unreasonably large.
+
+&gt; I have some scripts that I can make available for conversion 
+
+---
+class: middle, center
+
+# Creating a final product
+
+---
+
+## R Markdown
+
+[R Markdown](https://rmarkdown.rstudio.com) is a lightweight markup language that can inter-weave text and R code to create different kinds of outputs. 
+
+The [formats page](https://rmarkdown.rstudio.com/formats.html) gives you the breadth of documents that can be generated using R Markdown.
+
+---
+
+## R Markdown
+
+You can directly create PowerPoint presentations from R Markdown. This may be useful for your final presentations
+
+To create PDF documents, you must have LaTeX installed. This can be achieved by installing the `tinytex` package in R. Or, you can install 
+[MikTeX](https://miktex.org) on Windows or [MacTeX](http://www.tug.org/mactex) on Mac OS X.
+
+---
+class: middle, center, inverse
+
+# Demos
+
+---
+
+## Dashboard
+
+The `flexdashboard` package can help create interactive dashboards using R Markdown. The example we will use is based on [this](https://github.com/DIYtranscriptomics/DIYtranscriptomics.github.io/blob/master/Code/files/flexdashboard_essentials.Rmd) flexdashboard example. The data I use is also in that repository. 
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

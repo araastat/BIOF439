@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Adding to the story: Annotations, maps and interactions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta, PhD" />
+    <script src="04_annotations_files/header-attrs-2.6/header-attrs.js"></script>
+    <link href="04_annotations_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="04_annotations_files/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+    <script src="04_annotations_files/jquery-1.12.4/jquery.min.js"></script>
+    <link href="04_annotations_files/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="04_annotations_files/leaflet-1.3.1/leaflet.js"></script>
+    <link href="04_annotations_files/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="04_annotations_files/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="04_annotations_files/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="04_annotations_files/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="04_annotations_files/leaflet-binding-2.0.3/leaflet.js"></script>
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Adding to the story: Annotations, maps and interactions
+### Abhijit Dasgupta, PhD
+
+---
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span style="left: 15px; bottom:2px;"&gt;BIOF 439: Data Visualization with R&lt;/span&gt;
+&lt;span style='right:15px; bottom:2px;'&gt;Abhijit Dasgupta&lt;/span&gt;
+&lt;/div&gt;
+
+
+
+
+---
+class:middle, center, inverse
+
+# Annotations
+
+---
+
+## Stand-alone stories
+
+- You would like a data visualization to stand on its own
+- Relevant information should be placed on the graph
+- However, you need to balance the information content with real estate
+    - Don't clutter the graph and make it not readable
+
+---
+
+
+## An example 
+
+&lt;div id="origecon"&gt;&lt;/div&gt;
+![](img/economist1.gif)
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+library(tidyverse)
+theme_set(theme_bw())
+econ_data &lt;- rio::import(fs::path(datadir, 'EconomistData.csv'))
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_point()
+```
+]
+.pull-right[
+
+![](04_annotations_figs/a1-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_point() +
+  geom_smooth(color='red', se=F)
+```
+
+#### Add a trend line
+]
+.pull-right[
+![](04_annotations_figs/a2-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+* geom_smooth(color='red', se=F) +
+* geom_point()
+```
+
+#### Reverse order so points are above line
+]
+.pull-right[
+
+![](04_annotations_figs/a3-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_smooth(color='red', se=F) + 
+* geom_point(shape = 1, size = 4, stroke=1.25)
+```
+
+#### Different shape for points
+]
+.pull-right[
+![](04_annotations_figs/a4-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+pointsToLabel &lt;- c("Russia", "Venezuela", "Iraq", "Myanmar", "Sudan",
+                   "Afghanistan", "Congo", "Greece", "Argentina", "Brazil",
+                   "India", "Italy", "China", "South Africa", "Spane",
+                   "Botswana", "Cape Verde", "Bhutan", "Rwanda", "France",
+                   "United States", "Germany", "Britain", "Barbados", "Norway", "Japan",
+                   "New Zealand", "Singapore")
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_smooth(color='red', se=F) + 
+  geom_point(shape = 1, size = 4, stroke=1.25) + 
+  geom_text(aes(label=Country),
+            color = 'gray20')
+```
+
+#### Label countries
+]
+.pull-right[
+![](04_annotations_figs/a5-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+pointsToLabel &lt;- c("Russia", "Venezuela", "Iraq", "Myanmar", "Sudan",
+                   "Afghanistan", "Congo", "Greece", "Argentina", "Brazil",
+                   "India", "Italy", "China", "South Africa", "Spane",
+                   "Botswana", "Cape Verde", "Bhutan", "Rwanda", "France",
+                   "United States", "Germany", "Britain", "Barbados", "Norway", "Japan",
+                   "New Zealand", "Singapore")
+ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_smooth(color='red', se=F) + 
+  geom_point(shape = 1, size = 4, stroke=1.25) + 
+  geom_text(aes(label=Country),
+            color = 'gray20', 
+*           data = econ_data %&gt;%
+*             dplyr::filter(Country %in% pointsToLabel))
+```
+
+#### Better, but labels are overlayed on points
+]
+.pull-right[
+![](04_annotations_figs/a6-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+```r
+*library(ggrepel)
+pointsToLabel &lt;- c("Russia", "Venezuela", "Iraq", "Myanmar", "Sudan",
+                   "Afghanistan", "Congo", "Greece", "Argentina", "Brazil",
+                   "India", "Italy", "China", "South Africa", "Spane",
+                   "Botswana", "Cape Verde", "Bhutan", "Rwanda", "France",
+                   "United States", "Germany", "Britain", "Barbados", "Norway", "Japan",
+                   "New Zealand", "Singapore")
+(plt &lt;- ggplot(econ_data,
+       aes(x = CPI, y = HDI, color=Region))+
+  geom_smooth(color='red', se=F) + 
+  geom_point(shape = 1, size = 4, stroke=1.25) + 
+* geom_text_repel(aes(label=Country),
+            color = 'gray20', 
+            force=20,
+            data = econ_data %&gt;% 
+              dplyr::filter(Country %in% pointsToLabel)))
+```
+
+]
+.pull-right[
+![](04_annotations_figs/a7-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+
+Let's re-order the regions
+
+
+```r
+econ_data$Region &lt;- 
+  factor(econ_data$Region,
+         levels = c("EU W. Europe",
+                    "Americas",
+                    "Asia Pacific",
+                    "East EU Cemt Asia",
+                    "MENA",
+                    "SSA"),
+         labels = c("OECD",
+                    "Americas",
+                    "Asia &amp;\nOceania",
+                    "Central &amp;\nEastern Europe",
+                    "Middle East &amp;\nnorth Africa",
+                    "Sub-Saharan\nAfrica"))
+
+*plt$data = econ_data
+*plt
+```
+]
+.pull-right[
+![](04_annotations_figs/a8-1.png)
+]
+
+---
+
+## Reconstructing this annotated graph
+
+.pull-left[
+Clean up the graphic
+
+```r
+(plt_corrupt &lt;- 
+   plt +
+  scale_x_continuous(name = 'Corruption Perceptions Index',
+                     breaks = 1:10) +
+  scale_y_continuous(name="Human Development Index",
+                     breaks = seq(0.2, 1, by = 0.1))+
+  scale_color_manual(name = '',
+                     values = c("#24576D",
+                                "#099DD7",
+                                "#28AADC",
+                                "#248E84",
+                                "#F2583F",
+                                "#96503F")) +
+  ggtitle("Corruption and Human development")+
+  theme_bw()+
+  theme(legend.position='top',
+        legend.direction='horizontal')
+)
+```
+]
+.pull-right[
+![](04_annotations_figs/a9-1.png)
+]
+
+
+---
+class:middle,center
+
+# Adding derived statistics to a plot
+
+---
+
+## Adding group means
+
+.pull-left[
+
+```r
+ggplot(iris, 
+       aes(x = Sepal.Length,
+           y = Sepal.Width,
+           color = Species))+
+  geom_point()+
+  theme_bw()
+```
+]
+.pull-right[
+![](04_annotations_figs/b1-1.png)
+]
+
+---
+
+## Adding group means
+
+.pull-left[
+
+```r
+means &lt;- iris %&gt;% group_by(Species) %&gt;% 
+  summarize_at(vars(starts_with('Sepal')),
+               mean)
+means
+```
+
+```
+#&gt;  # A tibble: 3 x 3
+#&gt;    Species    Sepal.Length Sepal.Width
+#&gt;  * &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+#&gt;  1 setosa             5.01        3.43
+#&gt;  2 versicolor         5.94        2.77
+#&gt;  3 virginica          6.59        2.97
+```
+
+
+
+```r
+ggplot(iris, 
+       aes(x = Sepal.Length,
+           y = Sepal.Width,
+           color = Species))+
+  geom_point() + 
+* geom_point(data = means,
+*            size=5) +
+  theme_bw()
+```
+
+]
+.pull-right[
+![](04_annotations_figs/b2-1.png)
+]
+---
+
+
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+
+```r
+mod1 &lt;- lm(hwy ~ cty, data = mpg)
+r2 &lt;- broom::glance(mod1) %&gt;% pull(r.squared)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F) +
+  theme_bw()
+```
+]
+.pull-right[
+![](04_annotations_figs/c1-1.png)
+]
+
+---
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+
+```r
+mod1 &lt;- lm(hwy ~ cty, data = mpg)
+r2 &lt;- broom::glance(mod1) %&gt;% pull(r.squared) %&gt;% 
+  round(., 2)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F)+
+  annotate(geom='text',
+           x = 15, y = 40,
+           label=glue::glue("R^2 == {r}",r=r2),
+           size=12,
+           parse=T) + 
+  theme_bw()
+```
+]
+.pull-right[
+![](04_annotations_figs/c2-1.png)
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+
+```r
+mpg %&gt;% 
+  mutate(cyl = as.factor(cyl)) %&gt;% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()
+```
+]
+.pull-right[
+![](04_annotations_figs/d1-1.png)
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+
+```r
+mpg %&gt;% 
+  mutate(cyl = as.factor(cyl)) %&gt;% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()+
+  annotate(geom = 'rect',
+           xmin=3.75,xmax=4.25,
+           ymin = 22, ymax = 28,
+           fill = 'red',
+           alpha = 0.2) +
+  annotate('text', 
+           x = 4.5, y = 25,
+           label = 'Outliers?',
+           hjust = 0)+
+  coord_cartesian(xlim = c(0,5))+ 
+  theme_bw()
+```
+]
+.pull-right[
+![](04_annotations_figs/d2-1.png)
+]
+
+
+---
+class:center, middle,inverse
+
+# Maps
+
+---
+
+For maps, we need a couple of new packages. 
+
+- `sf`: Simple features in R
+- `rnaturalearth` &amp; `rnaturalearthdata`: map data
+
+---
+
+.pull-left[
+
+```r
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+world &lt;- ne_countries(scale='medium', returnclass='sf')
+ggplot(data = world) + 
+  geom_sf()
+```
+]
+.pull-right[
+![](04_annotations_figs/e1-1.png)
+]
+
+---
+
+.pull-left[
+
+```r
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+world &lt;- ne_countries(scale='medium', returnclass='sf')
+ggplot(data = world) + 
+  geom_sf(aes(fill = pop_est))
+```
+]
+.pull-right[
+![](04_annotations_figs/e2-1.png)
+]
+
+---
+
+.pull-left[
+
+```r
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+world &lt;- ne_countries(scale='medium', returnclass='sf')
+ggplot(data = world) + 
+  geom_sf(aes(fill = pop_est))+
+  scale_fill_viridis_c(option = 'plasma', trans='sqrt')
+```
+]
+.pull-right[
+![](04_annotations_figs/e3-1.png)
+]
+
+---
+
+
+## Looking at Florida
+
+.pull-left[
+
+```r
+library(maps)
+states &lt;- st_as_sf(maps::map('state', plot = F, 
+                             fill = T)) %&gt;% 
+  cbind(st_coordinates(st_centroid(.))) %&gt;% 
+  mutate(ID = str_to_title(ID))
+
+ggplot(data = world)+
+  geom_sf() + 
+  geom_sf(data = states, fill = NA) + 
+  geom_text(data = states, aes(X, Y, label = ID), 
+            size = 5) + 
+  coord_sf(xlim = c(-88, -78), ylim = c(24.5, 33), 
+           expand = F)
+```
+]
+.pull-right[
+![](04_annotations_figs/f1-1.png)
+]
+
+---
+
+## Looking at Florida
+
+.pull-left[
+
+```r
+library(maps)
+states &lt;- st_as_sf(map('state', plot = F, 
+                       fill = T)) %&gt;% 
+  cbind(st_coordinates(st_centroid(states))) %&gt;% 
+  mutate(ID = str_to_title(ID))
+
+ggplot(data = world)+
+  geom_sf() + 
+  geom_sf(data = states, fill = NA) + 
+* geom_label(data = states, aes(X, Y, label = ID),
+            size = 5) + 
+  coord_sf(xlim = c(-88, -78), ylim = c(24.5, 33), 
+           expand = F)
+```
+]
+.pull-right[
+![](04_annotations_figs/f2-1.png)
+]
+
+---
+
+## Looking at the Florida election
+
+.pull-left[
+
+```r
+source(fs::path(datadir,'florida.R'))
+head(florida_election)
+florida_election &lt;- florida_election %&gt;% 
+  mutate_at(vars(ends_with('perc')), 
+            ~as.numeric(str_remove(., '%')))
+head(florida_election)
+saveRDS(florida_election, fs::path(datadir, 'florida_election.rds'))
+```
+]
+.pull-right[
+
+```
+#&gt;  # A tibble: 6 x 14
+#&gt;    County   Bush Bush_perc   Gore Gore_perc Nader Nader_perc Buchanan
+#&gt;    &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;
+#&gt;  1 Alach…  34135 39.80%     47380 55.25%     3228 3.76%           263
+#&gt;  2 Baker    5611 68.80%      2392 29.33%       53 0.65%            73
+#&gt;  3 Bay     38682 65.70%     18873 32.06%      830 1.41%           248
+#&gt;  4 Bradf…   5416 62.43%      3075 35.45%       84 0.97%            65
+#&gt;  5 Breva… 115253 52.75%     97341 44.55%     4471 2.05%           571
+#&gt;  6 Browa… 177939 30.93%    387760 67.41%     7105 1.24%           795
+#&gt;  # … with 6 more variables: Buchanan_perc &lt;chr&gt;, Other &lt;dbl&gt;, Other_perc &lt;chr&gt;,
+#&gt;  #   Margin &lt;dbl&gt;, Margin_perc &lt;chr&gt;, Total &lt;dbl&gt;
+```
+
+```
+#&gt;  # A tibble: 6 x 14
+#&gt;    County   Bush Bush_perc   Gore Gore_perc Nader Nader_perc Buchanan
+#&gt;    &lt;chr&gt;   &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 Alach…  34135      39.8  47380      55.2  3228       3.76      263
+#&gt;  2 Baker    5611      68.8   2392      29.3    53       0.65       73
+#&gt;  3 Bay     38682      65.7  18873      32.1   830       1.41      248
+#&gt;  4 Bradf…   5416      62.4   3075      35.4    84       0.97       65
+#&gt;  5 Breva… 115253      52.8  97341      44.6  4471       2.05      571
+#&gt;  6 Browa… 177939      30.9 387760      67.4  7105       1.24      795
+#&gt;  # … with 6 more variables: Buchanan_perc &lt;dbl&gt;, Other &lt;dbl&gt;, Other_perc &lt;dbl&gt;,
+#&gt;  #   Margin &lt;dbl&gt;, Margin_perc &lt;dbl&gt;, Total &lt;dbl&gt;
+```
+
+]
+
+---
+
+## Looking at the Florida election
+
+.pull-left[
+Now we need the map information
+
+```r
+library(maps)
+counties &lt;- st_as_sf(maps::map('county', plot = F, 
+                               fill = T))
+head(counties)
+counties &lt;- counties %&gt;% 
+  dplyr::filter(str_detect(ID, 'florida'))
+counties &lt;- counties %&gt;% 
+  separate(ID, c('State','County'), sep = ',') %&gt;% 
+  mutate_at(vars(State:County), str_to_title)
+```
+]
+.pull-right[
+
+```
+#&gt;  Simple feature collection with 6 features and 1 field
+#&gt;  geometry type:  MULTIPOLYGON
+#&gt;  dimension:      XY
+#&gt;  bbox:           xmin: -88.01778 ymin: 30.24071 xmax: -85.06131 ymax: 34.2686
+#&gt;  geographic CRS: WGS 84
+#&gt;                 ID                           geom
+#&gt;  1 alabama,autauga MULTIPOLYGON (((-86.50517 3...
+#&gt;  2 alabama,baldwin MULTIPOLYGON (((-87.93757 3...
+#&gt;  3 alabama,barbour MULTIPOLYGON (((-85.42801 3...
+#&gt;  4    alabama,bibb MULTIPOLYGON (((-87.02083 3...
+#&gt;  5  alabama,blount MULTIPOLYGON (((-86.9578 33...
+#&gt;  6 alabama,bullock MULTIPOLYGON (((-85.66866 3...
+```
+
+]
+
+---
+
+## Looking at the Florida election
+
+.pull-left[
+The nice thing about the `sf` package is that it renders all the data into a data frame, so adding to it, or merging new data becomes easy. 
+
+We will now merge the election data with the map data
+
+
+```r
+florida_election &lt;- readRDS(fs::path(datadir, 'florida_election.rds'))
+election_by_county &lt;- counties %&gt;% 
+  left_join(florida_election)
+head(election_by_county, 2)
+```
+]
+.pull-right[
+
+
+```
+#&gt;  Simple feature collection with 2 features and 15 fields
+#&gt;  geometry type:  MULTIPOLYGON
+#&gt;  dimension:      XY
+#&gt;  bbox:           xmin: -82.66635 ymin: 29.42138 xmax: -82.01891 ymax: 30.57303
+#&gt;  geographic CRS: WGS 84
+#&gt;      State  County  Bush Bush_perc  Gore Gore_perc Nader Nader_perc Buchanan
+#&gt;  1 Florida Alachua 34135      39.8 47380     55.25  3228       3.76      263
+#&gt;  2 Florida   Baker  5611      68.8  2392     29.33    53       0.65       73
+#&gt;    Buchanan_perc Other Other_perc Margin Margin_perc Total
+#&gt;  1          0.31   751       0.88 -13245      -15.44 85757
+#&gt;  2          0.90    26       0.32   3219       39.47  8155
+#&gt;                              geom
+#&gt;  1 MULTIPOLYGON (((-82.66062 2...
+#&gt;  2 MULTIPOLYGON (((-82.04182 3...
+```
+
+]
+
+---
+
+## Looking at the Florida election
+
+.pull-left[
+Now we're ready to plot
+
+
+```r
+ggplot(election_by_county) + 
+  geom_sf(aes(fill = Gore_perc)) + 
+  scale_fill_viridis_c(option = 'plasma') + 
+  labs(caption = 'Source: Wikipedia')
+```
+]
+.pull-right[
+![](04_annotations_figs/g4-1.png)
+]
+
+---
+
+## Looking at the Florida election
+
+.pull-left[
+
+We can clean this up a bit, and add surrounding states
+
+
+
+```r
+plt_map &lt;- ggplot(data = world)+
+  geom_sf() + 
+  geom_sf(data = states, fill = NA) + 
+  geom_sf(data = election_by_county, 
+          aes(fill=Gore_perc)) + 
+* geom_label(data = states %&gt;%
+*              dplyr::filter(ID != 'Florida'),
+*            aes(X, Y, label = ID),
+            size = 5) +
+  coord_sf(xlim = c(-88, -78), ylim = c(24.5, 33),  
+           expand = F) +
+  labs(x = '', y = '', fill = 'Percentage for Gore') + 
+  scale_fill_viridis_c(option = 'plasma')
+plt_map
+```
+]
+.pull-right[
+![](04_annotations_figs/g5-1.png)
+]
+
+class: middle,center
+
+# Genomic data
+
+---
+
+## Visualizing a proteomic network
+
+.pull-left[
+We read a dataset that contains the network relationships between different proteins
+
+```r
+library(ggnetwork)
+datf &lt;- rio::import(fs::path(datadir, 'string_graph.txt'))
+head(datf)
+```
+]
+.pull-right[
+
+```
+#&gt;  Error in library(ggnetwork): there is no package called 'ggnetwork'
+```
+
+```
+#&gt;      node1  node2 node1_string_id node2_string_id node1_external_id
+#&gt;  1   CXCR3   CCR7         1855969         1843829   ENSP00000362795
+#&gt;  2   ITGA4    EED         1858446         1845338   ENSP00000380227
+#&gt;  3    SMC3  CENPK         1854200         1843648   ENSP00000354720
+#&gt;  4 HNRNPA1 LUC7L3         1852510         1843556   ENSP00000341826
+#&gt;  5    SMC2    RB1         1847012         1845924   ENSP00000286398
+#&gt;  6   RBBP4  CENPK         1855919         1843648   ENSP00000362592
+#&gt;    node2_external_id neighborhood fusion cooccurence homology coexpression
+#&gt;  1   ENSP00000246657            0      0           0    0.847        0.000
+#&gt;  2   ENSP00000263360            0      0           0    0.000        0.000
+#&gt;  3   ENSP00000242872            0      0           0    0.000        0.000
+#&gt;  4   ENSP00000240304            0      0           0    0.000        0.000
+#&gt;  5   ENSP00000267163            0      0           0    0.000        0.136
+#&gt;  6   ENSP00000242872            0      0           0    0.000        0.000
+#&gt;    experimental knowledge textmining combined_score
+#&gt;  1        0.000       0.9      0.878          0.913
+#&gt;  2        0.566       0.0      0.312          0.688
+#&gt;  3        0.000       0.9      0.081          0.904
+#&gt;  4        0.309       0.0      0.394          0.563
+#&gt;  5        0.000       0.9      0.097          0.915
+#&gt;  6        0.000       0.9      0.046          0.900
+```
+]
+
+---
+
+## Visualizing a proteomic network
+
+.pull-left[
+The `igraph` package allows the creation of network graphs. 
+
+However, here, we're only using it for data ingestion
+
+```r
+pacman::p_load(igraph)
+grs &lt;- graph_from_data_frame(datf[,c('node1','node2')], 
+                             directed = F)
+grs
+```
+
+We see that this object holds the different connections. 
+]
+.pull-right[
+
+```
+#&gt;  IGRAPH daa8f15 UN-- 37 58 -- 
+#&gt;  + attr: name (v/c)
+#&gt;  + edges from daa8f15 (vertex names):
+#&gt;   [1] CXCR3  --CCR7    ITGA4  --EED     SMC3   --CENPK   HNRNPA1--LUC7L3 
+#&gt;   [5] SMC2   --RB1     RBBP4  --CENPK   CXCR5  --CXCL13  CD44   --RUNX2  
+#&gt;   [9] CXCR5  --PF4     PF4    --THBD    SMARCA1--EZH2    HMMR   --BARD1  
+#&gt;  [13] MBP    --MMP7    CCL19  --CCR7    RBBP4  --EZH2    RUNX2  --RB1    
+#&gt;  [17] RB1    --HSPA8   DHX9   --BARD1   CXCL13 --CCR7    SMC2   --KIF23  
+#&gt;  [21] CD44   --HMMR    ITGA4  --CD44    RB1    --SMARCE1 ITGA4  --CCR7   
+#&gt;  [25] MBP    --STK4    RBBP4  --LIN9    RB1    --EED     CXCR5  --CCR7   
+#&gt;  [29] PSMA1  --HSPA8   RBBP4  --SMARCA1 CXCR3  --ITGA4   MBP    --CDK12  
+#&gt;  + ... omitted several edges
+```
+]
+
+---
+
+## Visualizing a proteomic network
+
+.pull-left[
+We can then transform this data into `ggplot`-friendly data, to use `ggplot` for the plotting
+
+
+
+```r
+library(intergraph)
+ggdf &lt;- ggnetwork(asNetwork(grs),
+                  layout='fruchtermanreingold')
+```
+
+```
+#&gt;  Error in ggnetwork(asNetwork(grs), layout = "fruchtermanreingold"): could not find function "ggnetwork"
+```
+
+```r
+ggplot(ggdf, aes(x = x, y = y, 
+                 xend = xend, yend = yend)) +
+* geom_edges(color = "black",
+*            curvature = 0.1,
+*            size = 0.95, alpha = 0.8)+
+* geom_nodes(aes(x = x, y = y),
+*            size = 3,
+*            alpha = 0.5,
+*            color = "orange") +
+* geom_nodelabel_repel(aes(label = vertex.names),
+*                    size=4, color="#8856a7") +
+  theme_blank() + theme(legend.position = "none")
+```
+
+```
+#&gt;  Error in ggplot(ggdf, aes(x = x, y = y, xend = xend, yend = yend)): object 'ggdf' not found
+```
+]
+.pull-right[
+![](04_annotations_figs/h3-1.png)
+]
+
+---
+class: middle, center
+
+# Composing different genomic data into tracks
+
+---
+
+## The `ggbio` package
+
+The `ggbio` package has several functions that allow graphical representations of different genomic entities.
+
+.pull-left[
+
+An ideogram
+
+
+```r
+library(ggbio) # p_install('ggbio', try.bioconductor=TRUE)
+```
+
+```
+#&gt;  Error in library(ggbio): there is no package called 'ggbio'
+```
+
+```r
+p.ideo &lt;- Ideogram(genome = 'hg19')
+```
+
+```
+#&gt;  Error in Ideogram(genome = "hg19"): could not find function "Ideogram"
+```
+
+```r
+p.ideo
+```
+
+```
+#&gt;  Error in eval(expr, envir, enclos): object 'p.ideo' not found
+```
+]
+.pull-right[
+![](04_annotations_figs/j1-1.png)
+]
+
+---
+
+## The `ggbio` package
+
+.pull-left[
+
+Visualizing the gene model
+
+
+```r
+pacman::p_load(Homo.sapiens)
+```
+
+```
+#&gt;  
+#&gt;  The downloaded binary packages are in
+#&gt;  	/var/folders/k4/xvcmx4yx76xdbl41zy3hq8rc0000gn/T//Rtmp0tuvl8/downloaded_packages
+```
+
+```r
+data(genesymbol, package='biovizBase')
+```
+
+```
+#&gt;  Error in find.package(package, lib.loc, verbose = verbose): there is no package called 'biovizBase'
+```
+
+```r
+wh &lt;- genesymbol[c('BRCA1','NBR1')]
+```
+
+```
+#&gt;  Error in eval(expr, envir, enclos): object 'genesymbol' not found
+```
+
+```r
+wh &lt;- range(wh, ignore.strand=T)
+```
+
+```
+#&gt;  Error in eval(expr, envir, enclos): object 'wh' not found
+```
+
+```r
+p.txdb &lt;- autoplot(Homo.sapiens, which = wh)
+```
+
+```
+#&gt;  Error: Objects of type OrganismDb not supported by autoplot.
+```
+
+```r
+p.txdb
+```
+
+```
+#&gt;  Error in eval(expr, envir, enclos): object 'p.txdb' not found
+```
+]
+.pull-right[
+![](04_annotations_figs/j2-1.png)
+]
+
+---
+
+
+## The `ggbio` package
+
+.pull-left[
+
+Putting it into tracks
+
+
+```r
+pacman::p_load(GenomicRanges)
+gr17 &lt;- GRanges("chr17", IRanges(41234415, 41234569))
+tks &lt;-  tracks(p.ideo, gene = p.txdb) + xlim(gr17)
+```
+
+```
+#&gt;  Error in tracks(p.ideo, gene = p.txdb): could not find function "tracks"
+```
+
+```r
+tks + theme_tracks_sunset()
+```
+
+```
+#&gt;  Error in eval(expr, envir, enclos): object 'tks' not found
+```
+]
+.pull-right[
+![](04_annotations_figs/j3-1.png)
+]
+
+---
+class: middle, center
+
+# Interactive maps
+
+---
+
+## Using real maps
+
+.pull-left[
+
+```r
+pacman::p_load(leaflet)
+
+m &lt;- leaflet() %&gt;%
+  addTiles() %&gt;%  # Add default OpenStreetMap map tiles
+  addMarkers(
+    lng=174.768, 
+    lat=-36.852, 
+    popup="The birthplace of R")
+m 
+```
+]
+.pull-right[
+
+```{=html}
+&lt;div id="htmlwidget-55f40c9c55e0d6073e70" style="width:504px;height:504px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-55f40c9c55e0d6073e70"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]},{"method":"addMarkers","args":[-36.852,174.768,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"The birthplace of R",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-36.852,-36.852],"lng":[174.768,174.768]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
+]
+
+
+
+
+
+
+
+
+
+
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
