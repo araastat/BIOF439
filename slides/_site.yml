@@ -1,5 +1,5 @@
 name: BIOF 439
-output_dir: '../docs/slides'
+output_dir: '../docs/slides_top'
 navbar:
   title: Data Visualization using R
   left:

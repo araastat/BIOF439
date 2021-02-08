@@ -30,9 +30,13 @@ parse_abstract <- function(f){
   if(is.na(f)) return(NA)
   rmarkdown::yaml_front_matter(f)$abstract
 }
-rmds <- dir_ls(here::here('slides/lectures'), regex = '\\d{2}-.*.Rmd')
-htmls <- dir_ls(here::here('docs/slides/lectures'),regex = '\\d{2}-.*.html')
-pdfs <- dir_ls(here::here('docs/slides/lectures'), regex = '\\d{2}-.*.pdf')
+rmds <- dir_ls(here::here('slides/lectures'), regex = '\\d{2}-.*.Rmd') %>% 
+  path_file()
+rmds <- paste0('https://github.com/araastat/BIOF439/blob/master/slides/lectures/',rmds)
+htmls <- dir_ls(here::here('docs/slides/lectures'),regex = '\\d{2}-.*.html') %>% 
+  path_rel(start = here::here('docs'))
+pdfs <- dir_ls(here::here('docs/slides/lectures'), regex = '\\d{2}-.*.pdf') %>% 
+  path_rel(start = here::here('docs'))
 
 htmls <- tibble(HTML = htmls) %>% 
   mutate(base = path_file(HTML) %>% str_replace('.html',''))
@@ -51,7 +55,7 @@ blah <- blah %>% tidyr::gather(variable, value, -base) %>%
            str_extract('^\\d+') %>% 
            as.numeric() %>% 
            glue::glue('Lecture {x}', x = .)) %>% 
-  mutate(Title = map_chr(str_match(Rmd, '\\((.+)\\)')[,2],parse_title)) %>% 
+  mutate(Title = map_chr(path(here::here('slides/lectures'), path_file(str_match(Rmd, '\\((.+)\\)')[,2])),parse_title)) %>% 
   select(Lecture, Title, everything()) %>% 
   mutate_all(~ifelse(is.na(.), '', .))
 kable(blah) %>%
