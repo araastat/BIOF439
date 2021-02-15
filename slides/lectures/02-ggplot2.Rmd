@@ -58,7 +58,7 @@ library(tidyverse)
 
 ```{r, echo = T, message = F}
 library(tidyverse) # do this once per session
-beaches <- read_csv('data/sydneybeaches3.csv')
+beaches <- read_csv('../data/sydneybeaches3.csv')
 ```
 ```{r, echo = F}
 beaches

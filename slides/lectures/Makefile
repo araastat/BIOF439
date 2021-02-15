@@ -1,4 +1,4 @@
-OUTDIR = $(shell Rscript -e "fs::path(here::here('docs', fs::path_rel(getwd(), start=here::here())))")
+OUTDIR = $(shell Rscript -e "cat(fs::path(here::here('docs', fs::path_rel(getwd(), start=here::here()))))")
 SLIDES := $(wildcard *.Rmd)
 SLIDES_OUT = $(patsubst %.Rmd, $(OUTDIR)/%.html, $(SLIDES))
 SLIDES_PDF = $(patsubst %.Rmd, $(OUTDIR)/%.pdf, $(SLIDES))

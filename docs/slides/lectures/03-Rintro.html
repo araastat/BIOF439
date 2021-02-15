@@ -1124,11 +1124,11 @@ The verbs in `tidyverse` are specially useful in pipes
    &lt;td style="text-align:left;"&gt; Group by levels of a variable &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; gather &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; pivot_longer &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Transform a wide dataset to a long dataset &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; spread &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; pivot_wider &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; Transform a long dataset to a wide dataset &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
@@ -1216,14 +1216,93 @@ beaches %&gt;%
 ```
 
 ]
+
 ---
-class: middle, center
 
-# A complicated example
+## `across` (Updated Spring 2021)
 
-There is now a `learnr` tutorial available for this example. Please play with that instead.
+The `across` function is now the more flexible standard way to apply most dplyr 
+verbs across multiple columns, which can be selected the same way you would in `select`. In 
+addition to what's on the previous slide, here are some more examples.
+
+.pull-left[
+
+```r
+summaries &lt;- list(
+  mean = ~mean(.x, na.rm=T), 
+  median = ~median(.x, na.rm=T)
+) # both the ~ and .x are required
+
+beaches %&gt;% 
+  summarise(across(.cols = where(is.numeric), 
+                   .fns = summaries))
+```
+
+```
+#&gt;    year_mean year_median month_mean month_median day_mean day_median season_mean season_median
+#&gt;  1  2015.494        2016   6.377907            6 15.88953         16     2.52907             3
+#&gt;    rainfall_mean rainfall_median temperature_mean temperature_median enterococci_mean
+#&gt;  1      4.191228               0         23.57994               23.3         34.59322
+#&gt;    enterococci_median day_num_mean day_num_median month_num_mean month_num_median
+#&gt;  1           9.372727     178.7994            177       36.30814               37
+```
+
+]
+.pull-right[
+
+```r
+beaches %&gt;% 
+  summarise(
+    across(where(is.numeric), ~mean(.x, na.rm=T), .names='mean_{.col}'),
+    across(where(is.numeric), ~median(.x, na.rm=T), .anems='median_{.col}'))
+```
+
+```
+#&gt;    mean_year mean_month mean_day mean_season mean_rainfall mean_temperature mean_enterococci
+#&gt;  1  2015.494   6.377907 15.88953     2.52907      4.191228         23.57994         34.59322
+#&gt;    mean_day_num mean_month_num year month day season rainfall temperature enterococci day_num month_num
+#&gt;  1     178.7994       36.30814 2016     6  16      3        0        23.3    9.372727     177        37
+```
+
+This groups the columns by function rather than by variable
 
 
+]
+---
+
+## `across` (Updated Spring 2021)
+
+.pull-left[
+
+```r
+beaches %&gt;% 
+  filter(across(everything(), ~!is.na(.x))) %&gt;% 
+  head() # rows with no missing values
+```
+
+```
+#&gt;          date year month day season rainfall temperature enterococci day_num month_num month_name
+#&gt;  1 2013-01-02 2013     1   2      1      0.0        23.4         6.7       2         1    January
+#&gt;  2 2013-01-06 2013     1   6      1      0.0        30.3         2.0       6         1    January
+#&gt;  3 2013-01-12 2013     1  12      1      0.0        31.4        69.1      12         1    January
+#&gt;  4 2013-01-18 2013     1  18      1      0.0        46.4         9.0      18         1    January
+#&gt;  5 2013-01-24 2013     1  24      1      0.0        27.5        33.9      24         1    January
+#&gt;  6 2013-01-30 2013     1  30      1      0.6        26.6        26.5      30         1    January
+#&gt;    season_name
+#&gt;  1      Summer
+#&gt;  2      Summer
+#&gt;  3      Summer
+#&gt;  4      Summer
+#&gt;  5      Summer
+#&gt;  6      Summer
+```
+
+]
+
+.pull-right[
+
+#### For more examples see https://dplyr.tidyverse.org/articles/colwise.html
+]
 ---
 class: middle, center
 
@@ -1559,7 +1638,7 @@ You can also save the graph from the RStudio Plots pane, but coding it using `gg
 .pull-right[
 ![](03-Rintro_files/figure-html/Rintro-47-1.png)&lt;!-- --&gt;
 
-If you need to get a high-definition TIFF, your best bet is to save your graph as a PDF and then convert it using Acrobat or other scripts (ask me if interested). The TIFF printer in R only creates 72 DPI TIFF files
+If you need to get a high-definition TIFF on a Mac, your best bet is to save your graph as a PDF and then convert it using Acrobat or other scripts (ask me if interested). The TIFF printer in R only creates 72 DPI TIFF files
 ]
 
 ---

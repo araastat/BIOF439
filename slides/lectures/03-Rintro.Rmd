@@ -764,8 +764,8 @@ my_tbl <- tribble(
   'arrange', 'Order the data frame by values of a column(s)',
   'filter','Keep only rows that meet some data criterion',
   'group_by', 'Group by levels of a variable',
-  'gather', 'Transform a wide dataset to a long dataset',
-  'spread','Transform a long dataset to a wide dataset',
+  'pivot_longer', 'Transform a wide dataset to a long dataset',
+  'pivot_wider','Transform a long dataset to a wide dataset',
   'separate', 'Separate one column into several columns',
   'unite', 'Concatenate several columns into 1 column')
 knitr::kable(my_tbl, align = 'l', format='html')
@@ -803,14 +803,58 @@ beaches %>%
 ```
 
 ]
+
 ---
-class: middle, center
 
-# A complicated example
+## `across` (Updated Spring 2021)
 
-There is now a `learnr` tutorial available for this example. Please play with that instead.
+The `across` function is now the more flexible standard way to apply most dplyr 
+verbs across multiple columns, which can be selected the same way you would in `select`. In 
+addition to what's on the previous slide, here are some more examples.
+
+.pull-left[
+```{r}
+summaries <- list(
+  mean = ~mean(.x, na.rm=T), 
+  median = ~median(.x, na.rm=T)
+) # both the ~ and .x are required
+
+beaches %>% 
+  summarise(across(.cols = where(is.numeric), 
+                   .fns = summaries))
+
+```
+
+]
+.pull-right[
+```{r}
+beaches %>% 
+  summarise(
+    across(where(is.numeric), ~mean(.x, na.rm=T), .names='mean_{.col}'),
+    across(where(is.numeric), ~median(.x, na.rm=T), .anems='median_{.col}'))
+```
+
+This groups the columns by function rather than by variable
 
 
+]
+---
+
+## `across` (Updated Spring 2021)
+
+.pull-left[
+```{r}
+beaches %>% 
+  filter(across(everything(), ~!is.na(.x))) %>% 
+  head() # rows with no missing values
+```
+
+]
+
+.pull-right[
+
+#### For more examples see https://dplyr.tidyverse.org/articles/colwise.html
+]
 ---
 class: middle, center
 
@@ -1049,7 +1093,7 @@ You can also save the graph from the RStudio Plots pane, but coding it using `gg
 
 ```
 
-If you need to get a high-definition TIFF, your best bet is to save your graph as a PDF and then convert it using Acrobat or other scripts (ask me if interested). The TIFF printer in R only creates 72 DPI TIFF files
+If you need to get a high-definition TIFF on a Mac, your best bet is to save your graph as a PDF and then convert it using Acrobat or other scripts (ask me if interested). The TIFF printer in R only creates 72 DPI TIFF files
 ]
 
 ---
