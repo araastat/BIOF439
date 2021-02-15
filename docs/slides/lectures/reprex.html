@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introducing reprex</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abhijit Dasgupta" />
+    <script src="reprex_files/header-attrs-2.6/header-attrs.js"></script>
+    <link href="reprex_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="reprex_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="reprex_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introducing reprex
+### Abhijit Dasgupta
+
+---
+
+
+.center[
+![:scale 25%](img/reprex.png)
+]
+Much of this presentation is taken from Jenny Bryan's "Creating reproducible
+examples with reprex" ([link](https://speakerdeck.com/jennybc/reprex-reproducible-examples-with-r))
+
+The full documentation is available at [https://reprex.tidyverse.org/](https://reprex.tidyverse.org/)
+
+---
+
+## The idea of a reproducible example
+
+- Boil down the issue into the minimal code required to get the result
+- This act can itself help solve your problem
+- **reprex** takes this minimal code and formats it, along with your result (errors, or whatnot)
+- Send this formatted product out for help
+- This makes it easy for the recipient to run your code and help
+
+---
+
+## How to use **reprex**
+
+1. First, install the package: `install.packages("reprex")` (or, already installed with **tidyverse**)
+1. This gives you the `reprex()` function as well as a RStudio Add-in
+
+.pull-left[
+
+#### Console
+
+![](img/reprex1.png)
+]
+.pull-right[
+
+#### Add-in
+![:scale 50%](img/reprex2.png)
+]
+
+---
+
+## How to use reprex
+
+1. Copy the code you want to share, using `Ctrl/Cmd-C` or the Edit menu
+1. Run `reprex()` in the console, or use the Add-in ("Render reprex...")
+1. You'll see a preview in the Viewer window; the actual reprex is already copied to your computer clipboard
+1. Copy it to Slack/e-mail/Github/Stackoverflow
+1. For this class, choose Slack 😄
+
+
+---
+
+## Why reprex?
+
+conversations about code are more productive with:
+
++ code that .fatinline[actually runs]
++ code that .fatinline[I don't have to run]
++ code that .fatinline[I can easily run]
+
+---
+## Strategies
+
+https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html
+
+
+- Use the smallest, simplest, most built-in data possible
+- Include commands on a strict "need to run" basis
+- Pack it in, pack it out, and don't take liberties with other people's computers
+
+---
+
+## Code that .fatinline[actually runs]
+
+code is run in a new R session
+
+ergo, it must be self-contained!
+
+must load all the necessary packages
+must create all necessary objects
+
+---
+
+#### not self-contained -- forgot to to attach package
+
+```
+template &lt;- "#{EXCLAMATION} - your reprex is ${adjective}"
+praise(template)
+#&gt; Error in praise(template): could not find function "praise"
+```
+
+#### not self-contained -- forgot to define template object
+
+```
+library(praise)
+praise(template)
+#&gt; Error in grepl(template_pattern, x): object 'template' not found
+```
+
+#### All the pieces in place
+
+```
+library(praise)
+template &lt;- "${EXCLAMATION} - your reprex is ${adjective}!"
+praise(template)
+#&gt; [1] "WHOA - your reprex is bedazzling!"
+```
+
+This provides both the working code and the results
+
+---
+
+## code that .fatinline[I don't have to run]
+
+many readers have lots of experience
+
+they can often get the point w/o running code, especially if they can see the 
+output
+
+reveal the output produced by the code
+
+---
+
+## code that .fatinline[I don't have to run]
+
+.pull-left[
+#### do not copy/paste from the R console
+
+```
+&gt; test1 &lt;- "\"Header \nLine Two\"\nValue"
+&gt; cat(test1)
+"Header 
+Line Two"
+Value
+&gt; readr::read_csv(test1)
+# A tibble: 1 x 1
+  `Header \nLine Two`
+  &lt;chr&gt;              
+1 Value              
+```
+Others must make fiddly edits to run
+
+]
+.pull-right[
+#### do not take a screenshot of your R session
+
+![:scale 100%](img/reprex3.png)
+
+Others must retype everything to reproduce
+
+]
+
+---
+
+## code that .fatinline[I don't have to run]
+
+```
+test1 &lt;- "\"Header \nLine Two\"\nValue"
+cat(test1)
+#&gt; "Header 
+#&gt; Line Two"
+#&gt; Value
+readr::read_csv(test1)
+#&gt; # A tibble: 1 x 1
+#&gt;   `Header \nLine Two`
+#&gt;   &lt;chr&gt;              
+#&gt; 1 Value
+```
+
+A proper reprex can be re-run via copy/paste
+
+---
+
+## Formatting reprex's
+
+You can format the output of a reprex depending on where you want to use it. 
+These are specified using the `venue` argument. 
+
+
+```
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+```
+
+```
+## ✔ ggplot2 3.3.3     ✔ purrr   0.3.4
+## ✔ tibble  3.0.6     ✔ dplyr   1.0.4
+## ✔ tidyr   1.1.2     ✔ stringr 1.4.0
+## ✔ readr   1.4.0     ✔ forcats 0.5.1
+```
+
+```
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+```
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Code &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Target &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reprex(venue='r') &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; R or Slack &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reprex(venue='gh') &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Github &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reprex(venue='so') &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; StackOverflow &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reprex(venue='html') &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; HTML &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reprex(venue='rtf') &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RTF (for Word/Powerpoint) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+#### "Making a good reprex is a lot of work!"
+
+#### Yes, it is!
+
+#### You're asking others to experience your pain
+
+#### This is how you meet them halfway
+
+#### True story: experts are afrraid to offer a solution if they can't prove to themselves that it works
+
+#### Show us the code.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
