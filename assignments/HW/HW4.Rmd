@@ -125,33 +125,42 @@ your R session (`Session > Restart R`).
 The `coronavirus` dataset is in the **coronavirus** package and contains data on cases, deaths and recoveries on a daily basis from around the world. We will only use the deaths data, which is obtained by filtering the rows
 of the `coronavirus` dataset to contain only rows with `type=="death"`
 
-Extract out data for 6th July, 2020 (`date == "2020-07-06`) and then identify the top 10 countries in terms of
+Note that if you have previously used the **coronavirus** package, you may have to update your available datasets using `coronavirus::update_dataset()`. 
+
+Extract out data for 15 February, 2021 (`date == "2021-02-15"`) and then identify the top 10 countries in terms of
 deaths on that date. 
 
 There are a couple of nuances here. For some countries, there is also provincial data, so you have to sum over those rows within country (`%>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T) %>% ungroup()`))
 
-You can use `slice_max` to grab the approriate rows. To pull out the countries, you can then use `%>% pull(country)` and save the result. You should have
+You can use `slice_max` to grab the appropriate rows. To pull out the countries, you can then use `%>% pull(country)` and save the result. You should have
 
 ```{r, echo=FALSE, message=FALSE}
 library(coronavirus)
-coronavirus %>% filter(date==max(date), type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country)
+date_choice = '2021-02-15'
+coronavirus %>% filter(date==date_choice, type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country)
 ```
 
 #### Part b
 
-Make a plot of smoothed lines of daily deaths over time for these 10 countries, from the beginning of the data collection to 6th July. Transform the `country` variable so that the legend is ordered in order of deaths on 6th July. The y-axis should also be log-transformed (`scale_y_log10()`). This should look something like this.
+Make a plot of smoothed lines of daily deaths over time for these 10 countries, from the beginning of the data collection to 15 January.  Transform the `country` variable so that the legend is ordered in order of deaths on 15 January. The y-axis should also be log-transformed (`scale_y_log10()`). This should look something like this.
+
+The smoothed lines can be using `geom_smooth`, or, preferably, using a 7-day moving average as is commonly reported today. This can be done using `tidyquant::geom_ma` within the ggplot pipe. You may of course need to install **tidyquant**. 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(coronavirus)
-coronavirus %>% filter(date==max(date), type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country) -> country_top10
+library(tidyquant)
+date_choice <- '2021-02-15'
+coronavirus %>% filter(date==date_choice, type=='death') %>% group_by(country) %>% summarise(cases = sum(cases, na.rm=T)) %>% ungroup() %>% slice_max(cases, n=10) %>% pull(country) -> country_top10
 
-coronavirus %>% filter(type=='death', country %in% country_top10, date <= '2020-07-06') %>% 
+coronavirus %>% filter(type=='death', country %in% country_top10, date <= date_choice) %>% 
   ggplot(aes(x = date, y = cases, 
              color = fct_reorder2(country, date, cases)))+
-  geom_smooth(se=FALSE) + 
-  scale_y_log10('Number of deaths') +
+  # geom_smooth(se=FALSE) + 
+  geom_ma(n = 7, linetype=1)+
+  scale_y_log10('Number of daily deaths') +
   labs(x = '', color = 'Country',
-       title = 'Patterns of daily deaths globally from COVID-19',
-       caption = 'Johns Hopkins University CCSE, 2020')
+       title = 'Patterns of daily deaths globally from COVID-19 (7-day average)',
+       caption = 'Johns Hopkins University CCSE, 2020')+
+  theme_bw()
 ```
 
