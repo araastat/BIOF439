@@ -2,7 +2,7 @@ xaringan::moon_reader:
     css: [default, './robot.css', './robot-fonts.css', './sfah.css']
     #css: [default, metropolis, metropolis-fonts]
     nature:
-      beforeInit: macros.js
+      beforeInit: ../js/macros.js
       ratio: '16:9'
       highlightLanguage: R
       countIncrementalSlides: false
