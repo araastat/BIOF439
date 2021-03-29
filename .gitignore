@@ -35,6 +35,7 @@ docs/**/Makefile
 docs/**/data/*
 docs/**/*.tgz
 docs/toplevel/*
+docs/slides_top/*
 
 ForCanvas/*.html
 ForCanvas/*.docx

@@ -34,9 +34,9 @@ rmds <- dir_ls(here::here('slides/lectures'), regex = '\\d{2}-.*.Rmd') %>%
   path_file()
 rmds <- paste0('https://github.com/araastat/BIOF439/blob/master/slides/lectures/',rmds)
 htmls <- dir_ls(here::here('docs/slides/lectures'),regex = '\\d{2}-.*.html') %>% 
-  path_rel(start = here::here('docs'))
+  path_rel(start = here::here('docs/slides'))
 pdfs <- dir_ls(here::here('docs/slides/lectures'), regex = '\\d{2}-.*.pdf') %>% 
-  path_rel(start = here::here('docs'))
+  path_rel(start = here::here('docs/slides'))
 
 htmls <- tibble(HTML = htmls) %>% 
   mutate(base = path_file(HTML) %>% str_replace('.html',''))
