@@ -13,6 +13,7 @@ toplevel: FORCE ## Create top level website
 	Rscript -e "rmarkdown::render_site('.')"
 	cp  docs/toplevel/*.html docs
 	cp -r docs/toplevel/site_libs docs
+	for i in docs/*.html; do set -i '' 's/fas\ fa-github/fab\ fa-github/g' $$i; done;
 
 all: lectures slides_web toplevel
 

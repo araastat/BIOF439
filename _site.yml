@@ -18,8 +18,6 @@ navbar:
       href: resources.html
 
   right:
-    - text: Final Projects
-      href: FinalProjects/2020Summer/index.html
     - text: Course Notes
       href: notes/
     - icon: fa-github

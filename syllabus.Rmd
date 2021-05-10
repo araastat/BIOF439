@@ -23,7 +23,7 @@ h4 {
 <div style="text-align: center;">
 <p>BIOF 439: Data Visualization using R
 <p>Number of credits : 1
-<p>Spring 2021 Term A
+<p>Summer 2021
 <p>Syllabus
 </div>
 
@@ -32,8 +32,7 @@ Abhijit Dasgupta, PhD
 
 #### Contact information:
 + E-mail: [dasgupta.faes@gmail.com](mailto:dasgupta.faes@gmail.com)
-+ Preferred method of communcation: via [Slack](https://biof439.slack.com){target=_blank}. 
-  - Sign up via [this link](https://join.slack.com/t/biof439/shared_invite/zt-l64dr6hh-vfQUIjYId_E~akztoDm~Fg){target=_blank}
++ Preferred method of communcation: via [Slack](https://biof439.slack.com){target=_blank}. Sign up link will be available the week before class starts
 
 ### Course information
 

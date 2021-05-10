@@ -1,13 +1,9 @@
 ---
 title: ''
-output:
-  pdf_document:
-    toc: no
+output: 
   html_document:
     css: styles.css
-    toc: no
-  word_document:
-    toc: no
+    toc: false
 ---
 
 ```{css, echo=FALSE}
@@ -27,23 +23,22 @@ h4 {
 <div style="text-align: center;">
 <p>BIOF 439: Data Visualization using R
 <p>Number of credits : 1
-<p>Spring 2021 Term A
+<p>Summer 2021
 <p>Syllabus
 </div>
 
-### Instructor
+#### Instructor
 Abhijit Dasgupta, PhD
 
-### Contact information:
+#### Contact information:
 + E-mail: [dasgupta.faes@gmail.com](mailto:dasgupta.faes@gmail.com)
-+ Preferred method of communcation: via [Slack](https://biof439.slack.com){target=_blank}. 
-<!--- Sign up via [this link](https:/join.slack.com/t/biof339/shared_invite/zt-hczp2mg1-Yh0yqms52wAA8H445jkBUg){target=_blank} --->
++ Preferred method of communcation: via [Slack](https://biof439.slack.com){target=_blank}. Sign up link will be available the week before class starts
 
-## Course information
+### Course information
 
-Prerequisites, if any: None, though some knowledge and practice of R might be useful
+Prerequisites, if any: None
 
-### Course description
+#### Course description
 
 This course will demonstrate and practice the use of R in creating and
 presenting data visualizations. After a short introduction to R tools,
@@ -57,11 +52,11 @@ dynamic visualizations. Finally, we will use RMarkdown and several packages to
 develop web pages for presenting data visualizations as self-explanatory, and
 possibly interactive, storyboards.
 
-### Course materials
+#### Course materials
 
 All course materials (lectures, videos, homework, discussions) will be available on the class [Canvas](https://faes.instructure.com){target="_blank"} site. 
 
-### Learning Materials
+#### Learning Materials
 Required and Recommended Texts: There are no required texts for this class. However, the following texts, freely available online, will be used for reference:
 
 1. _R for Data Science_ [R4DS] by Hadley Wickham and Garrett Grolemund (available [online](https://r4ds.had.co.nz/){target=_blank})
@@ -71,7 +66,7 @@ Required and Recommended Texts: There are no required texts for this class. Howe
 
 Required Journal Articles: There are no required journal articles for this class
 
-### Course Goals
+#### Course Goals
 When you complete the course successfully, you will be able to:
 
 - Understand principles of good data visualization; avoid poor or inappropriate data visualization
@@ -80,14 +75,23 @@ When you complete the course successfully, you will be able to:
 -	Static and dynamic data visualizations
 -	Using the web as a presentation medium
 
+#### Communication
 
-### Structure of the course
+This class will communicate primarily via Slack. 
+
+You will see a channel `#spring2021-a`. Please join this channel. Please use Slack for broadcasting messages, answering questions and the like. When you ask a question, please ask it under the `#general` or `#spring2021-a channels, so others can learn as well. I should respond within 24 hours.
+
+The Canvas Discussion forum will be used for graded class discussions.
+
+I will also hold virtual office hours on Zoom, time TBD, one evening a week.
+
+#### Structure of the course
 
 This course will run for 7 weeks. Of these, there will be instructional material, including videos, lectures, slides, discussion, tutorials and homework, for 6 of the weeks. The seventh week will be dedicated to a culminating project that will be submitted by the end of the seventh week. Your grade will be determined by class participation, i.e., discussions & Slack participation (30%), homework assignments (50%) and the final project (20%).
 
 **Detailed course outline**
 
-#### Week 1
+### Week 1
 
 - Introduction to the class
 - Principles of good data visualization
@@ -95,7 +99,7 @@ This course will run for 7 weeks. Of these, there will be instructional material
 - Introduction to RStudio, RStudio Cloud and R
 - Introduction to the `flexdashboard` package
 
-####  Week 2
+###  Week 2
 
 __Readings:__ R4DS Chapters 4 and 27    
 __Resource:__ PDV Chapters 2-4
@@ -110,7 +114,7 @@ __Theme:__ Descriptive plots
 - Thematic personalization
 - Easy animation
 
-#### Week 3
+### Week 3
 
 __Theme:__ Analytic plots
 
@@ -125,7 +129,7 @@ __Theme:__ Analytic plots
   - Networks
   - Maps
   
-#### Week 4
+### Week 4
 
 __Theme:__ R for Bioinformatics
 
@@ -137,7 +141,7 @@ __Theme:__ R for Bioinformatics
   - Linkage maps
 - Visualizations for RNA-seq and NGS analyses
 
-#### Week 5
+### Week 5
 
 __Theme:__ Dynamic visualization
 
@@ -148,7 +152,7 @@ __Theme:__ Dynamic visualization
 - 3-D visualization
   - threejs
 
-#### Week 6
+### Week 6
 
 __Theme:__ Presenting your graphs
 
@@ -160,40 +164,31 @@ __Reference:__ _R Markdown: The Definitive Guide_ by Yihui Xie, J.J. Allaire and
   - Posters
 - Shiny for interactive widgets
 
-#### Week 7
+### Week 7
 
 Class presentations and discussion
 
-### The Learning Process
+#### The Learning Process
 
 I believe in teaching practical methods for using R as a tool in achieving informative data-driven visualizations.  As such, this course is opinionated, in that I make certain choices of what parts of R to teach to make things most accessible and useful. The course will be a mixture of didactic lessons, interactive tutorials and exercises, culminating in a final project that brings different aspects of the course together into a single dashboard.
 
 R is a tool to be used, not studied, and so I promote active learning by doing in order to become familiar with R, its advantages and disadvantages, and using R regularly through the course to learn its capabilities to visualize data. Students will be expected to create simple dashboards to show their data story from the first day, thus learning how to apply their learning to their own workflows and work environments.
 
-#### Methods for students to achieve success
-
-Students can be successful in this course through following the teaching materials, participating in discussions on Slack, and practice. R is a language in the same way that French or Japanese is a language (you’re just talking to a computer), and so the only way to retain the knowledge gained in this class is to use it. The exercises and tutorials are meant to get you used to using R for different purposes, so please do them diligently.
-
-In particular, the following points are important
+Methods for students to achieve success
 
 1.	Practice programming and coding with R
 2.	See high quality online examples provided by members of the R community and learn
 3. Participate in class discussions on Slack
 3.	Determine a target visualization they would like to create for presentation to their labs and work towards creating that.
 
-Time commitment:  
+Time commitment 
 Daily practice for even 30 minutes is good, but for particular class work I don’t expect more than a couple of hours a week.
+
+
+Students can be successful in this course through following the teaching materials, participating in discussions on Slack, and practice. R is a language in the same way that French or Japanese is a language (you’re just talking to a computer), and so the only way to retain the knowledge gained in this class is to use it. The exercises and tutorials are meant to get you used to using R for different purposes, so please do them diligently.
 
 This course should take around 4-6 hours of time weekly, depending on the week. 
 
-#### Communication
-
-This class will communicate primarily via Slack. 
-You will see a channel `#spring2021-a`. Please join this channel. Please use Slack for broadcasting messages, answering questions and the like. When you ask a question, please ask it under the `#general` or `#spring2021-a` channels, so others can learn as well. I should respond within 24 hours.
-
-Office hours will be held on Zoom every Thursday 7:00-8:30 pm
-
-The Canvas Discussion forum will be used for guided class discussions.
 
 #### Etiquette
 
@@ -246,17 +241,19 @@ Grades will be based on the following requirements:
 
 1.	Homeworks for each week are due Sunday at 11:59pm (50%) 
     - No late homeworks
-    - We’ll have 6 homeworks; I’ll score the top 4 for grade
-2.	Final project: A presentation demonstrating visualizations in R using your own data  (20%)
-3.	Class participation (30%): Discussion topics in weeks 2-6, as well as discussions on Slack
+    - We’ll have 6 homeworks, I’ll score the top 4 for grade
+2.	Final project: A R Markdown report/presentation demonstrating an end-to-end data analysis in R using your own data, from data ingestion to munging to analyses and graphics, with a brief introduction and conclusion (30%)
+3.	Class participation (20%): Discussion topics in weeks 2-6
 
 **Final project**
 
-+	Create a R Markdown dashboard using the **flexdashboard** package
++	Create a R Markdown document or presentation
 +	Use your own data, or data available on the web (legally)
-+	Show me that you can create 3 visualizations using R, tied together to form a story. This must include
-    - An exploratory/descriptive visualization
-    - A visualization representing analytic results
-
-+	5 minute lightning talks presenting your dashboard. These can be recorded using Quicktime or [Screencastify](https://www.screencastify.com){target=_blank}, which requires the Chrome browser
++	Show me that you can 
+    - import data into R
+    - manipulate (munge) the data
+    - perform some analysis on the data
+    - create a visualization
+    - create a report in R Markdown
++	5 minute lightning talks that can be recorded using Quicktime or [Screencastify](https://www.screencastify.com){target=_blank    }, which requires the Chrome browser
 
