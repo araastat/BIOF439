@@ -9,6 +9,7 @@ output:
 knitr::opts_chunk$set(echo=FALSE, eval=FALSE, 
                       message=FALSE, warning=FALSE,
                       cache=TRUE)
+datadir <- here::here('slides/lectures/data')
 ```
 
 # Instructions
@@ -23,7 +24,7 @@ fit a linear regression of $\log_{10}(\text{enterococci})$ on other variables.
 
 ```{r, eval=T, echo=TRUE}
 library(tidyverse)
-beaches <- read_csv('data/sydneybeaches3.csv')
+beaches <- read_csv(file.path(datadir,'sydneybeaches3.csv'))
 model <- lm(log10(enterococci)~ temperature + rainfall + 
               month_name, data = beaches)
 ```
@@ -130,7 +131,7 @@ ggplot(states1) + geom_sf(aes(geometry=geometry))+
   labs(fill = 'Deaths')+
   theme_void() + 
   theme(legend.position = 'bottom')
-```
+  ```
 
 You can choose to do this using either the `ggplot+geom_sf` route or the **tmaps** package. Either is fine. You don't have to match my color palette, but you should use a sequential palette for this.
 
