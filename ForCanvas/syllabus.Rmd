@@ -79,7 +79,7 @@ When you complete the course successfully, you will be able to:
 
 This class will communicate primarily via Slack. 
 
-You will see a channel `#spring2021-a`. Please join this channel. Please use Slack for broadcasting messages, answering questions and the like. When you ask a question, please ask it under the `#general` or `#spring2021-a channels, so others can learn as well. I should respond within 24 hours.
+You will see a channel `#summer2021`. Please join this channel. Please use Slack for broadcasting messages, answering questions and the like. When you ask a question, please ask it under the `#general` or `#summer2021` channels, so others can learn as well. I should respond within 24 hours.
 
 The Canvas Discussion forum will be used for graded class discussions.
 
