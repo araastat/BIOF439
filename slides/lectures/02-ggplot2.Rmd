@@ -12,7 +12,7 @@ layout: true
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = '#> ', warning = FALSE, message=FALSE, cache=F)
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', warning = FALSE, message=FALSE, cache=F, fig.height = 3.5)
 library(tidyverse)
 ```
 
@@ -56,11 +56,11 @@ library(tidyverse)
 
 ## A dataset
 
-```{r, echo = T, message = F}
+```{r 02-ggplot2-1, echo = T, message = F}
 library(tidyverse) # do this once per session
 beaches <- read_csv('../data/sydneybeaches3.csv')
 ```
-```{r, echo = F}
+```{r 02-ggplot2-2, echo = F}
 beaches
 ```
 
@@ -86,7 +86,7 @@ ggplot()
 
 ### 
 
-```{r, ref.label='gr2', eval=T, echo = F}
+```{r 02-ggplot2-3, ref.label='gr2', eval=T, echo = F}
 
 ```
 
@@ -111,7 +111,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr3', eval=T, echo = F}
+```{r 02-ggplot2-4, ref.label='gr3', eval=T, echo = F}
 
 ```
 
@@ -144,7 +144,7 @@ What goes in
 
 ### 
 
-```{r, ref.label='gr4', eval=T, echo = F}
+```{r 02-ggplot2-5, ref.label='gr4', eval=T, echo = F}
 
 ```
 
@@ -177,7 +177,7 @@ What to draw:
 
 ### 
 
-```{r, ref.label='gr5', eval=T, echo = F}
+```{r 02-ggplot2-6, ref.label='gr5', eval=T, echo = F}
 
 ```
 
@@ -206,7 +206,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr6', eval=T, echo = F}
+```{r 02-ggplot2-7, ref.label='gr6', eval=T, echo = F}
 
 ```
 
@@ -238,7 +238,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr7', eval=T, echo = F}
+```{r 02-ggplot2-8, ref.label='gr7', eval=T, echo = F}
 
 ```
 
@@ -255,7 +255,7 @@ class:middle, center
 
 The `aes` function and when it needs to be used creates quite a bit of confusion initially. Let's start with the documentation for this function
 
-```{r, eval=F}
+```{r 02-ggplot2-9, eval=F}
 ?aes
 ```
 
@@ -272,7 +272,7 @@ The `aes` function can occur in one of two places:
 .pull-left[
 Within the `ggplot` function:
 
-```{r, fig.height=2}
+```{r 02-ggplot2-10, fig.height=2}
 ggplot(
   data=beaches,
   mapping=aes(
@@ -287,7 +287,7 @@ ggplot(
 .pull-right[
 In the actual `geom` layer:
 
-```{r, fig.height=2}
+```{r 02-ggplot2-11, fig.height=2}
 ggplot(
   data = beaches
 ) +
@@ -350,7 +350,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr8', eval=T, echo = F}
+```{r 02-ggplot2-12, ref.label='gr8', eval=T, echo = F}
 
 ```
 
@@ -385,7 +385,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr9', eval=T, echo = F}
+```{r 02-ggplot2-13, ref.label='gr9', eval=T, echo = F}
 
 ```
 
@@ -422,7 +422,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr10', eval=T, echo = F}
+```{r 02-ggplot2-14, ref.label='gr10', eval=T, echo = F}
 
 ```
 
@@ -457,7 +457,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr11', eval=T, echo = F}
+```{r 02-ggplot2-15, ref.label='gr11', eval=T, echo = F}
 
 ```
 
@@ -494,7 +494,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr12', eval=T, echo = F}
+```{r 02-ggplot2-16, ref.label='gr12', eval=T, echo = F}
 
 ```
 
@@ -534,7 +534,7 @@ ggplot(
 
 ### 
 
-```{r, ref.label='gr13', eval=T, echo = F}
+```{r 02-ggplot2-17, ref.label='gr13', eval=T, echo = F}
 
 ```
 
@@ -571,7 +571,7 @@ class: middle, center
 .pull-left[
 ### If I write...
 
-```{r, eval = F, echo = T}
+```{r 02-ggplot2-18, eval = F, echo = T}
 ggplot(
   data = beaches,
   aes(x = temperature,
@@ -585,7 +585,7 @@ ggplot(
 .pull-right[
 ### what's really run is ...
 
-```{r,echo = T, eval = F}
+```{r 02-ggplot2-19,echo = T, eval = F}
 ggplot(
   data = beaches, 
   mapping = aes(
@@ -630,7 +630,7 @@ ggplot(
 > This is looking at the distribution of enterococci concentration (x-axis) in this dataset
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp1"}
+```{r 02-ggplot2-20, eval=T, echo = F, ref.label="grp1"}
 ```
 ]
 
@@ -654,7 +654,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp2"}
+```{r 02-ggplot2-21, eval=T, echo = F, ref.label="grp2"}
 ```
 ]
 
@@ -680,7 +680,7 @@ ggplot(
 > But.... things are too crammed on the left of the plot. This is because the bacterial concentrations are low, with some high values. A transformation may be nice.
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp3"}
+```{r 02-ggplot2-22, eval=T, echo = F, ref.label="grp3"}
 ```
 ]
 
@@ -705,7 +705,7 @@ ggplot(
 > This makes things a bit clearer, but still a bunch of squiggly lines
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp5"}
+```{r 02-ggplot2-23, eval=T, echo = F, ref.label="grp5"}
 ```
 ]
 
@@ -732,7 +732,7 @@ ggplot(
 > For geometries with "insides", `color` puts color on the outlines, and `fill` puts color on the insides.
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp6"}
+```{r 02-ggplot2-24, eval=T, echo = F, ref.label="grp6"}
 ```
 ]
 
@@ -759,7 +759,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp7"}
+```{r 02-ggplot2-25, eval=T, echo = F, ref.label="grp7"}
 ```
 ]
 
@@ -789,7 +789,7 @@ ggplot(
 > Also, can we please make the numbers human-readable
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp8"}
+```{r 02-ggplot2-26, eval=T, echo = F, ref.label="grp8"}
 ```
 ]
 
@@ -814,7 +814,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="grp10"}
+```{r 02-ggplot2-27, eval=T, echo = F, ref.label="grp10"}
 ```
 ]
 ---
@@ -840,7 +840,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr17', eval=T, echo=F}
+```{r 02-ggplot2-28, ref.label='gr17', eval=T, echo=F}
 
 ```
 
@@ -875,7 +875,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, ref.label='gr20', echo = F, eval=T, message = T}
+```{r 02-ggplot2-29, ref.label='gr20', echo = F, eval=T, message = T}
 
 ```
 
@@ -898,7 +898,7 @@ ggplot(
 This gives a very different view of the data
 ]
 .pull-right[
-```{r, ref.label='gr21', echo = F, eval=T, message = T}
+```{r 02-ggplot2-30, ref.label='gr21', echo = F, eval=T, message = T}
 
 ```
 
@@ -916,7 +916,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, ref.label='gr22', echo = F, eval=T, message = T}
+```{r 02-ggplot2-31, ref.label='gr22', echo = F, eval=T, message = T}
 
 ```
 
@@ -935,7 +935,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, ref.label='gr23', echo = F, eval=T, message = T}
+```{r 02-ggplot2-32, ref.label='gr23', echo = F, eval=T, message = T}
 
 ```
 
@@ -957,7 +957,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr24', eval=T, echo=F}
+```{r 02-ggplot2-33, ref.label='gr24', eval=T, echo=F}
 
 ```
 
@@ -978,7 +978,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r,ref.label='gr25', eval=T, echo = F}
+```{r 02-ggplot2-34,ref.label='gr25', eval=T, echo = F}
 
 ```
 
@@ -1002,7 +1002,7 @@ ggplot(
 Add additional information via mapping
 ]
 .pull-right[
-```{r,ref.label='gr26', eval=T, echo = F}
+```{r 02-ggplot2-35,ref.label='gr26', eval=T, echo = F}
 
 ```
 ]
@@ -1026,7 +1026,7 @@ ggplot(
 Change the nature of the geometry
 ]
 .pull-right[
-```{r,ref.label='gr27', eval=T, echo = F}
+```{r 02-ggplot2-36,ref.label='gr27', eval=T, echo = F}
 
 ```
 ]
@@ -1042,7 +1042,7 @@ different palettes for distinguishing groups
 ## Graphing tabulated data
 
 .pull-left[
-```{r, eval = T, warning = T, error = T}
+```{r 02-ggplot2-37, eval = T, warning = T, error = T}
 tabulated <- dat_brca %>% count(Tumor)
 tabulated
 
@@ -1076,7 +1076,7 @@ We suppress that here since we have already
 done the computation
 ]
 .pull-right[
-```{r, ref.label='gr_identity', eval = T, results='hide',echo = F}
+```{r 02-ggplot2-38, ref.label='gr_identity', eval = T, results='hide',echo = F}
 
 ```
 
@@ -1087,7 +1087,7 @@ done the computation
 ## Peeking under the hood
 
 .pull-left[
-```{r}
+```{r 02-ggplot2-39}
 plt <- ggplot(
   data = tabulated,
   aes(x = Tumor, y = n)) +
@@ -1098,7 +1098,7 @@ plt$layers
 
 ]
 .pull-right[
-```{r}
+```{r 02-ggplot2-40}
 plt <- ggplot(
   data = tabulated,
   aes(x = Tumor, y = n)) +
@@ -1132,7 +1132,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, ref.label='gr28', eval=T, echo = F}
+```{r 02-ggplot2-41, ref.label='gr28', eval=T, echo = F}
 
 ```
 
@@ -1151,7 +1151,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r, ref.label='gr29', eval=T, echo = F}
+```{r 02-ggplot2-42, ref.label='gr29', eval=T, echo = F}
 
 ```
 
@@ -1174,7 +1174,7 @@ ggplot(
 Layer points and lines
 ]
 .pull-right[
-```{r, ref.label='gr30', eval=T, echo = F}
+```{r 02-ggplot2-43, ref.label='gr30', eval=T, echo = F}
 
 ```
 
@@ -1198,7 +1198,7 @@ Order of laying down geometries matters
 
 ]
 .pull-right[
-```{r, ref.label='gr31', eval=T, echo = F}
+```{r 02-ggplot2-44, ref.label='gr31', eval=T, echo = F}
 
 ```
 
@@ -1220,7 +1220,7 @@ ggplot(
 Averages over 75% of the data
 ]
 .pull-right[
-```{r, ref.label='gr32', eval=T, echo=F}
+```{r 02-ggplot2-45, ref.label='gr32', eval=T, echo=F}
 
 ```
 
@@ -1242,7 +1242,7 @@ ggplot(
 Averages over 10% of the data
 ]
 .pull-right[
-```{r, ref.label='gr33', eval=T, echo=F}
+```{r 02-ggplot2-46, ref.label='gr33', eval=T, echo=F}
 
 ```
 
@@ -1263,7 +1263,7 @@ ggplot(
 ```
 ]
 .pull-right[
-```{r,ref.label='gr34', echo = F, eval = T, message = F}
+```{r 02-ggplot2-47,ref.label='gr34', echo = F, eval = T, message = F}
 
 ```
 
@@ -1287,7 +1287,7 @@ ggplot(
 Computation is done by groups
 ]
 .pull-right[
-```{r,ref.label='gr35', echo = F, eval = T, message = F}
+```{r 02-ggplot2-48,ref.label='gr35', echo = F, eval = T, message = F}
 
 ```
 
@@ -1312,7 +1312,7 @@ ggplot(
 Ignore the outlier for now
 ]
 .pull-right[
-```{r,ref.label='gr36', echo = F, eval = T, message = F}
+```{r 02-ggplot2-49,ref.label='gr36', echo = F, eval = T, message = F}
 
 ```
 
@@ -1338,7 +1338,7 @@ Only color-code the smoothers
 You can change the plot based on where you map the aesthetic
 ]
 .pull-right[
-```{r,ref.label='gr37', echo = F, eval = T, message = F}
+```{r 02-ggplot2-50,ref.label='gr37', echo = F, eval = T, message = F}
 
 ```
 
@@ -1365,7 +1365,7 @@ Remove the confidence bands
 Maybe a cleaner look
 ]
 .pull-right[
-```{r,ref.label='gr38', echo = F, eval = T, message = F}
+```{r 02-ggplot2-51,ref.label='gr38', echo = F, eval = T, message = F}
 
 ```
 
@@ -1387,7 +1387,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr39', eval = T, echo = F}
+```{r 02-ggplot2-52, ref.label='gr39', eval = T, echo = F}
 
 ```
 ]
@@ -1397,7 +1397,7 @@ ggplot(
 ## Box Plots
 
 .pull-left[
-```{r, echo = T, eval = F}
+```{r 02-ggplot2-53, echo = T, eval = F}
 ggplot(
   data = beaches,
   aes(x = season_name, 
@@ -1407,7 +1407,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r,  eval = T, echo = F}
+```{r 02-ggplot2-54,  eval = T, echo = F}
 p <- ggplot(
   data = beaches,
   aes(x = season_name, 
@@ -1438,7 +1438,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr40', eval = T, echo = F}
+```{r 02-ggplot2-55, ref.label='gr40', eval = T, echo = F}
 
 ```
 ]
@@ -1459,7 +1459,7 @@ ggplot(
 Points are overlayed on each other
 ]
 .pull-right[
-```{r, ref.label='gr41', eval = T, echo = F}
+```{r 02-ggplot2-56, ref.label='gr41', eval = T, echo = F}
 
 ```
 ]
@@ -1482,7 +1482,7 @@ Jittering allows all points to be seen
 Maybe too much
 ]
 .pull-right[
-```{r, ref.label='gr42', eval = T, echo = F}
+```{r 02-ggplot2-57, ref.label='gr42', eval = T, echo = F}
 
 ```
 ]
@@ -1505,7 +1505,7 @@ Jittering allows all points to be seen
 Maybe too much
 ]
 .pull-right[
-```{r, ref.label='gr43', eval = T, echo = F}
+```{r 02-ggplot2-58, ref.label='gr43', eval = T, echo = F}
 
 ```
 ]
@@ -1527,7 +1527,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr44', eval = T, echo = F}
+```{r 02-ggplot2-59, ref.label='gr44', eval = T, echo = F}
 
 ```
 ]
@@ -1549,7 +1549,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr45', eval = T, echo = F}
+```{r 02-ggplot2-60, ref.label='gr45', eval = T, echo = F}
 
 ```
 ]
@@ -1575,7 +1575,7 @@ ggplot(
 All the action is happening in the bottom bit
 ]
 .pull-right[
-```{r, ref.label='gr53', eval = T, echo = F}
+```{r 02-ggplot2-61, ref.label='gr53', eval = T, echo = F}
 
 ```
 
@@ -1595,7 +1595,7 @@ ggplot(
 Log-transforming an axis can make things easier to see
 ]
 .pull-right[
-```{r, ref.label='gr54', eval = T, echo = F}
+```{r 02-ggplot2-62, ref.label='gr54', eval = T, echo = F}
 
 ```
 
@@ -1616,7 +1616,7 @@ ggplot(
 Making the labels a bit easier to read
 ]
 .pull-right[
-```{r, ref.label='gr55', eval = T, echo = F}
+```{r 02-ggplot2-63, ref.label='gr55', eval = T, echo = F}
 
 ```
 
@@ -1651,7 +1651,7 @@ This plot is very hard to read
 There is no ordering, and states can't be read
 ]
 .pull-right[
-```{r, ref.label='gr56', eval = T, echo = F}
+```{r 02-ggplot2-64, ref.label='gr56', eval = T, echo = F}
 
 ```
 
@@ -1673,7 +1673,7 @@ ggplot(
 We see the pattern, but its still unreadable
 ]
 .pull-right[
-```{r, ref.label='gr561', eval = T, echo = F}
+```{r 02-ggplot2-65, ref.label='gr561', eval = T, echo = F}
 
 
 ```
@@ -1699,7 +1699,7 @@ Flipping the axes makes the states readable
 
 ]
 .pull-right[
-```{r, ref.label='gr57', eval = T, echo = F}
+```{r 02-ggplot2-66, ref.label='gr57', eval = T, echo = F}
 
 ```
 
@@ -1729,7 +1729,7 @@ Cleaning it up a little
 
 ]
 .pull-right[
-```{r, ref.label='gr58', eval = T, echo = F}
+```{r 02-ggplot2-67, ref.label='gr58', eval = T, echo = F}
 
 ```
 
@@ -1773,7 +1773,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr60', eval = T, echo = F}
+```{r 02-ggplot2-68, ref.label='gr60', eval = T, echo = F}
 
 ```
 ]
@@ -1794,7 +1794,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr61', eval = T, echo = F}
+```{r 02-ggplot2-69, ref.label='gr61', eval = T, echo = F}
 
 ```
 ]
@@ -1815,7 +1815,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr62', eval = T, echo = F}
+```{r 02-ggplot2-70, ref.label='gr62', eval = T, echo = F}
 
 ```
 ]
@@ -1836,7 +1836,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr63', eval = T, echo = F, message = F}
+```{r 02-ggplot2-71, ref.label='gr63', eval = T, echo = F, message = F}
 
 ```
 
@@ -1860,7 +1860,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr64', eval = T, echo = F, message = F}
+```{r 02-ggplot2-72, ref.label='gr64', eval = T, echo = F, message = F}
 
 ```
 
@@ -1902,7 +1902,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr65', eval = T, echo = F, message = F}
+```{r 02-ggplot2-73, ref.label='gr65', eval = T, echo = F, message = F}
 
 ```
 ]
@@ -1933,7 +1933,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr66', eval = T, echo = F, message = F}
+```{r 02-ggplot2-74, ref.label='gr66', eval = T, echo = F, message = F}
 
 ```
 ]
@@ -1967,7 +1967,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr68', eval = T, echo = F}
+```{r 02-ggplot2-75, ref.label='gr68', eval = T, echo = F}
 
 ```
 ]
@@ -2001,7 +2001,7 @@ ggplot(
 
 ]
 .pull-right[
-```{r, ref.label='gr69', eval = T, echo = F}
+```{r 02-ggplot2-76, ref.label='gr69', eval = T, echo = F}
 
 ```
 ]
@@ -2034,7 +2034,7 @@ plt
 
 ]
 .pull-right[
-```{r, ref.label='gr70', echo = F, eval = T}
+```{r 02-ggplot2-77, ref.label='gr70', echo = F, eval = T}
 
 ```
 
