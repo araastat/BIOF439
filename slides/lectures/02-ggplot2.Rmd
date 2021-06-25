@@ -12,7 +12,7 @@ layout: true
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = '#> ', warning = FALSE, message=FALSE, cache=F, fig.height = 3.5)
+knitr::opts_chunk$set(echo = TRUE, comment = '#> ', warning = FALSE, message=FALSE, cache=F, fig.height = 5)
 library(tidyverse)
 ```
 
