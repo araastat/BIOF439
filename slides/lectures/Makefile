@@ -18,7 +18,7 @@ $(OUTDIR)/%.pdf: $(OUTDIR)/%.html
 	cp -r ../css $(OUTDIR)
 	cp -r ../js $(OUTDIR)
 	cp -r img $(OUTDIR)
-	Rscript -e "pagedown::chrome_print('$(@D)/$(*F).html')"
+	Rscript -e "xaringanBuilder::build_pdf('$(@D)/$(*F).html')"
 	rm -rf css
 	rm -rf js
 	rm -rf img
