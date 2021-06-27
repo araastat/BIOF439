@@ -5,7 +5,7 @@ abstract: In this lecture we’ll spend most of our time learning various aspect
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = '#> ', cache=TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = '#> ', cache=FALSE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 ```
@@ -1129,7 +1129,6 @@ ggplot(
 ]
 .pull-right[
 ```{r Rintro-48, ref.label='d1', eval=T, echo=F }
-
 ```
 
 ]
