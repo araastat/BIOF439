@@ -6,7 +6,7 @@ abstract: We explore patterns in data sets
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=FALSE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 theme_set(theme_classic()+theme(axis.text = element_text(size=14),

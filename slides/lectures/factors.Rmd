@@ -6,7 +6,7 @@ abstract: We explore categorical variables
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=FALSE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 theme_set(theme_classic()+theme(axis.text = element_text(size=14),
@@ -447,9 +447,7 @@ Suppose you are plotting two variables, grouped by a factor.
 .pull-left[
 ```{r factors-31, fig.height=4}
 ggplot(iris, aes(
-  x = Sepal.Length, 
-  y = Sepal.Width, 
-  color = Species))+
+  x = Sepal.Length, y = Sepal.Width, color = Species))+
   geom_smooth(se=F)
 ```
 
@@ -457,8 +455,7 @@ ggplot(iris, aes(
 .pull-right[
 ```{r factors-32, fig.height=4}
 ggplot(iris, aes(
-  x = Sepal.Length, 
-  y = Sepal.Width, 
+  x = Sepal.Length, y = Sepal.Width, 
   color = fct_reorder2(Species,
                        Sepal.Length, Sepal.Width)))+
   geom_smooth(se=F) + labs(color = 'Species')

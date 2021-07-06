@@ -6,7 +6,7 @@ author: Abhijit Dasgupta, PhD
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=FALSE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 library(palmerpenguins)

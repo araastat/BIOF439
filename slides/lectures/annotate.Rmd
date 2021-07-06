@@ -4,7 +4,7 @@ author: Abhijit Dasgupta, PhD
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE,
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=FALSE,
                       fig.height=5)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
@@ -44,7 +44,8 @@ class:middle, center, inverse
 <div id="origecon"></div>
 ![](img/economist1.gif)
 
-We will recreate this plot in a tutorial
+After this week, you can try to reproduce this plot. The data is available
+at EconomistData.csv in the data folder.
 
 ---
 
