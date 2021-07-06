@@ -42,12 +42,12 @@ The **visdat** package and the **naniar** package help us with visualizing these
 ## Without visualization
 
 .pull-left[
-```{r}
+```{r visdat-1}
 summary(airquality)
 ```
 ]
 .pull-right[
-```{r}
+```{r visdat-2}
 glimpse(airquality, width=40)
 ```
 
@@ -61,7 +61,7 @@ These give us a variable-by-variable view.
 
 .pull-left[
 
-```{r}
+```{r visdat-3}
 visdat::vis_dat(airquality)
 ```
 ]
@@ -76,7 +76,7 @@ visdat::vis_dat(airquality)
 
 ## Correlation patterns
 
-```{r, fig.height=6}
+```{r visdat-4, fig.height=6}
 visdat::vis_cor(airquality)
 ```
 
@@ -84,7 +84,7 @@ visdat::vis_cor(airquality)
 
 ## Focus on missing data patterns
 
-```{r, fig.height=6}
+```{r visdat-5, fig.height=6}
 visdat::vis_miss(airquality)
 ```
 
@@ -95,14 +95,14 @@ class: middle, center
 
 ---
 
-```{r}
+```{r visdat-6}
 library(naniar)
 gg_miss_upset(airquality)
 ```
 
 ---
 
-```{r}
+```{r visdat-7}
 gg_miss_upset(riskfactors)
 ```
 
@@ -113,7 +113,7 @@ gg_miss_upset(riskfactors)
 Does missingness in one variable depend on values of another variable?
 
 .pull-left[
-```{r, fig.height=5}
+```{r visdat-8, fig.height=5}
 ggplot(airquality, 
        aes(Ozone, Solar.R))+
   geom_miss_point()
@@ -128,7 +128,7 @@ The red points are the values of one variable when the other variable is missing
 ## Missing at random?
 
 .pull-left[
-```{r, fig.height=6}
+```{r visdat-9, fig.height=6}
 gg_miss_fct(x = riskfactors, fct=marital)
 ```
 

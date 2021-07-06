@@ -45,7 +45,7 @@ There are three excellent packages for putting separate `ggplot` graphs together
 
 ## The graphs
 
-```{r, eval=T, results='hide'}
+```{r patchwork-1, eval=T, results='hide'}
 plt1 <- ggplot(penguins, aes(x = species, y = body_mass_g, fill=species)) +
   geom_boxplot()
 
@@ -58,7 +58,7 @@ plt3 <- ggplot(penguins, aes(x = bill_length_mm, y = flipper_length_mm,
   geom_smooth(se=F)
 ```
 
-```{r, echo=FALSE, fig.width=15, fig.height=3}
+```{r patchwork-2, echo=FALSE, fig.width=15, fig.height=3}
 ggarrange(plt1,plt2, plt3, nrow=1)
 ```
 
@@ -66,7 +66,7 @@ ggarrange(plt1,plt2, plt3, nrow=1)
 
 ## ggpubr
 
-```{r, fig.height=6, fig.width=15, message=F}
+```{r patchwork-3, fig.height=6, fig.width=15, message=F}
 ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2)
 ```
 
@@ -74,7 +74,7 @@ ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2)
 
 ## ggpubr
 
-```{r, fig.height=6, fig.width=15, message=F}
+```{r patchwork-4, fig.height=6, fig.width=15, message=F}
 ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2, common.legend = TRUE)
 ```
 
@@ -82,7 +82,7 @@ ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2, common.legend = TRUE)
 
 ## cowplot
 
-```{r, fig.height=6, fig.width=15}
+```{r patchwork-5, fig.height=6, fig.width=15}
 cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2)
 ```
 
@@ -90,7 +90,7 @@ cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2)
 
 ## cowplot
 
-```{r, fig.height=6, fig.width=15}
+```{r patchwork-6, fig.height=6, fig.width=15}
 cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2, labels = c('A','B','C'))
 ```
 
@@ -98,7 +98,7 @@ cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2, labels = c('A','B','C')
 
 ## cowplot
 
-```{r, fig.height=6, fig.width=15}
+```{r patchwork-7, fig.height=6, fig.width=15}
 grid1 = cowplot::plot_grid(plt1, plt2, nrow = 1, rel_widths=c(0.3, 0.7),
                            labels=c('A','B'))
 cowplot::plot_grid(grid1, plt3, nrow=2, labels = c('', 'C'))
@@ -110,7 +110,7 @@ cowplot::plot_grid(grid1, plt3, nrow=2, labels = c('', 'C'))
 
 ## patchwork
 
-```{r,fig.height=6, fig.width=15}
+```{r patchwork-8,fig.height=6, fig.width=15}
 plt1 | plt2 / plt3
 ```
 
@@ -118,7 +118,7 @@ plt1 | plt2 / plt3
 
 ## patchwork
 
-```{r,fig.height=6, fig.width=15}
+```{r patchwork-9,fig.height=6, fig.width=15}
 (plt1 | plt2) / plt3
 ```
 
@@ -126,7 +126,7 @@ plt1 | plt2 / plt3
 
 ## patchwork
 
-```{r,fig.height=6, fig.width=15}
+```{r patchwork-10,fig.height=6, fig.width=15}
 plt1 + plt2 + plt3 + plot_layout(ncol = 2)
 ```
 

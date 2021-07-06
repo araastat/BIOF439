@@ -83,7 +83,7 @@ The simplest case is when we just need to add more data to existing data
 
 .pull-left[
 <span style="text-align:center;">`cbind(x,y)`</span>
-```{r, fig.caption = "`cbind`", echo=FALSE}
+```{r joins-1, fig.caption = "`cbind`", echo=FALSE}
 knitr::include_graphics('img/addcol.png')
 ```
 
@@ -91,7 +91,7 @@ Data sets have same subjects/observations, but new variables
 ]
 .pull-right[
 <span style="text-align:center;">`rbind(x,y)`</span>
-```{r, fig.caption="`rbind`", echo = FALSE}
+```{r joins-2, fig.caption="`rbind`", echo = FALSE}
 knitr::include_graphics('img/addrow.png')
 ```
 
@@ -142,7 +142,7 @@ These functions are available in the **dplyr** package.
 
 ## A breast cancer example
 
-```{r, echo=T}
+```{r joins-3, echo=T}
 library(readxl)
 clinical <- read_excel('data/BreastCancer_Clinical.xlsx', 
                        .name_repair = 'universal') 
@@ -152,12 +152,12 @@ proteome <- read_excel('data/BreastCancer_Expression.xlsx',
 ```
 
 .pull-left[
-```{r}
+```{r joins-4}
 clinical
 ```
 ]
 .pull-right[
-```{r}
+```{r joins-5}
 proteome
 ```
 
@@ -167,7 +167,7 @@ proteome
 
 ## A breast cancer example
 
-```{r, eval = F, echo=T}
+```{r joins-6, eval = F, echo=T}
 library(readxl)
 clinical <- read_excel('data/BreastCancer_Clinical.xlsx',
                        .name_repair = 'universal')
@@ -176,12 +176,12 @@ proteome <- read_excel('data/BreastCancer_Expression.xlsx',
 ```
 
 .pull-left[
-```{r}
+```{r joins-7}
 clinical[,1:2]
 ```
 ]
 .pull-right[
-```{r}
+```{r joins-8}
 proteome[,1:2]
 ```
 ]
@@ -200,12 +200,12 @@ Let's keep only the first two columns so we can see the ID variable
 
 Let's make sure that the ID's are truly IDs, i.e. each row has a unique value
 
-```{r, echo = T}
+```{r joins-9, echo = T}
 length(unique(clinical$Complete.TCGA.ID)) == nrow(clinical)
 ```
 --
 
-```{r, echo = T}
+```{r joins-10, echo = T}
 length(unique(proteome$TCGA_ID)) == nrow(proteome)
 ```
 
@@ -225,7 +225,7 @@ which rows go with which rows.
 
 For convenience we'll keep the first instance for each ID in the `proteome` data
 
-```{r, echo = T}
+```{r joins-11, echo = T}
 proteome <- proteome %>% filter(!duplicated(TCGA_ID))
 ```
 
@@ -233,7 +233,7 @@ proteome <- proteome %>% filter(!duplicated(TCGA_ID))
 
 --
 
-```{r, echo=T}
+```{r joins-12, echo=T}
 length(unique(proteome$TCGA_ID)) == nrow(proteome)
 ```
 
@@ -256,11 +256,11 @@ We don't have to sort data for duplicated
 ---
 ## Inner join
 
-```{r, echo=T, eval=F}
+```{r joins-13, echo=T, eval=F}
 common_rows <- inner_join(clinical[,1:6], proteome, 
                           by=c('Complete.TCGA.ID'='TCGA_ID'))
 ```
-```{r, echo=F, eval=T}
+```{r joins-14, echo=F, eval=T}
 common_rows <- inner_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 common_rows
 ```
@@ -291,10 +291,10 @@ All the animations are courtesy Garrick Aden-Buie and are available <a src="http
 ]
 ---
 ## Left join
-```{r, echo=T, eval=F}
+```{r joins-15, echo=T, eval=F}
 left_rows <- left_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 ```
-```{r, echo=F, eval=T}
+```{r joins-16, echo=F, eval=T}
 options(tibble.print_min=3, dplyr.width=Inf)
 left_rows <- left_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 left_rows
@@ -316,10 +316,10 @@ We get `r nrow(left_rows)` rows, which is all the rows of `clinical`, combined w
 ]
 ---
 ## Right join
-```{r, echo=T, eval=F}
+```{r joins-17, echo=T, eval=F}
 right_rows <- right_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 ```
-```{r, echo=F, eval=T}
+```{r joins-18, echo=F, eval=T}
 options(tibble.print_min=3, dplyr.width=Inf)
 right_rows <- right_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 right_rows
@@ -346,10 +346,10 @@ This is the _kitchen sink_ join
 ---
 ## Outer/Full Join
 
-```{r, echo=T, eval=F}
+```{r joins-19, echo=T, eval=F}
 full_rows <- full_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 ```
-```{r, echo=F, eval=T}
+```{r joins-20, echo=F, eval=T}
 options(tibble.print_min=3, dplyr.width=Inf)
 full_rows <- full_join(clinical[,1:6], proteome, by=c('Complete.TCGA.ID'='TCGA_ID'))
 full_rows
@@ -366,7 +366,7 @@ In each of `inner_join`, `left_join`, `right_join` and `full_join`, the number o
 
 There are also two joins where the number of columns don't increase. They aren't really "joins" in that sense, but really fancy filters on a dataset
 
-```{r}
+```{r joins-21}
 tbl <- tribble(~Join,~Use,~Description,
                "semi_join", "semi_join(A,B)", "Keep rows in A where ID matches some ID value in B",
                'anti_join', 'anti_join(A,B)', 'Keep rows in A where ID does NOT match any ID value in B')
@@ -379,14 +379,14 @@ These just filter the rows of `A` without adding any columns of `B`. These can b
 
 # Putting it in a pipe
 
-```{r, echo=T}
+```{r joins-22, echo=T}
 final_data <- clinical %>% 
   inner_join(proteome, by=c("Complete.TCGA.ID"="TCGA_ID")) %>% 
   filter(Gender =='FEMALE') %>% 
   select(Complete.TCGA.ID, Age.at.Initial.Pathologic.Diagnosis, ER.Status,
          starts_with("NP")) # grabs all the protein data
 ```
-```{r, echo=F}
+```{r joins-23, echo=F}
 final_data
 ```
 
@@ -409,7 +409,7 @@ makes life infinitely easier
 
 **Requirement:** Pull together over 200 datasets of variant alleles and expressions (1 per subject/cell line) 
 
-```{r, eval=FALSE}
+```{r joins-24, eval=FALSE}
 library(dplyr)
 
 fnames <- dir('~/Desktop/Sreya', full.names = TRUE) # Grab and store the paths to the individual files

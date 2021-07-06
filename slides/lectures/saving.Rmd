@@ -50,7 +50,7 @@ class: middle, inverse
 
 R allows you to save graphics by using **printers** for PDF, PNG and the like.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r saving-1, echo=TRUE, eval=FALSE}
 pdf('temp.pdf', width=5, height=5) # inches
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
   geom_point() + 
@@ -66,7 +66,7 @@ dev.off() #<<
 
 R allows you to save graphics by using **printers** for PDF, PNG and the like.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r saving-2, echo=TRUE, eval=FALSE}
 png('temp.png', width=5, height=5, units='in', res=300) # 300 dpi
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
   geom_point() + 
@@ -82,7 +82,7 @@ dev.off() #<<
 
 R allows you to save graphics by using **printers** for PDF, PNG and the like.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r saving-3, echo=TRUE, eval=FALSE}
 tiff('temp.tif', width=5, height=5, units='in', res=300, compression='lzw') # 300 dpi
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
   geom_point() + 
@@ -103,7 +103,7 @@ of the setting.
 
 The workaround is to print to PDF, and convert to TIFF, either via Preview, or using the **pdftools** package.
 
-```{r, echo=TRUE, eval=FALSE}
+```{r saving-4, echo=TRUE, eval=FALSE}
 pdf('temp.pdf', width=5, height=5) # inches
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
   geom_point() + 
@@ -120,7 +120,7 @@ pdftools::pdf_convert('temp.pdf', format='tiff', dpi=300)
 
 The previous slides showed the basic R way of printing a plot to a file. **ggplot2** makes it a bit easier.
 
-```{r, echo=T, eval=F}
+```{r saving-5, echo=T, eval=F}
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
   geom_point() + 
   labs(x = 'Bill length (mm)',

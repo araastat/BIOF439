@@ -180,7 +180,7 @@ A proper reprex can be re-run via copy/paste
 You can format the output of a reprex depending on where you want to use it. 
 These are specified using the `venue` argument. 
 
-```{r, echo=F}
+```{r reprex-1, echo=F}
 library(tidyverse)
 tribble(~Code, ~Target,
         "reprex(venue='r')", "R or Slack",

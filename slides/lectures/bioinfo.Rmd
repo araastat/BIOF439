@@ -90,7 +90,7 @@ ggplot(ggdf, aes(x = x, y = y,
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='h3'}
+```{r bioinfo-1, eval=T, echo=F, ref.label='h3'}
 
 ```
 
@@ -121,7 +121,7 @@ p.ideo
 ```
 ]
 .pull-right[
-```{r, echo=F, eval=T, ref.label='j1'}
+```{r bioinfo-2, echo=F, eval=T, ref.label='j1'}
 
 ```
 
@@ -145,7 +145,7 @@ p.txdb
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='j2'}
+```{r bioinfo-3, eval=T, echo=F, ref.label='j2'}
 
 ```
 ]
@@ -165,7 +165,7 @@ p.bg + zoom(1/1000)
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="bg"}
+```{r bioinfo-4, eval=T, echo = F, ref.label="bg"}
 ```
 ]
 ---
@@ -186,7 +186,7 @@ p.mis
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="mismatch"}
+```{r bioinfo-5, eval=T, echo = F, ref.label="mismatch"}
 ```
 ]
 
@@ -212,7 +212,7 @@ print(tks)
 ```
 ]
 .pull-right[
-```{r, eval=TRUE, echo=FALSE}
+```{r bioinfo-6, eval=TRUE, echo=FALSE}
 knitr::include_graphics('img/tracks.png')
 ```
 
@@ -233,7 +233,7 @@ autoplot(ideoCyto$hg19, layout = "karyogram",
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="karyo"}
+```{r bioinfo-7, eval=T, echo = F, ref.label="karyo"}
 ```
 ]
 
@@ -246,7 +246,7 @@ class: middle,inverse
 
 ## A very simple example
 
-```{r, echo=FALSE}
+```{r bioinfo-8, echo=FALSE}
 pacman::p_unload('AnnotationDbi')
 ```
 
@@ -561,7 +561,7 @@ plot(ann2)
 ```
 ]
 .pull-right[
-```{r, echo=F, eval=FALSE, out.height="100%", out.width="100%"}
+```{r bioinfo-9, echo=F, eval=FALSE, out.height="100%", out.width="100%"}
 knitr::include_graphics('img/heatmap.png')
 ```
 
@@ -636,7 +636,7 @@ of objects.
 
 We used UpSet plots to look at missing value patterns
 
-```{r, echo=F}
+```{r bioinfo-10, echo=F}
 library(UpSetR)
 library(ComplexHeatmap)
 
@@ -652,7 +652,7 @@ UpSet(m)
 
 ## UpSet plots
 
-```{r, echo =F, eval=F}
+```{r bioinfo-11, echo =F, eval=F}
 file_list = c(
     "ESC" = "data/E016-H3K4me3.narrowPeak.gz",
     "ES-deriv1" = "data/E004-H3K4me3.narrowPeak.gz",
@@ -680,7 +680,7 @@ UpSet(m)
 
 Enrichment network based on GSEA
 
-```{r, echo=F}
+```{r bioinfo-12, echo=F}
 library(DOSE)
 data(geneList)
 de <- names(geneList)[abs(geneList) > 2]
@@ -699,7 +699,7 @@ class:middle, center
 
 # Playing with Seurat
 
-```{r echo=FALSE}
+```{r bioinfo-13, echo=FALSE}
 pacman::p_unload('AnnotationDbi')
 ```
 

@@ -54,7 +54,7 @@ There are several broad categories of dynamic graphs
 
 General purpose:
 
-```{r, echo=FALSE }
+```{r animation-1, echo=FALSE }
 tribble(
     ~Package, ~Description,
     'r2d3' , 'Interface for D3.js, requires D3.js code',
@@ -69,7 +69,7 @@ tribble(
 
 Maps: 
 
-```{r }
+```{r animation-2 }
 tribble(
     ~Package, ~Description,
         "leaflet", "Maps using OpenStreetMaps") %>%
@@ -83,7 +83,7 @@ tribble(
 
 Networks:
 
-```{r }
+```{r animation-3 }
 tribble(~Package, ~Description,
         'networkD3', 'Dynamic network visualizations using D3',
         'visNetwork', 'Interface to the vis.js library') %>%
@@ -118,7 +118,7 @@ plt
 ```
 ]
 .pull-right[
-```{r , echo=TRUE, fig.height=4}
+```{r animation-4, echo=TRUE, fig.height=4}
 ggplotly(plt)
 ```
 ]
@@ -129,7 +129,7 @@ ggplotly(plt)
 
 You can do some customization on the tooltips (what shows up when you put your mouse over a point). 
 
-```{r , fig.height=5, fig.width=12, echo=TRUE}
+```{r animation-5, fig.height=5, fig.width=12, echo=TRUE}
 p <- ggplot(data = diamonds, aes(x = cut, fill = clarity))+
     geom_bar(position = 'dodge')
 ggplotly(p, tooltip = c('cut')) #<<
@@ -223,7 +223,7 @@ You could name the group anything you like, as long as it's the same across the 
 
 You could also annotate dygraphs
 
-```{r ,echo=TRUE, fig.height=5}
+```{r animation-6,echo=TRUE, fig.height=5}
 dygraph(presidents, main = "Quarterly Presidential Approval Ratings") %>%
   dyAxis("y", valueRange = c(0, 100)) %>%
   dyEvent("1950-6-30", "Korea", labelLoc = "bottom") %>%
@@ -269,7 +269,7 @@ See how the elements are similar to what you'd put in a **ggplot2** pipe, except
 Options can be added with pipes
 ]
 .pull-right[
-```{r , echo=F, eval=T, fig.height=4, ref.label='hc1'}
+```{r animation-7, echo=F, eval=T, fig.height=4, ref.label='hc1'}
 
 ```
 ]
@@ -287,7 +287,7 @@ hc1
 ```
 ]
 .pull-right[
-```{r ,ref.label='hc2', eval=T}
+```{r animation-8,ref.label='hc2', eval=T}
 
 ```
 ]
@@ -299,7 +299,7 @@ hc1
 We can make some more complex plots using **highcharter**
 
 .pull-left[
-```{r , eval=FALSE, echo=TRUE}
+```{r animation-9, eval=FALSE, echo=TRUE}
 library(survival)
 library(widgetframe)
 
@@ -311,7 +311,7 @@ hchart(fit, ranges=TRUE)
 ```
 ]
 .pull-right[
-```{r , eval=TRUE, echo=FALSE}
+```{r animation-10, eval=TRUE, echo=FALSE}
 library(survival)
 library(widgetframe)
 
@@ -327,7 +327,7 @@ frameWidget(hc)
 ## Highcharter
 
 .pull-left[
-```{r, echo=TRUE, eval=FALSE}
+```{r animation-11, echo=TRUE, eval=FALSE}
 library(highcharter)
 mtcars2 <- mtcars[1:20, ]
 x <- dist(mtcars2)
@@ -335,7 +335,7 @@ hchart(x)
 ```
 ]
 .pull-right[
-```{r, echo=FALSE, eval=TRUE}
+```{r animation-12, echo=FALSE, eval=TRUE}
 library(highcharter)
 mtcars2 <- mtcars[1:20, ]
 x <- dist(mtcars2)
@@ -383,7 +383,7 @@ p
 ```
 ]
 .pull-right[
-```{r, echo=TRUE }
+```{r animation-13, echo=TRUE }
 z <- lm(dist ~ speed, data = cars)
 p <- figure(width = 400, height = 400) %>%
   ly_points(cars, hover = cars) %>%
@@ -409,7 +409,7 @@ details
 
 .pull-left[
 **rbokeh**
-```{r , echo=FALSE}
+```{r animation-14, echo=FALSE}
 library(maps)
 data(world.cities)
 caps <- subset(world.cities, capital == 1)
@@ -422,7 +422,7 @@ figure(width = 400, height = 250, padding_factor = 0) %>%
 ]
 .pull-right[
 **highcharter**
-```{r , echo=FALSE}
+```{r animation-15, echo=FALSE}
 data <- tibble(
   country = 
     c("PT", "IE", "GB", "IS",
@@ -493,7 +493,7 @@ However, it controls each aspect of a chart and so can require rather long JS sc
 
 If you know D3.js, you can use it pretty easily embed them in R using the **r2d3** package
 
-```{r echo=TRUE, eval=TRUE}
+```{r animation-16, echo=TRUE, eval=TRUE}
 library(r2d3)
 
 r2d3(data =  read_csv('data/flare.csv'), d3_version = 4, script = 'bubbles.js')
@@ -503,7 +503,7 @@ r2d3(data =  read_csv('data/flare.csv'), d3_version = 4, script = 'bubbles.js')
 
 ## r2d3
 
-```{r echo=TRUE}
+```{r animation-17, echo=TRUE}
 
 r2d3(data = jsonlite::read_json('data/miserables.json'), d3_version = 4, script = 'forcegraph.js')
 ```
@@ -532,7 +532,7 @@ forceNetwork(Links = lemis$links, Nodes = lemis$nodes,
 ```
 ]
 .pull-right[
-```{r , echo=FALSE, eval=TRUE, ref.label="nd3"}
+```{r animation-18, echo=FALSE, eval=TRUE, ref.label="nd3"}
 
 ```
 ]
@@ -545,7 +545,7 @@ forceNetwork(Links = lemis$links, Nodes = lemis$nodes,
 
 Not all packages in the **htmlwidgets** family are **crosstalk**-compatible.
 
-```{r , echo=TRUE, eval=FALSE}
+```{r animation-19, echo=TRUE, eval=FALSE}
 load('data/exdata.rda')
 library(leaflet); library(crosstalk); library(d3scatter)
 

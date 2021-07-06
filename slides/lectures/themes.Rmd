@@ -90,18 +90,18 @@ g1 + scale_color_gradient2(low = 'blue',
 
 These are palettes based on scientific journals and sci-fi shows
 
-```{r , echo=TRUE, fig.height=4}
+```{r themes-1, echo=TRUE, fig.height=4}
 library(ggsci)
 plt <- ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
     geom_point() 
 ```
 .pull-left[
-```{r , echo=TRUE, fig.height=3}
+```{r themes-2, echo=TRUE, fig.height=3}
 plt + scale_color_lancet()
 ```
 ]
 .pull-right[
-```{r , echo=TRUE, fig.height=3}
+```{r themes-3, echo=TRUE, fig.height=3}
 plt + scale_color_npg()
 ```
 ]
@@ -117,7 +117,7 @@ These palettes are available in **ggplot2** as `scale_color_brewer` and `scale_f
 There are also a variation of these for continuous data, using these color schemes to create gradients. These
 are accessed using `scale_color_distiller` and `scale_fill_distiller`
 
-```{r , echo=TRUE, fig.height=3}
+```{r themes-4, echo=TRUE, fig.height=3}
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
     geom_point()+
     scale_color_brewer(type='qual', palette=2)
@@ -138,7 +138,7 @@ Divergent palettes are good when you want to show both extremes
 ]
 .pull-right[
 
-```{r , echo=FALSE}
+```{r themes-5, echo=FALSE}
 RColorBrewer::display.brewer.all()
 ```
 ]
@@ -151,7 +151,7 @@ RColorBrewer::display.brewer.all()
 The **viridis** package provides color palettes that are not only pleasing, but are robust to most forms of 
 color-blindness, including green-blind (deuteranopia), red-blind (protanopia) and blue-blind (tritanopia)
 
-```{r , echo=TRUE, fig.height=5}
+```{r themes-6, echo=TRUE, fig.height=5}
 library(viridis)
 ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
     geom_point()+
@@ -202,7 +202,7 @@ g1 + theme(text =
 
 We might want gray-scale palettes, to avoid journal color fees, for example
 
-```{r , echo=TRUE, fig.height=4}
+```{r themes-7, echo=TRUE, fig.height=4}
 plt + scale_color_grey()+theme_bw()
 ```
 ---
@@ -226,7 +226,7 @@ There are several themes built into **ggplot2**
 + You can modify any of these themes using the `theme` function
 + You can set a particular theme for a document at the very beginning using `theme_set`
 
-```{r, eval=FALSE}
+```{r themes-8, eval=FALSE}
 theme_set(theme_classic)
 ```
 

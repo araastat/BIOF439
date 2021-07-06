@@ -748,7 +748,7 @@ of objects.
 
 In BIOF339 we used UpSet plots to look at missing value patterns
 
-```{r, echo=F}
+```{r 05-bioinformatics-1, echo=F}
 library(UpSetR)
 library(ComplexHeatmap)
 
@@ -764,7 +764,7 @@ UpSet(m)
 
 ## UpSet plots
 
-```{r, echo =F, eval=F}
+```{r 05-bioinformatics-2, echo =F, eval=F}
 file_list = c(
     "ESC" = "data/E016-H3K4me3.narrowPeak.gz",
     "ES-deriv1" = "data/E004-H3K4me3.narrowPeak.gz",
@@ -792,7 +792,7 @@ UpSet(m)
 
 Enrichment network based on GSEA
 
-```{r, echo=F}
+```{r 05-bioinformatics-3, echo=F}
 library(DOSE)
 data(geneList)
 de <- names(geneList)[abs(geneList) > 2]

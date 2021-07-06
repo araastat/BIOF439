@@ -60,7 +60,7 @@ library(palmerpenguins)
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="p1"}
+```{r annotate-1, eval=T, echo = F, ref.label="p1"}
 ```
 ]
 
@@ -83,7 +83,7 @@ plt +
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="p2"}
+```{r annotate-2, eval=T, echo = F, ref.label="p2"}
 ```
 ]
 
@@ -107,7 +107,7 @@ plt +
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="p3"}
+```{r annotate-3, eval=T, echo = F, ref.label="p3"}
 ```
 ]
 
@@ -132,7 +132,7 @@ plt +
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="p4"}
+```{r annotate-4, eval=T, echo = F, ref.label="p4"}
 ```
 ]
 
@@ -158,7 +158,7 @@ plt +
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="p5"}
+```{r annotate-5, eval=T, echo = F, ref.label="p5"}
 ```
 ]
 ---
@@ -180,7 +180,7 @@ ggplot(penguins,
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label="b1"}
+```{r annotate-6, eval=T, echo=F, ref.label="b1"}
 
 ```
 
@@ -213,7 +213,7 @@ Adding data from a different dataset
 
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='b2'}
+```{r annotate-7, eval=T, echo=F, ref.label='b2'}
 
 ```
 
@@ -240,7 +240,7 @@ ggplot(mpg,
 ```
 ]
 .pull-right[
-```{r,eval=T, echo=F, ref.label='c1'}
+```{r annotate-8,eval=T, echo=F, ref.label='c1'}
 
 ```
 ]
@@ -270,7 +270,7 @@ ggplot(mpg,
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='c2'}
+```{r annotate-9, eval=T, echo=F, ref.label='c2'}
 
 ```
 
@@ -290,7 +290,7 @@ mpg %>%
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='d1'}
+```{r annotate-10, eval=T, echo=F, ref.label='d1'}
 
 ```
 
@@ -323,7 +323,7 @@ mpg %>%
 Note: If you have a factor on the x-axis, they are plotted at 1, 2, 3, ...
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='d2'}
+```{r annotate-11, eval=T, echo=F, ref.label='d2'}
 
 ```
 

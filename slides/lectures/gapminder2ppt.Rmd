@@ -12,7 +12,7 @@ library(tidyverse)
 library(gapminder)
 ```
 
-```{r, echo=FALSE, eval=TRUE,results='asis' }
+```{r gapminder2ppt-1, echo=FALSE, eval=TRUE,results='asis' }
 for(n in unique(gapminder$country)){
 #    cat(paste('##', n))
 #    cat('\\n\\n')

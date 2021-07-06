@@ -94,7 +94,7 @@ R stores categorical variables as type `factor`.
 
 ## The `factor` data type
 
-```{r}
+```{r factors-1}
 x <- c('Maryland','Virginia', 'District', 'Maryland','Virginia')  # a character vector
 xf <- as.factor(x)
 xf
@@ -105,14 +105,14 @@ There are three levels, that by default are in alphabetical order
 ----
 
 .pull-left[
-```{r}
+```{r factors-2}
 as.integer(xf)
 ```
 
 + District = 1, Maryland = 2, Virginia = 3
 ]
 .pull-right[
-```{r}
+```{r factors-3}
 as.character(xf)
 ```
 
@@ -125,7 +125,7 @@ as.character(xf)
 
 ## The `factor` data type
 
-```{r}
+```{r factors-4}
 y <- c(5, 3, 9, 4, 5, 3)
 yf <- as.factor(y)
 yf
@@ -136,7 +136,7 @@ Levels are still in alphanumeric order
 ----
 
 .pull-left[
-```{r}
+```{r factors-5}
 as.numeric(yf)
 ```
 
@@ -144,7 +144,7 @@ as.numeric(yf)
 + 3 = 1, 4 = 2, 5 = 3, 9 = 4
 ]
 .pull-right[
-```{r}
+```{r factors-6}
 as.numeric(as.character(yf))
 ```
 
@@ -157,7 +157,7 @@ as.numeric(as.character(yf))
 
 
 .pull-left[
-```{r}
+```{r factors-7}
 x <- c('MD','DC','VA','MD','DC')
 xf <- factor(x)
 unclass(xf)
@@ -165,7 +165,7 @@ unclass(xf)
 
 ]
 .pull-right[
-```{r}
+```{r factors-8}
 x <- c('MD','DC','VA','MD','DC')
 xf <- factor(x, levels = c('MD','DC','VA'))
 unclass(xf)
@@ -186,7 +186,7 @@ The `drv` variable in the `mpg` dataset tells us the kind of drive (front, rear 
 it's coded as `f`, `r`, and `4`, which is not great for display purposes. We can re-label these levels, but we have to be a bit careful
 
 .pull-left[
-```{r, error=TRUE}
+```{r factors-9, error=TRUE}
 x <- mpg$drv
 xf <- factor(x, 
               levels = c('4-wheel','Front wheel',
@@ -196,7 +196,7 @@ head(xf)
 
 ]
 .pull-right[
-```{r}
+```{r factors-10}
 x <- mpg$drv
 xf <- factor(x, 
               levels = c('4', 'f','r'), #<<
@@ -223,14 +223,14 @@ class: middle, center
 + Factors are interpreted as discrete by R's functions
 
 .pull-left[
-```{r, message=TRUE, warning=TRUE, fig.height=3}
+```{r factors-11, message=TRUE, warning=TRUE, fig.height=3}
 ggplot(mpg,
        aes(year, cty))+
   geom_boxplot()
 ```
 ]
 .pull-right[
-```{r, fig.height=3}
+```{r factors-12, fig.height=3}
 ggplot(mpg, 
        aes(as.factor(year), cty))+
   geom_boxplot()
@@ -242,10 +242,10 @@ ggplot(mpg,
 ## Dummy variables are automatically created from factors
 
 .pull-left[
-```{r, eval=F}
+```{r factors-13, eval=F}
 model.matrix(~species, data = palmerpenguins::penguins)
 ```
-```{r, echo = F}
+```{r factors-14, echo = F}
 palmerpenguins::penguins %>% 
   group_by(species) %>% 
   slice_head(n=2) %>% 
@@ -273,7 +273,7 @@ class: middle, center
 ## Effect in models
 
 .pull-left[
-```{r}
+```{r factors-15}
 library(palmerpenguins)
 m <- lm(body_mass_g ~ species, data = penguins)
 broom::tidy(m)
@@ -281,7 +281,7 @@ broom::tidy(m)
 Compare with Adele
 ]
 .pull-right[
-```{r}
+```{r factors-16}
 p1 <- penguins %>% 
   mutate(species = fct_relevel(species, 'Gentoo'))
 m1 <- lm(body_mass_g ~ species, data=p1 )
@@ -302,7 +302,7 @@ ones you specify.
 ## Effect in plots
 
 .pull-left[
-```{r, fig.height=4}
+```{r factors-17, fig.height=4}
 ggplot(penguins, 
        aes(x = species))+
   geom_bar()
@@ -310,7 +310,7 @@ ggplot(penguins,
 
 ]
 .pull-right[
-```{r, fig.height=4}
+```{r factors-18, fig.height=4}
 ggplot(p1, 
        aes(x = species))+
   geom_bar()
@@ -325,22 +325,22 @@ Changes the order in which bars are plotted
 ## Extra levels
 
 .pull-left[
-```{r}
+```{r factors-19}
 x <- factor(str_split('statistics', '')[[1]], 
             levels = letters)
 x
 ```
-```{r}
+```{r factors-20}
 p1 <- penguins %>% filter(species != 'Gentoo')
 fct_count(p1$species)
 ```
 
 ]
 .pull-right[
-```{r}
+```{r factors-21}
 fct_drop(x)
 ```
-```{r}
+```{r factors-22}
 p1 <- p1 %>% mutate(species = fct_drop(species))
 fct_count(p1$species)
 ```
@@ -355,7 +355,7 @@ Sometimes levels with no data show up in summaries or plots
 # Ordering levels by frequency
 
 .pull-left[
-```{r, fig.height=4}
+```{r factors-23, fig.height=4}
 ggplot(penguins, 
        aes(x = species))+
   geom_bar()
@@ -363,7 +363,7 @@ ggplot(penguins,
 
 ]
 .pull-right[
-```{r, fig.height=4}
+```{r factors-24, fig.height=4}
 ggplot(penguins,
        aes(x = fct_infreq(species)))+
   geom_bar()
@@ -378,7 +378,7 @@ Ordering levels from most to least frequent
 ## Ordering levels by values of another variable
 
 .pull-left[
-```{r, fig.height=4}
+```{r factors-25, fig.height=4}
 ggplot(penguins, 
        aes(x = species,
            y = bill_length_mm))+
@@ -386,7 +386,7 @@ ggplot(penguins,
 ```
 ]
 .pull-right[
-```{r, fig.height=4}
+```{r factors-26, fig.height=4}
 ggplot(penguins, 
        aes(x = fct_reorder(species, bill_length_mm, 
                            .fun=median, na.rm=T),
@@ -403,21 +403,21 @@ makes the plot easier to read.
 
 ## Ordering levels by values of another variable
 
-```{r, echo=FALSE}
+```{r factors-27, echo=FALSE}
 if('USArrests' %in% ls()) rm(USArrests)
 if(!('State' %in% names(USArrests))) USArrests <- USArrests %>% rownames_to_column('State')
 
 ```
 
 
-```{r, eval=F}
+```{r factors-28, eval=F}
 USArrests <- USArrests %>% rownames_to_column('State')
 ```
 
 
 
 .pull-left[
-```{r, fig.height=5}
+```{r factors-29, fig.height=5}
 ggplot(USArrests, aes(x=State, y = Murder))+
   geom_bar(stat = 'identity') + 
   theme(axis.text = element_text(size=6))+
@@ -426,7 +426,7 @@ ggplot(USArrests, aes(x=State, y = Murder))+
 
 ]
 .pull-right[
-```{r, fig.height=5}
+```{r factors-30, fig.height=5}
 ggplot(USArrests, aes(
   x = fct_reorder(State, Murder),
   y = Murder))+
@@ -445,7 +445,7 @@ The level ordering also shows up in the order of levels in the legends of plots.
 Suppose you are plotting two variables, grouped by a factor.
 
 .pull-left[
-```{r, fig.height=4}
+```{r factors-31, fig.height=4}
 ggplot(iris, aes(
   x = Sepal.Length, 
   y = Sepal.Width, 
@@ -455,7 +455,7 @@ ggplot(iris, aes(
 
 ]
 .pull-right[
-```{r, fig.height=4}
+```{r factors-32, fig.height=4}
 ggplot(iris, aes(
   x = Sepal.Length, 
   y = Sepal.Width, 
@@ -495,7 +495,7 @@ See [here](https://homepage.divms.uiowa.edu/~luke/classes/STAT4580/catone.html#p
 [here](https://www.r-graph-gallery.com/piechart-ggplot2.html) for more examples.
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label="pie"}
+```{r factors-33, eval=T, echo = F, ref.label="pie"}
 ```
 ]
 

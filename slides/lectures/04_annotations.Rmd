@@ -549,7 +549,7 @@ saveRDS(florida_election, fs::path(datadir, 'florida_election.rds'))
 ```
 ]
 .pull-right[
-```{r, eval=T, echo = F, ref.label='g1'}
+```{r 04-annotations-1, eval=T, echo = F, ref.label='g1'}
 ```
 
 ]
@@ -573,7 +573,7 @@ counties <- counties %>%
 ```
 ]
 .pull-right[
-```{r, eval=T, echo=F, ref.label='g2'}
+```{r 04-annotations-2, eval=T, echo=F, ref.label='g2'}
 
 ```
 
@@ -597,7 +597,7 @@ head(election_by_county, 2)
 ]
 .pull-right[
 
-```{r, eval=T, echo=F, ref.label='g3'}
+```{r 04-annotations-3, eval=T, echo=F, ref.label='g3'}
 
 ```
 

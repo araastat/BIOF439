@@ -65,7 +65,7 @@ Geocomputation with R by Lovelace, Nowosad and Muenchow (2019), also available o
 
 We'll start of loading the following packages
 
-```{r}
+```{r maps-1}
 library(ggplot2)
 library(sf)
 library(spData)
@@ -75,7 +75,7 @@ The **sf** package provides [simple features access](https://en.wikipedia.org/wi
 packages that are standard in the geography world.
 
 .pull-left[
-```{r, echo=FALSE, out.height="70%", out.width="70%",fig.pos='h'}
+```{r maps-2, echo=FALSE, out.height="70%", out.width="70%",fig.pos='h'}
 knitr::include_graphics('img/sfcartoon.jpg')
 ```
 
@@ -94,13 +94,13 @@ Additional information is available [here](htps://r-spacial.github.io/sf/)
 Chloropleth maps are maps with some geometries filled in to signify levels of some variable. 
 
 .pull-left[
-```{r, echo=FALSE, fig.caption='Smoking rates in USA in 2012 (NY Times, March 24, 2014)'}
+```{r maps-3, echo=FALSE, fig.caption='Smoking rates in USA in 2012 (NY Times, March 24, 2014)'}
 knitr::include_graphics('img/Smoking-rates.png')
 ```
 .small[Smoking rates in USA in 2012 (NY Times, March 24, 2014)]
 ]
 .pull-right[
-```{r, echo=FALSE, out.height="120%", out.width="120%"}
+```{r maps-4, echo=FALSE, out.height="120%", out.width="120%"}
 knitr::include_graphics('img/Figure-1-1.png')
 ```
 .small[Observed to Expected Ratios (OERs) for Rates of Primary Total Knee Arthroplasty Among White Medicare Beneficiaries by Health Referral Region [(Ward & Dasgupta, 2020)](https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2765054)]]
@@ -131,7 +131,7 @@ If you look at `world`, you'll see it's a data.frame, with one column named `geo
 If you look at `world`, it also provides life expectancy estimates from 2014 (World Bank). The data set is tidy, with one row corresponding to one country. We'll use our known **ggplot2** way of filling things in.
 
 .left-column70[
-```{r}
+```{r maps-5}
 ggplot(data = spData::world) + 
   geom_sf(aes(fill = lifeExp)) # a special geometry for plotting maps
 ```
@@ -148,7 +148,7 @@ We  need a more distinctive color palette.
 If you look at `world`, it also provides life expectancy estimates from 2014 (World Bank). The data set is tidy, with one row corresponding to one country. We'll use our known **ggplot2** way of filling things in.
 
 
-```{r, out.width='60%', out.height='60%'}
+```{r maps-6, out.width='60%', out.height='60%'}
 ggplot(data = spData::world) + 
   geom_sf(aes(fill = lifeExp)) + # a special geometry for plotting maps
   viridis::scale_fill_viridis('Life Exp', option='plasma', 
@@ -160,7 +160,7 @@ ggplot(data = spData::world) +
 
 ## The electoral picture in Florida, 2000
 
-```{r, echo=FALSE}
+```{r maps-7, echo=FALSE}
 library(spData)
 library(maps)
 states <- st_as_sf(maps::map('state', plot = F, 
@@ -208,7 +208,7 @@ The **tmap** package uses many synactical structures similar to **ggplot2**, but
 can be nicer in some ways
 
 .left-column70[
-```{r}
+```{r maps-8}
 library(tmap)
 tm_shape(spData::world) + tm_polygons(col = "lifeExp", style='jenks',
                                       title = 'Life expectancy')
@@ -226,7 +226,7 @@ It makes some nice choices
 ## tmap (interactive)
 
 .left-column70[
-```{r, out.width='100%', out.height='100%'}
+```{r maps-9, out.width='100%', out.height='100%'}
 tmap_mode('view')  #<<
 tm_shape(spData::world) + tm_polygons(col = 'pop', style='jenks',
                               palette='Reds', title='Population',
@@ -248,7 +248,7 @@ It gains interactivity using **leaflet**, which we'll see in a bit
 
 The easiest ways to overlay data on street maps is with the  **leaflet** package.
 
-```{r, eval=TRUE, cache=FALSE}
+```{r maps-10, eval=TRUE, cache=FALSE}
 library(leaflet)
 library(leaflet.providers)
 load(file.path(here::here('slides','lectures','data', 'exdata.rda')))
@@ -262,7 +262,7 @@ leaflet(gpx) %>% addTiles() %>% addCircleMarkers(~Longitude, ~Latitude, radius=1
 You can also use the **mapview** package, which calls **leaflet** and has a bit more compact syntax
 
 .pull-left[
-```{r, echo=TRUE, eval=FALSE}
+```{r maps-11, echo=TRUE, eval=FALSE}
 load(file.path(here::here('slides','lectures','data', 'exdata.rda')))
 gpx <- sf::st_as_sf(gpx, 
                 coords=c("Longitude", "Latitude"), 
@@ -274,7 +274,7 @@ mapview::mapview(gpx, color='blue',
 ```
 ]
 .pull-right[
-```{r, echo=FALSE}
+```{r maps-12, echo=FALSE}
 knitr::include_graphics('img/run.png')
 ```
 ]
@@ -286,7 +286,7 @@ knitr::include_graphics('img/run.png')
 You can also use the **mapview** package, which calls **leaflet** and has a bit more compact syntax
 
 .pull-left[
-```{r, echo=TRUE, eval=FALSE}
+```{r maps-13, echo=TRUE, eval=FALSE}
 load(file.path(here::here('slides','lectures','data', 'exdata.rda')))
 gpx <- st_as_sf(gpx, 
                 coords=c("Longitude", "Latitude"), 
@@ -302,7 +302,7 @@ You can also have some stylistic fun with maps.
 More possibilities at [http://leaflet-extras.github.io/leaflet-providers/preview/](http://leaflet-extras.github.io/leaflet-providers/preview/)
 ]
 .pull-right[
-```{r, echo=FALSE}
+```{r maps-14, echo=FALSE}
 knitr::include_graphics('img/run2.png')
 ```
 ]
@@ -312,7 +312,7 @@ knitr::include_graphics('img/run2.png')
 ## Dot density maps
 
 .left-column70[
-```{r, fig.height=4}
+```{r maps-15, fig.height=4}
 library(ggmap)
 crime1 <- crime %>% 
   filter(between(crime$lon, -95.4, -95.34) & 
@@ -359,7 +359,7 @@ qmplot(lon, lat, data=crime1,
 ```
 ]
 .pull-right[
-```{r, echo=FALSE, ref.label='qm1'}
+```{r maps-16, echo=FALSE, ref.label='qm1'}
 
 ```
 
@@ -370,7 +370,7 @@ qmplot(lon, lat, data=crime1,
 ## Facetted maps
 
 .pull-left[
-```{r, eval=FALSE}
+```{r maps-17, eval=FALSE}
 library(tmap)
 world1 <- world %>% 
   filter(continent %in% c('Europe','Asia',
@@ -384,7 +384,7 @@ tm_shape(world1)+tm_polygons(col='lifeExp') +
 ```
 ]
 .pull-right[
-```{r, echo=FALSE, out.height="100%", out.width="100%"}
+```{r maps-18, echo=FALSE, out.height="100%", out.width="100%"}
 knitr::include_graphics('img/tmap_facet.png')
 ```
 ]
