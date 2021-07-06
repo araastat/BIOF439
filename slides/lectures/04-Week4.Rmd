@@ -1,0 +1,38 @@
+---
+title: "Data Visualization using R"
+author: "Week 4: Working with ggplot graphs"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = '#> ', cache=FALSE)
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+options(knitr.duplicate.label='allow')
+```
+
+
+
+```{r factor, child='factors.Rmd'}
+
+```
+
+```{r visdat, child='visdat.Rmd'}
+
+```
+
+---
+
+```{r annotate, child='annotate.Rmd'}
+
+```
+
+```{r patch, child='patchwork.Rmd'}
+
+```
+
+---
+
+```{r saving, child = 'saving.Rmd'}
+
+```
+

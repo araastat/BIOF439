@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Visualization using R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Week 4: Working with ggplot graphs" />
+    <script src="04-Week4_files/header-attrs-2.9.1/header-attrs.js"></script>
+    <link href="04-Week4_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="robot.css" type="text/css" />
+    <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="sfah.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Visualization using R
+### Week 4: Working with ggplot graphs
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle,center
+
+# Categorical variables
+
+---
+
+## What are categorical variables?
+
+Categorical variables are variables that
+
++ have values defining categories of things
++ typically have a few unique values
++ may or may not be ordered
++ are not interval-scaled, i.e., their differences don't make sense _per se_
+
+
+
+---
+
+## What are categorical variables?
+
+.pull-left[
+#### Non-ordered
+
+1. Race (White, Black, Hispanic, Asian, Native American)
+1. Gender (Male, Female, Other)
+1. Geographic regions (Africa, Asia, Europe, North America, South America)
+1. Genes/Proteins
+]
+.pull-right[
+#### Ordered
+
+1. Income levels (&lt; $10K, $10K - $25K, $25K - $75K, $75K - $100K)
+1. BMI categories (Underweight, Normal, Overweight, Obese)
+1. Number of bedrooms in houses (1 BR, 2BR, 3BR, 4BR)
+]
+
+---
+class: middle, center
+
+# Cateogical variables in R
+
+---
+
+## The `factor` data type
+
+R stores categorical variables as type `factor`.
+
++ You can coerce a character or numeric object into a factor using `as.factor`.
++ You can check if an object is a factor with `is.factor`.
++ You can create a factor with the function `factor`.
+
+
+---
+
+## The `factor` data type
+
+&gt; `factor(x = character(), levels, labels = levels,
+       exclude = NA, ordered = is.ordered(x), nmax = NA)`
+&gt;
+&gt; factor returns an object of class "factor" which has a set of integer codes the length of x with a "levels" attribute of mode character and unique
+
+----
+
++ Internally, each level of a factor is coded as an integer
++ Each such integer has a corresponding `level` which is a character, describing the level. 
++ You can add `labels` to each level to change the printed form of the factor. 
+
+
+---
+
+## The `factor` data type
+
+
+```r
+x &lt;- c('Maryland','Virginia', 'District', 'Maryland','Virginia')  # a character vector
+xf &lt;- as.factor(x)
+xf
+```
+
+```
+  [1] Maryland Virginia District Maryland Virginia
+  Levels: District Maryland Virginia
+```
+
+There are three levels, that by default are in alphabetical order
+
+----
+
+.pull-left[
+
+```r
+as.integer(xf)
+```
+
+```
+  [1] 2 3 1 2 3
+```
+
++ District = 1, Maryland = 2, Virginia = 3
+]
+.pull-right[
+
+```r
+as.character(xf)
+```
+
+```
+  [1] "Maryland" "Virginia" "District" "Maryland" "Virginia"
+```
+
++ Get original characters back
+]
+
+
+
+---
+
+## The `factor` data type
+
+
+```r
+y &lt;- c(5, 3, 9, 4, 5, 3)
+yf &lt;- as.factor(y)
+yf
+```
+
+```
+  [1] 5 3 9 4 5 3
+  Levels: 3 4 5 9
+```
+
+Levels are still in alphanumeric order
+
+----
+
+.pull-left[
+
+```r
+as.numeric(yf)
+```
+
+```
+  [1] 3 1 4 2 3 1
+```
+
++ Note, we don't get original integers back!!
++ 3 = 1, 4 = 2, 5 = 3, 9 = 4
+]
+.pull-right[
+
+```r
+as.numeric(as.character(yf))
+```
+
+```
+  [1] 5 3 9 4 5 3
+```
+
++ This is how you get numbers back
+]
+
+---
+
+## The `factor` data type
+
+
+.pull-left[
+
+```r
+x &lt;- c('MD','DC','VA','MD','DC')
+xf &lt;- factor(x)
+unclass(xf)
+```
+
+```
+  [1] 2 1 3 2 1
+  attr(,"levels")
+  [1] "DC" "MD" "VA"
+```
+
+]
+.pull-right[
+
+```r
+x &lt;- c('MD','DC','VA','MD','DC')
+xf &lt;- factor(x, levels = c('MD','DC','VA'))
+unclass(xf)
+```
+
+```
+  [1] 1 2 3 1 2
+  attr(,"levels")
+  [1] "MD" "DC" "VA"
+```
+
+]
+
+----
+
++ If I change the level designation, the underlying coding changes
++ This is important when a factor is an independent variable in a regression model
+
+---
+
+## The `factor` data type
+
+The `drv` variable in the `mpg` dataset tells us the kind of drive (front, rear or 4-wheel) each car has. However
+it's coded as `f`, `r`, and `4`, which is not great for display purposes. We can re-label these levels, but we have to be a bit careful
+
+.pull-left[
+
+```r
+x &lt;- mpg$drv
+xf &lt;- factor(x, 
+              levels = c('4-wheel','Front wheel',
+                         'Rear wheel'))
+head(xf)
+```
+
+```
+  [1] &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+  Levels: 4-wheel Front wheel Rear wheel
+```
+
+]
+.pull-right[
+
+```r
+x &lt;- mpg$drv
+xf &lt;- factor(x, 
+*             levels = c('4', 'f','r'),
+*             labels = c('4-wheel','Front wheel',
+*                        'Rear wheel'))
+head(xf)
+```
+
+```
+  [1] Front wheel Front wheel Front wheel Front wheel Front wheel Front wheel
+  Levels: 4-wheel Front wheel Rear wheel
+```
+
+]
+
+----
+
+Levels have to match what's actually in the original data, but you can re-label the levels.
+
+---
+class: middle, center
+
+# Why factors?
+
+---
+
+## Factors are R's discrete data type
+
++ Factors are interpreted as discrete by R's functions
+
+.pull-left[
+
+```r
+ggplot(mpg,
+       aes(year, cty))+
+  geom_boxplot()
+```
+
+```
+  Warning: Continuous x aesthetic -- did you forget aes(group=...)?
+```
+
+![](04-Week4_files/figure-html/factors-11-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+
+```r
+ggplot(mpg, 
+       aes(as.factor(year), cty))+
+  geom_boxplot()
+```
+
+![](04-Week4_files/figure-html/factors-12-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Dummy variables are automatically created from factors
+
+.pull-left[
+
+```r
+model.matrix(~species, data = palmerpenguins::penguins)
+```
+
+```
+    (Intercept) speciesChinstrap speciesGentoo
+  1           1                0             0
+  2           1                0             0
+  3           1                1             0
+  4           1                1             0
+  5           1                0             1
+  6           1                0             1
+  attr(,"assign")
+  [1] 0 1 1
+  attr(,"contrasts")
+  attr(,"contrasts")$species
+  [1] "contr.treatment"
+```
+]
+.pull-right[
++ If a factor has _n_ levels, you get _n-1_ dummy variables
++ The level corresponding to integer code 1 is omitted as the reference level
+]
+
+----
+
+Changing the base level (integer code 1) changes model interpretation since
+it changes the reference level against which all other levels are compared.
+
+---
+class: middle, center
+
+# Manipulating factors&lt;br/&gt;&lt;br/&gt;The `forcats` package (part of `tidyverse`)
+
+---
+
+## Effect in models
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+m &lt;- lm(body_mass_g ~ species, data = penguins)
+broom::tidy(m)
+```
+
+```
+  # A tibble: 3 x 5
+    term             estimate std.error statistic   p.value
+    &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1 (Intercept)        3701.       37.6    98.4   2.49e-251
+  2 speciesChinstrap     32.4      67.5     0.480 6.31e-  1
+  3 speciesGentoo      1375.       56.1    24.5   5.42e- 77
+```
+Compare with Adele
+]
+.pull-right[
+
+```r
+p1 &lt;- penguins %&gt;% 
+  mutate(species = fct_relevel(species, 'Gentoo'))
+m1 &lt;- lm(body_mass_g ~ species, data=p1 )
+broom::tidy(m1)
+```
+
+```
+  # A tibble: 3 x 5
+    term             estimate std.error statistic   p.value
+    &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+  1 (Intercept)         5076.      41.7     122.  6.86e-282
+  2 speciesAdelie      -1375.      56.1     -24.5 5.42e- 77
+  3 speciesChinstrap   -1343.      69.9     -19.2 3.21e- 56
+```
+Compare with Gentoo
+]
+
+----
+
+Providing only one level to `fct_relevel` makes that the base level (integer code 1).  
+You can also fully specify all the levels in order, or partially specify them. If you 
+partially specify them, the remaining levels will be put in alphabetical order after the
+ones you specify.
+
+---
+
+## Effect in plots
+
+.pull-left[
+
+```r
+ggplot(penguins, 
+       aes(x = species))+
+  geom_bar()
+```
+
+![](04-Week4_files/figure-html/factors-17-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+
+```r
+ggplot(p1, 
+       aes(x = species))+
+  geom_bar()
+```
+
+![](04-Week4_files/figure-html/factors-18-1.png)&lt;!-- --&gt;
+
+]
+
+Changes the order in which bars are plotted
+
+---
+
+## Extra levels
+
+.pull-left[
+
+```r
+x &lt;- factor(str_split('statistics', '')[[1]], 
+            levels = letters)
+x
+```
+
+```
+   [1] s t a t i s t i c s
+  Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z
+```
+
+```r
+p1 &lt;- penguins %&gt;% filter(species != 'Gentoo')
+fct_count(p1$species)
+```
+
+```
+  # A tibble: 3 x 2
+    f             n
+    &lt;fct&gt;     &lt;int&gt;
+  1 Adelie      152
+  2 Chinstrap    68
+  3 Gentoo        0
+```
+
+]
+.pull-right[
+
+```r
+fct_drop(x)
+```
+
+```
+   [1] s t a t i s t i c s
+  Levels: a c i s t
+```
+
+```r
+p1 &lt;- p1 %&gt;% mutate(species = fct_drop(species))
+fct_count(p1$species)
+```
+
+```
+  # A tibble: 2 x 2
+    f             n
+    &lt;fct&gt;     &lt;int&gt;
+  1 Adelie      152
+  2 Chinstrap    68
+```
+
+]
+
+Getting rid of extra levels&lt;br/&gt;&lt;br/&gt;
+Sometimes levels with no data show up in summaries or plots
+
+---
+
+# Ordering levels by frequency
+
+.pull-left[
+
+```r
+ggplot(penguins, 
+       aes(x = species))+
+  geom_bar()
+```
+
+![](04-Week4_files/figure-html/factors-23-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+
+```r
+ggplot(penguins,
+       aes(x = fct_infreq(species)))+
+  geom_bar()
+```
+
+![](04-Week4_files/figure-html/factors-24-1.png)&lt;!-- --&gt;
+
+]
+
+Ordering levels from most to least frequent
+
+---
+
+## Ordering levels by values of another variable
+
+.pull-left[
+
+```r
+ggplot(penguins, 
+       aes(x = species,
+           y = bill_length_mm))+
+  geom_boxplot()
+```
+
+![](04-Week4_files/figure-html/factors-25-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+
+```r
+ggplot(penguins, 
+       aes(x = fct_reorder(species, bill_length_mm, 
+                           .fun=median, na.rm=T),
+           y = bill_length_mm))+
+  geom_boxplot() + labs(x = 'species')
+```
+
+![](04-Week4_files/figure-html/factors-26-1.png)&lt;!-- --&gt;
+
+]
+
+`fct_reorder` is useful for ordering a plot by ascending or descending levels. This 
+makes the plot easier to read. 
+
+---
+
+## Ordering levels by values of another variable
+
+
+
+
+
+```r
+USArrests &lt;- USArrests %&gt;% rownames_to_column('State')
+```
+
+
+
+.pull-left[
+
+```r
+ggplot(USArrests, aes(x=State, y = Murder))+
+  geom_bar(stat = 'identity') + 
+  theme(axis.text = element_text(size=6))+
+  coord_flip()
+```
+
+![](04-Week4_files/figure-html/factors-29-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+
+```r
+ggplot(USArrests, aes(
+  x = fct_reorder(State, Murder),
+  y = Murder))+
+  geom_bar(stat = 'identity')+
+  theme(axis.text = element_text(size=6))+
+  coord_flip()
+```
+
+![](04-Week4_files/figure-html/factors-30-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Order levels based on last values when plotting 2 variables
+
+The level ordering also shows up in the order of levels in the legends of plots. 
+Suppose you are plotting two variables, grouped by a factor.
+
+.pull-left[
+
+```r
+ggplot(iris, aes(
+  x = Sepal.Length, y = Sepal.Width, color = Species))+
+  geom_smooth(se=F)
+```
+
+![](04-Week4_files/figure-html/factors-31-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+
+```r
+ggplot(iris, aes(
+  x = Sepal.Length, y = Sepal.Width, 
+  color = fct_reorder2(Species,
+                       Sepal.Length, Sepal.Width)))+
+  geom_smooth(se=F) + labs(color = 'Species')
+```
+
+![](04-Week4_files/figure-html/factors-32-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Further exploration
+
+1. [forcats cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/factors.pdf)
+1. [Chapter 15](https://r4ds.had.co.nz/factors.html) of R4DS
+
+
+---
+
+## Pie chart
+
+.pull-left[
+
+```r
+penguins %&gt;% count(species) %&gt;% 
+  ggplot(aes(x=1,y=n, fill=species))+
+    geom_bar(stat='identity')+
+*   coord_polar('y') +
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(), 
+          axis.ticks=element_blank(), 
+          panel.grid = element_blank(),
+          axis.line = element_blank())
+```
+
+See [here](https://homepage.divms.uiowa.edu/~luke/classes/STAT4580/catone.html#pie-charts-and-doughnut-charts) and
+[here](https://www.r-graph-gallery.com/piechart-ggplot2.html) for more examples.
+]
+.pull-right[
+![](04-Week4_files/figure-html/factors-33-1.png)&lt;!-- --&gt;
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle, center
+
+# The nature of a data set
+
+---
+
+## Data characteristics
+
+Some of the things we care about in a data set are 
+
++ Nature of each column
++ Missing data patterns
++ Correlation patterns
+
+The **visdat** package and the **naniar** package help us with visualizing these.
+
+---
+
+## Without visualization
+
+.pull-left[
+
+```r
+summary(airquality)
+```
+
+```
+       Ozone           Solar.R           Wind             Temp      
+   Min.   :  1.00   Min.   :  7.0   Min.   : 1.700   Min.   :56.00  
+   1st Qu.: 18.00   1st Qu.:115.8   1st Qu.: 7.400   1st Qu.:72.00  
+   Median : 31.50   Median :205.0   Median : 9.700   Median :79.00  
+   Mean   : 42.13   Mean   :185.9   Mean   : 9.958   Mean   :77.88  
+   3rd Qu.: 63.25   3rd Qu.:258.8   3rd Qu.:11.500   3rd Qu.:85.00  
+   Max.   :168.00   Max.   :334.0   Max.   :20.700   Max.   :97.00  
+   NA's   :37       NA's   :7                                       
+       Month            Day      
+   Min.   :5.000   Min.   : 1.0  
+   1st Qu.:6.000   1st Qu.: 8.0  
+   Median :7.000   Median :16.0  
+   Mean   :6.993   Mean   :15.8  
+   3rd Qu.:8.000   3rd Qu.:23.0  
+   Max.   :9.000   Max.   :31.0  
+  
+```
+]
+.pull-right[
+
+```r
+glimpse(airquality, width=40)
+```
+
+```
+  Rows: 153
+  Columns: 6
+  $ Ozone   &lt;int&gt; 41, 36, 12, 18, NA, 28…
+  $ Solar.R &lt;int&gt; 190, 118, 149, 313, NA…
+  $ Wind    &lt;dbl&gt; 7.4, 8.0, 12.6, 11.5, …
+  $ Temp    &lt;int&gt; 67, 72, 74, 62, 56, 66…
+  $ Month   &lt;int&gt; 5, 5, 5, 5, 5, 5, 5, 5…
+  $ Day     &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8…
+```
+
+]
+
+These give us a variable-by-variable view.
+
+---
+
+## Visualizing a dataset
+
+.pull-left[
+
+
+```r
+visdat::vis_dat(airquality)
+```
+
+![](04-Week4_files/figure-html/visdat-3-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+
++ What kinds of variables are in the dataset
++ Which elements are missing
++ A sense of missing patterns
+]
+
+---
+
+## Correlation patterns
+
+
+```r
+visdat::vis_cor(airquality)
+```
+
+![](04-Week4_files/figure-html/visdat-4-1.png)&lt;!-- --&gt;
+
+---
+
+## Focus on missing data patterns
+
+
+```r
+visdat::vis_miss(airquality)
+```
+
+![](04-Week4_files/figure-html/visdat-5-1.png)&lt;!-- --&gt;
+
+---
+class: middle, center
+
+# A deeper look at missing data
+
+---
+
+
+```r
+library(naniar)
+gg_miss_upset(airquality)
+```
+
+![](04-Week4_files/figure-html/visdat-6-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+gg_miss_upset(riskfactors)
+```
+
+![](04-Week4_files/figure-html/visdat-7-1.png)&lt;!-- --&gt;
+
+---
+
+## Missing at random? 
+
+Does missingness in one variable depend on values of another variable?
+
+.pull-left[
+
+```r
+ggplot(airquality, 
+       aes(Ozone, Solar.R))+
+  geom_miss_point()
+```
+
+![](04-Week4_files/figure-html/visdat-8-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+The red points are the values of one variable when the other variable is missing
+]
+
+---
+
+## Missing at random?
+
+.pull-left[
+
+```r
+gg_miss_fct(x = riskfactors, fct=marital)
+```
+
+![](04-Week4_files/figure-html/visdat-9-1.png)&lt;!-- --&gt;
+
+]
+.pull-right[
+Percent missing in each variable by levels of a factor
+
+What you're looking for is relatively even colors across
+]
+
+---
+
+## Further exploration
+
+1. The **naniar** [website](http://naniar.njtierney.com/)
+
+---
+
+
+
+
+
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class:middle, center, inverse
+
+# Annotations
+
+---
+
+## Stand-alone stories
+
+- You would like a data visualization to stand on its own
+- Relevant information should be placed on the graph
+- However, you need to balance the information content with real estate
+    - Don't clutter the graph and make it not readable
+
+---
+
+
+## An example 
+
+&lt;div id="origecon"&gt;&lt;/div&gt;
+![](img/economist1.gif)
+
+After this week, you can try to reproduce this plot. The data is available
+at EconomistData.csv in the data folder.
+
+---
+
+## Titles, subtitles and captions
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+(plt &lt;- ggplot(penguins, 
+               aes(bill_length_mm, body_mass_g, 
+                   color=species))+
+  geom_point())
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-1-1.png)&lt;!-- --&gt;
+]
+
+
+
+---
+
+## Titles, subtitles and captions
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+plt &lt;- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)')
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-2-1.png)&lt;!-- --&gt;
+]
+
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+plt &lt;- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+*      color = 'Species')
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-3-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+plt &lt;- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+       color = 'Species',
+*      title = "Palmer penguins",
+*      subtitle = "Bill length vs Body mass")
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-4-1.png)&lt;!-- --&gt;
+]
+
+---
+
+## Titles, subtitles and captions
+
+
+.pull-left[
+
+```r
+library(palmerpenguins)
+plt &lt;- ggplot(penguins, 
+              aes(bill_length_mm, body_mass_g, 
+                  color=species))+
+  geom_point()
+plt + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)',
+       color = 'Species',
+       title = "Palmer penguins",
+       subtitle = "Bill length vs Body mass",
+       caption = "Palmer Station LTER") 
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-5-1.png)&lt;!-- --&gt;
+]
+---
+class:middle,center
+
+# Adding derived statistics to a plot
+
+---
+
+## Adding group means
+
+.pull-left[
+
+```r
+ggplot(penguins, 
+       aes(x = bill_length_mm,
+           y = body_mass_g,
+           color = species))+
+  geom_point()
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-6-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Adding group means
+
+.pull-left[
+
+```r
+means &lt;- penguins %&gt;% group_by(species) %&gt;% 
+  summarize_at(vars(bill_length_mm, body_mass_g),
+               mean, na.rm=TRUE)
+means
+```
+
+```
+  # A tibble: 3 x 3
+    species   bill_length_mm body_mass_g
+    &lt;fct&gt;              &lt;dbl&gt;       &lt;dbl&gt;
+  1 Adelie              38.8       3701.
+  2 Chinstrap           48.8       3733.
+  3 Gentoo              47.5       5076.
+```
+
+
+
+```r
+ggplot(penguins, 
+       aes(x = bill_length_mm,
+           y = body_mass_g,
+           color = species))+
+  geom_point()+ 
+* geom_point(data = means,
+*            size=8)
+```
+
+Adding data from a different dataset
+
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-7-1.png)&lt;!-- --&gt;
+
+]
+---
+
+
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+
+```r
+mod1 &lt;- lm(hwy ~ cty, data = mpg)
+r2 &lt;- broom::glance(mod1) %&gt;% pull(r.squared)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F) +
+  theme_bw()
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-8-1.png)&lt;!-- --&gt;
+]
+---
+
+## Adding regression metrics
+
+.pull-left[
+
+Regress highway mileage on city mileage (data: mpg)
+
+
+```r
+mod1 &lt;- lm(hwy ~ cty, data = mpg)
+r2 &lt;- broom::glance(mod1) %&gt;% pull(r.squared) %&gt;% 
+  round(., 2)
+
+ggplot(mpg, 
+       aes(x = cty, y = hwy))+
+  geom_point() + 
+  geom_smooth(method = 'lm', se=F)+
+  annotate(geom='text',
+           x = 15, y = 40,
+           label=glue::glue("R^2 == {r}",r=r2),
+           size=12,
+           parse=T) + 
+  theme_bw()
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-9-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+
+```r
+mpg %&gt;% 
+  mutate(cyl = as.factor(cyl)) %&gt;% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()
+```
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-10-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+## Highlighting regions
+
+.pull-left[
+
+```r
+mpg %&gt;% 
+  mutate(cyl = as.factor(cyl)) %&gt;% 
+  ggplot(aes(x = cyl, y = hwy)) + 
+  geom_boxplot() + 
+  theme_bw()+
+  annotate(geom = 'rect',
+           xmin=3.75,xmax=4.25,
+           ymin = 22, ymax = 28,
+           fill = 'red',
+           alpha = 0.2) +
+  annotate('text', 
+           x = 4.5, y = 25,
+           label = 'Outliers?',
+           hjust = 0)+
+  coord_cartesian(xlim = c(0,5))+ 
+  theme_bw()
+```
+
+Note: If you have a factor on the x-axis, they are plotted at 1, 2, 3, ...
+]
+.pull-right[
+![](04-Week4_files/figure-html/annotate-11-1.png)&lt;!-- --&gt;
+
+]
+
+
+
+
+
+
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle, inverse
+
+# Putting plots together
+
+---
+
+## The packages
+
+There are three excellent packages for putting separate `ggplot` graphs together in panels.
+
+1. **ggpubr**
+1. **cowplot**
+1. **patchwork**
+
+---
+
+## The graphs
+
+
+```r
+plt1 &lt;- ggplot(penguins, aes(x = species, y = body_mass_g, fill=species)) +
+  geom_boxplot()
+
+plt2 &lt;- ggplot(penguins, aes(x = bill_length_mm, y = body_mass_g,
+                             color = species))+
+  geom_point()
+
+plt3 &lt;- ggplot(penguins, aes(x = bill_length_mm, y = flipper_length_mm, 
+                             color = species))+
+  geom_smooth(se=F)
+```
+
+![](04-Week4_files/figure-html/patchwork-2-1.png)&lt;!-- --&gt;
+
+---
+
+## ggpubr
+
+
+```r
+ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2)
+```
+
+![](04-Week4_files/figure-html/patchwork-3-1.png)&lt;!-- --&gt;
+
+---
+
+## ggpubr
+
+
+```r
+ggarrange(plt1, plt2, plt3, ncol = 2, nrow=2, common.legend = TRUE)
+```
+
+![](04-Week4_files/figure-html/patchwork-4-1.png)&lt;!-- --&gt;
+
+---
+
+## cowplot
+
+
+```r
+cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2)
+```
+
+![](04-Week4_files/figure-html/patchwork-5-1.png)&lt;!-- --&gt;
+
+---
+
+## cowplot
+
+
+```r
+cowplot::plot_grid(plt1, plt2, plt3, nrow = 2, ncol = 2, labels = c('A','B','C'))
+```
+
+![](04-Week4_files/figure-html/patchwork-6-1.png)&lt;!-- --&gt;
+
+---
+
+## cowplot
+
+
+```r
+grid1 = cowplot::plot_grid(plt1, plt2, nrow = 1, rel_widths=c(0.3, 0.7),
+                           labels=c('A','B'))
+cowplot::plot_grid(grid1, plt3, nrow=2, labels = c('', 'C'))
+```
+
+![](04-Week4_files/figure-html/patchwork-7-1.png)&lt;!-- --&gt;
+
+---
+
+## patchwork
+
+
+```r
+plt1 | plt2 / plt3
+```
+
+![](04-Week4_files/figure-html/patchwork-8-1.png)&lt;!-- --&gt;
+
+---
+
+## patchwork
+
+
+```r
+(plt1 | plt2) / plt3
+```
+
+![](04-Week4_files/figure-html/patchwork-9-1.png)&lt;!-- --&gt;
+
+---
+
+## patchwork
+
+
+```r
+plt1 + plt2 + plt3 + plot_layout(ncol = 2)
+```
+
+![](04-Week4_files/figure-html/patchwork-10-1.png)&lt;!-- --&gt;
+
+
+---
+
+## Further references
+
+ggpubr: [https://rpkgs.datanovia.com/ggpubr/](https://rpkgs.datanovia.com/ggpubr/)  
+cowplot: [https://wilkelab.org/cowplot/index.html](https://wilkelab.org/cowplot/index.html) and Fundamentals of Data Visualization  
+patchwork: [https://patchwork.data-imaginist.com/index.html](https://patchwork.data-imaginist.com/index.html)
+
+---
+
+
+
+
+
+
+
+
+
+
+
+layout: true
+
+&lt;div class="my-header"&gt;
+&lt;span&gt;BIOF 439: Data Visualization using R&lt;/span&gt;&lt;/div&gt;
+
+---
+class: middle, inverse
+
+# Saving your work
+
+---
+
+You want to actually use the visualizations you make
+
++ Save to file
+    - PNG for web
+    - PDF for print
+    - High resolution PNG for Word (600-1200 dpi)
+    - Journals often want high resolution TIFF (300+ dpi)
++ Save to document
+    - Create a Word file from R Markdown
+    - Create a PowerPoint file from R Markdown.
+    
+---
+class: middle, inverse
+
+# Save to file
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+
+```r
+pdf('temp.pdf', width=5, height=5) # inches
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+*dev.off()
+```
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+
+```r
+png('temp.png', width=5, height=5, units='in', res=300) # 300 dpi
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+*dev.off()
+```
+
+---
+
+## Printers in R
+
+R allows you to save graphics by using **printers** for PDF, PNG and the like.
+
+
+```r
+tiff('temp.tif', width=5, height=5, units='in', res=300, compression='lzw') # 300 dpi
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() 
+```
+
+---
+
+## Printers in R
+
+#### Issues with tiff on a Mac
+
+The `tiff` printer doesn't annotate the TIFF file properly, so Preview thinks it's at 72 dpi, regardless
+of the setting.
+
+The workaround is to print to PDF, and convert to TIFF, either via Preview, or using the **pdftools** package.
+
+
+```r
+pdf('temp.pdf', width=5, height=5) # inches
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+dev.off() 
+pdftools::pdf_convert('temp.pdf', format='tiff', dpi=300)
+```
+
+---
+
+## ggplot2 savings
+
+The previous slides showed the basic R way of printing a plot to a file. **ggplot2** makes it a bit easier.
+
+
+```r
+ggplot(penguins, aes(bill_length_mm, body_mass_g, color=species))+
+  geom_point() + 
+  labs(x = 'Bill length (mm)',
+       y = 'Body mass (g)', 
+       color = 'Species')
+ggsave('temp.pdf', width=5, height=5)
+```
+
+`ggsave` figures out the type from the ending. If you use `temp.png` it will create a PNG file. 
+
+Note, in all of the examples, the file gets saved to the working directory (`getwd()`). 
+
+---
+
+## Practice
+
+Save to PDF by default
+
+Why?
+
++ PDF is _infinite resolution_. As a vector format, it can be infinitely magnified.
++ PNG, TIFF are raster formats, so if you magnify too much, you'll see pixels
++ Convert from PDF to other raster formats saves both resolution and disk space.
+
+---
+class: middle, inverse
+
+# Save to document
+
+---
+
+## Saving to a document
+
+From the same R Markdown where you create the plot, you can save to Word or PowerPoint (even if you 
+don't have it on your computer) by changing the _front matter_ on top (between the `---`)
+
++ For Word, use `output: word_document`
++ For PowerPoint, use `output: powerpoint_presentation`
+
+
+----
+
+You can also learn the excellent **officer** package to directly create Word and PowerPoint
+presentations from R programmatically. See the website at https://davidgohel.github.io/officer/index.html.
+
+--- 
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="../js/macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "docco",
+"highlightLines": true,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
