@@ -8,13 +8,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, eval=FALSE, 
                       message=FALSE, warning=FALSE,
-                      cache=TRUE)
+                      cache=FALSE)
 datadir <- here::here('slides/lectures/data')
 ```
 
 # Instructions
 
-Create your own R Markdown file and submit your R Markdown and knitted HTML file by Sunday 11:59pm. I will **not** make any deductions for a Sunday submission. 
+Create your own R Markdown file and submit your R Markdown and knitted HTML file by Monday 11:59pm. 
 
 
 ## Question 1 (10 points)
