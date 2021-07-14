@@ -1,0 +1,22 @@
+---
+title: 'Week 5 slides'
+author: 'BIOF 439'
+---
+
+```{r, include=FALSE}
+options(knitr.duplicate.label = "allow")
+```
+
+```{r, child = 'biomed.Rmd'}
+
+```
+
+```{r, child = 'maps.Rmd'}
+
+```
+
+```{r, child='bioinfo.Rmd'}
+
+```
+
+

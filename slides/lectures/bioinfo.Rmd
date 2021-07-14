@@ -4,7 +4,7 @@ author: Abhijit Dasgupta, PhD
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=TRUE,
+knitr::opts_chunk$set(echo = TRUE, message=F, warning=F, comment = ' ', cache=FALSE,
                       fig.height=5)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
@@ -16,7 +16,7 @@ theme_439 <- theme_classic()+theme(axis.text = element_text(size=14),
                                 plot.subtitle = element_text(size=16),
                                 plot.caption = element_text(size=12))
 theme_set(theme_439)
-
+library(Heatplus)
 ## If you don't have Garrett Aden-Buie's animations, clone the repository https://github.com/gadenbuie/tidyexplain
 ## or install (devtools::install_github("gadenbuie/tidy-animated-verbs"))
 
@@ -507,7 +507,7 @@ plot(reg1)
 ```{r e2, echo=T, eval=F}
 corrdist <- function(x) as.dist(1-cor(t(x)))
 hclust.avl <- function(x) hclust(x, method='average')
-reg2 <- regHeatmap(exprs(exdat2), legend=2, 
+reg2 <- Heatplus::regHeatmap(exprs(exdat2), legend=2, 
                    col=heat.colors,
                    breaks=-3:3, 
                    dendrogram = 
@@ -530,7 +530,7 @@ plot(reg2)
 
 .pull-left[
 ```{r e3, echo=T, eval=F}
-ann1 <- annHeatmap(exprs(exdat2), 
+ann1 <- Heatplus::annHeatmap(exprs(exdat2), 
                    ann=pData(exdat2), #<<
                    col = heat.colors)
 plot(ann1)
@@ -551,7 +551,7 @@ plot(ann1)
 
 .pull-left[
 ```{r e4, echo=T, eval=F, fig.width=4, fig.height=3}
-ann2 <- annHeatmap(exprs(exdat2), 
+ann2 <- Heatplus::annHeatmap(exprs(exdat2), 
                    ann=pData(exdat2), 
                    col = heat.colors,
         cluster = 
@@ -580,7 +580,7 @@ knitr::include_graphics('img/heatmap.png')
 library(ComplexHeatmap)
 library(circlize)
 mat = readRDS(system.file("extdata", "measles.rds", package = "ComplexHeatmap"))
-ha1 = HeatmapAnnotation(
+ha1 = ComplexHeatmap::HeatmapAnnotation(
     dist1 = anno_barplot(
         colSums(mat), 
         bar_width = 1, 
