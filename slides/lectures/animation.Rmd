@@ -6,7 +6,6 @@ abstract: Animated graphics in R, with mouseovers
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message=F, warning=F, comment = ' ', cache=TRUE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 library(knitr)
@@ -19,6 +18,9 @@ theme_set(theme_classic()+theme(axis.text = element_text(size=14),
                                 axis.title = element_text(size=16),
                                 legend.text = element_text(size=14),
                                 legend.title = element_text(size=16)))
+knitr::opts_chunk$set(echo = FALSE, message=F, warning=F, comment = ' ', cache=FALSE,
+                      widgetframe_self_contained = FALSE,
+                      widgetframe_isolate_widgets = TRUE)
 Sys.setenv("RSTUDIO_PANDOC" = '/usr/bin/')
 ```
 

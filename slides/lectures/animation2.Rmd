@@ -1,0 +1,166 @@
+---
+title: "Animated graphics in R"
+author: Abhijit Dasgupta, PhD
+abstract: Animated graphics in R, with mouseovers
+---
+
+
+```{r setup, include=FALSE}
+setwd(here::here('slides/lectures'))
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(plotly)
+library(palmerpenguins)
+library(htmltools)
+library(htmlwidgets)
+library(widgetframe)
+widgetdir = here::here('slides','lectures',
+                       'animation2_files',
+                       'figure-html',
+                       'widgets')
+theme_set(theme_classic()+theme(axis.text = element_text(size=14),
+                                axis.title = element_text(size=16),
+                                legend.text = element_text(size=14),
+                                legend.title = element_text(size=16)))
+knitr::opts_chunk$set(echo = FALSE, message=F, warning=F, comment = ' ', 
+                      widgetframe_self_contained = FALSE,
+                      widgetframe_isolate_widgets = TRUE)
+Sys.setenv("RSTUDIO_PANDOC" = '/usr/bin/')
+options(htmltools.dir.version = FALSE, htmltools.preserve.raw = FALSE)
+widget_show <- function(widget, filename, 
+                        lib = widgetdir,...){
+  saveWidget(p, file.path(widgetdir, filename), selfcontained = F, libdir = lib)
+htmltools::tags$iframe(
+  src = file.path(lib, filename),
+  scrolling='no', frameBorder='0',width='100%', ...)
+                        }
+```
+
+layout: true
+
+<div class="my-header">
+<span>BIOF 439: Data Visualization using R</span></div>
+
+---
+class: middle,inverse
+
+# Dynamic graphics
+
+
+---
+
+## Dynamic graphics in R
+
+There are several package in R that provide dynamic graphics meant to be consumed on the web.
+
+Many of these are wrappers around well-known Javascript libraries like D3.js, leaflet.js and others
+
+These packages have mostly come under the umbrella of of the `htmlwidgets` package, which allows these
+HTML-based graphics to be displayed through R and R Markdown
+
+<iframe src="https://www.htmlwidgets.org" scrolling="yes" seamless="seamless" frameBorder="1",
+  width="100%", height="300"></iframe>
+---
+
+## Dynamic graphics in R
+
+There are several broad categories of dynamic graphs
+
+General purpose:
+
+```{r animation-1, echo=FALSE }
+tribble(
+    ~Package, ~Description,
+    'r2d3' , 'Interface for D3.js, requires D3.js code',
+    'plotly', 'Interface with plot.ly, direct conversion from ggplot2',
+    'highcharter', 'Using the Highcharts.js package',
+    'dygraphs', 'For time series or longitudinal data'
+) %>%
+    knitr::kable() %>%
+    kable_styling()
+
+```
+
+Maps: 
+
+```{r animation-2 }
+tribble(
+    ~Package, ~Description,
+        "leaflet", "Maps using OpenStreetMaps") %>%
+    kable() %>%
+    kable_styling()
+```
+
+---
+
+## Dynamic graphics in R
+
+Networks:
+
+```{r animation-3 }
+tribble(~Package, ~Description,
+        'networkD3', 'Dynamic network visualizations using D3',
+        'visNetwork', 'Interface to the vis.js library') %>%
+    kable() %>% kable_styling()
+        
+```
+
+
+---
+class: middle, inverse
+
+# Plotly
+https://plotly.com/graphing-libraries
+
+---
+
+## Plotly
+
+Plotly is a company that developed the `plotly.js` graphing library, as well as packages for R and Python. 
+
+For the R package, it developed a turnkey method to convert `ggplot2` graphics into interactive graphs.
+
+.pull-left[
+```{r g1, echo=TRUE, fig.height=3}
+plt <- ggplot(penguins,
+              aes(bill_length_mm, body_mass_g,
+                  color = species))+
+    geom_point()
+plt
+```
+]
+.pull-right[
+```{r animation-4, echo=TRUE, eval=F,fig.height=4}
+ggplotly(plt)
+```
+```{r, echo=F}
+p <- ggplotly(plt)
+widget_show(p, 'animation4.html', height=300)
+```
+
+]
+---
+
+## Plotly
+
+You can do linked plots in plotly, so interactions in one plot are reflected in a second plot. This is called _brushing_. The key here is to use `highlight_key`, which allows a data frame to be shared between multiple
+plots at the same time. 
+
+```{r brush, echo=T, eval=F,fig.height=4, fig.width=9}
+d <- highlight_key(penguins)
+plt1 <- ggplot(d, aes(x = bill_length_mm, y = body_mass_g))+geom_point()
+plt2 <- ggplot(d, aes(x = bill_length_mm, y = flipper_length_mm))+geom_point()
+subplot(plt1, plt2) %>% 
+    layout(title = "Click and drag to select points") %>%
+    highlight(on = "plotly_selected")
+```
+```{r brush_out, echo=F, eval=T,fig.height=4, fig.width=9}
+d <-  highlight_key(penguins, ~species)
+plt1 <- plot_ly(d, x = ~bill_length_mm, y = ~body_mass_g, mode='markers', hoverinfo = 'x+y')
+plt2 <- plot_ly(d, x = ~bill_length_mm, y=~flipper_length_mm, mode='markers', hoverinfo='x+y')
+p <- subplot(plt1, plt2) %>% 
+    layout(title = "Click and drag to select points") %>%
+    highlight(on = "plotly_selected", off='plotly_doubleclick')
+widget_show(p, 'animation_brush.html', height='250')
+```
