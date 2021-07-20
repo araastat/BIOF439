@@ -4,7 +4,7 @@
     <title>Visualization in bioinformatics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Abhijit Dasgupta, PhD" />
-    <script src="bioinfo_files/header-attrs-2.6/header-attrs.js"></script>
+    <script src="bioinfo_files/header-attrs-2.9/header-attrs.js"></script>
     <link href="bioinfo_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
     <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
@@ -132,7 +132,7 @@ ggplot(ggdf, aes(x = x, y = y,
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-1-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -162,7 +162,7 @@ p.ideo
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-2-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -185,7 +185,7 @@ p.txdb
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-3-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -204,7 +204,7 @@ p.bg + zoom(1/1000)
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-4-1.png)&lt;!-- --&gt;
 ]
 ---
 
@@ -224,7 +224,7 @@ p.mis
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-5-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -269,7 +269,7 @@ autoplot(ideoCyto$hg19, layout = "karyogram",
 ```
 ]
 .pull-right[
-![](bioinfo_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-7-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -599,7 +599,7 @@ plot(reg1)
 ```r
 corrdist &lt;- function(x) as.dist(1-cor(t(x)))
 hclust.avl &lt;- function(x) hclust(x, method='average')
-reg2 &lt;- regHeatmap(exprs(exdat2), legend=2, 
+reg2 &lt;- Heatplus::regHeatmap(exprs(exdat2), legend=2, 
                    col=heat.colors,
                    breaks=-3:3, 
                    dendrogram = 
@@ -678,7 +678,7 @@ of objects.
 
 We used UpSet plots to look at missing value patterns
 
-![](bioinfo_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-10-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -695,7 +695,7 @@ We used UpSet plots to look at missing value patterns
 
 Enrichment network based on GSEA
 
-![](bioinfo_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](bioinfo_files/figure-html/bioinfo-12-1.png)&lt;!-- --&gt;
 
 ---
 

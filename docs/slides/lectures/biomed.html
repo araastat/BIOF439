@@ -4,7 +4,7 @@
     <title>Visualization in different applications</title>
     <meta charset="utf-8" />
     <meta name="author" content="Abhijit Dasgupta, PhD" />
-    <script src="biomed_files/header-attrs-2.6/header-attrs.js"></script>
+    <script src="biomed_files/header-attrs-2.9/header-attrs.js"></script>
     <link href="biomed_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="robot.css" type="text/css" />
     <link rel="stylesheet" href="robot-fonts.css" type="text/css" />
@@ -85,7 +85,7 @@ encapsulated in the function `Surv` (note capitalization)
 ## Kaplan-Meier curve
 
 .left-column70[
-![](biomed_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-2-1.png)&lt;!-- --&gt;
 ]
 .right-column70[
 + Small ticks are times when subjects are censored
@@ -197,7 +197,7 @@ ggplot(results)+
   theme_439
 ```
 
-![](biomed_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-6-1.png)&lt;!-- --&gt;
 ]
 .right-column70[
 We plot the estimate and 95% confidence interval for each term
@@ -265,7 +265,7 @@ ggplot(results)+
   coord_flip()
 ```
 
-![](biomed_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-9-1.png)&lt;!-- --&gt;
 ]
 .right-column70[
 The graph makes it clear that number of pregnancies and body mass significantly influence the odds of being diabetic, but blood pressure and tricep size do not
@@ -319,7 +319,7 @@ ggplot(results)+
   theme_439
 ```
 
-![](biomed_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-11-1.png)&lt;!-- --&gt;
 
 ]
 .right-column70[
@@ -370,7 +370,7 @@ broom::tidy(fit) %&gt;%
   plt_reg_results()
 ```
 
-![](biomed_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-13-1.png)&lt;!-- --&gt;
 
 ]
 .pull-right[
@@ -384,7 +384,7 @@ broom::tidy(fit_logistic) %&gt;%
   plt_reg_results(reflevel=1)
 ```
 
-![](biomed_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](biomed_files/figure-html/biomed-14-1.png)&lt;!-- --&gt;
 
 ]
     </textarea>
