@@ -6,7 +6,9 @@ author: Abhijit Dasgupta, PhD
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=F, 
                       warning=F, comment = ' ',
-                      fig.height=5, cache=FALSE)
+                      fig.height=5, cache=FALSE,
+                       widgetframe_self_contained = FALSE,
+                      widgetframe_isolate_widgets = TRUE)
 setwd(here::here('slides/lectures'))
 library(tidyverse)
 theme_439 <- theme_classic()+theme(axis.text = element_text(size=14),
