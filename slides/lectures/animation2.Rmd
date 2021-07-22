@@ -15,10 +15,13 @@ library(palmerpenguins)
 library(htmltools)
 library(htmlwidgets)
 library(widgetframe)
-widgetdir = here::here('slides','lectures',
+library(fs)
+topdir <- here::here('slides','lectures')
+widgetdir = file.path(topdir,
                        'animation2_files',
                        'figure-html',
                        'widgets')
+if(!dir.exists(widgetdir)) dir.create(widgetdir)
 theme_set(theme_classic()+theme(axis.text = element_text(size=14),
                                 axis.title = element_text(size=16),
                                 legend.text = element_text(size=14),
@@ -26,15 +29,35 @@ theme_set(theme_classic()+theme(axis.text = element_text(size=14),
 knitr::opts_chunk$set(echo = FALSE, message=F, warning=F, comment = ' ', 
                       widgetframe_self_contained = FALSE,
                       widgetframe_isolate_widgets = TRUE)
-Sys.setenv("RSTUDIO_PANDOC" = '/usr/bin/')
+#Sys.setenv("RSTUDIO_PANDOC" = '/usr/bin/')
 options(htmltools.dir.version = FALSE, htmltools.preserve.raw = FALSE)
+
+save_tags <- function (tags, file, selfcontained = F, libdir = widgetdir) 
+{
+  # https://github.com/r-spatial/mapview/issues/35#issuecomment-237900713
+  if (is.null(libdir)) {
+    libdir <- paste(tools::file_path_sans_ext(basename(file)), 
+                    "_files", sep = "")
+  }
+  htmltools::save_html(tags, file = file, libdir = libdir)
+  if (selfcontained) {
+    if (!htmlwidgets:::pandoc_available()) {
+      stop("Saving a widget with selfcontained = TRUE requires pandoc. For details see:\n", 
+           "https://github.com/rstudio/rmarkdown/blob/master/PANDOC.md")
+    }
+    htmlwidgets:::pandoc_self_contained_html(file, file)
+    unlink(libdir, recursive = TRUE)
+  }
+  return(file)
+}
 widget_show <- function(widget, filename, 
                         lib = widgetdir,...){
-  saveWidget(p, file.path(widgetdir, filename), selfcontained = F, libdir = lib)
-htmltools::tags$iframe(
-  src = file.path(lib, filename),
-  scrolling='no', frameBorder='0',width='100%', ...)
-                        }
+  x <- save_tags(widget, file.path(lib, filename), selfcontained = F, libdir = lib)
+return(htmltools::tags$iframe(
+  src = path_rel(x, topdir),
+  scrolling='no', frameBorder='0',width='100%', ...))
+}
+
 ```
 
 layout: true
@@ -136,10 +159,30 @@ ggplotly(plt)
 ```
 ```{r, echo=F}
 p <- ggplotly(plt)
-widget_show(p, 'animation4.html', height=300)
+widget_show(p, 'animation4.html', height="100%")
 ```
 
 ]
+---
+
+## Plotly
+
+You can do some customization on the tooltips (what shows up when you put your mouse over a point). 
+
+```{r animation-5, fig.height=5, fig.width=12, echo=TRUE, eval=F}
+p <- ggplot(data = diamonds, aes(x = cut, fill = clarity))+
+    geom_bar(position = 'dodge')
+ggplotly(p, tooltip = c('cut'))
+```
+
+```{r animation-5-out, fig.height=5, fig.width=12, echo=F, eval=T}
+p <- ggplot(data = diamonds, aes(x = cut, fill = clarity))+
+    geom_bar(position = 'dodge')
+p1 = ggplotly(p, tooltip=c('cut'))
+widget_show(p1 , 'animation5.html', height="100%") #<<
+
+```
+
 ---
 
 ## Plotly
@@ -148,19 +191,29 @@ You can do linked plots in plotly, so interactions in one plot are reflected in 
 plots at the same time. 
 
 ```{r brush, echo=T, eval=F,fig.height=4, fig.width=9}
-d <- highlight_key(penguins)
+penguins <- penguins %>% mutate(id = 1:n())
+d <- highlight_key(penguins, ~id)
 plt1 <- ggplot(d, aes(x = bill_length_mm, y = body_mass_g))+geom_point()
 plt2 <- ggplot(d, aes(x = bill_length_mm, y = flipper_length_mm))+geom_point()
-subplot(plt1, plt2) %>% 
+subplot(ggplotly(plt1), ggplotly(plt2)) %>% 
     layout(title = "Click and drag to select points") %>%
-    highlight(on = "plotly_selected")
+    highlight(on = "plotly_selected", off = 'plotly_doubleclick', dynamic=T)
 ```
 ```{r brush_out, echo=F, eval=T,fig.height=4, fig.width=9}
-d <-  highlight_key(penguins, ~species)
-plt1 <- plot_ly(d, x = ~bill_length_mm, y = ~body_mass_g, mode='markers', hoverinfo = 'x+y')
-plt2 <- plot_ly(d, x = ~bill_length_mm, y=~flipper_length_mm, mode='markers', hoverinfo='x+y')
-p <- subplot(plt1, plt2) %>% 
+penguins <- penguins %>% mutate(id = 1:n())
+d <- highlight_key(penguins, ~id)
+plt1 <- ggplot(d, aes(x = bill_length_mm, y = body_mass_g))+geom_point()
+plt2 <- ggplot(d, aes(x = bill_length_mm, y = flipper_length_mm))+geom_point()
+p = subplot(ggplotly(plt1), ggplotly(plt2)) %>% 
     layout(title = "Click and drag to select points") %>%
-    highlight(on = "plotly_selected", off='plotly_doubleclick')
-widget_show(p, 'animation_brush.html', height='250')
+    highlight(on = "plotly_selected", off = 'plotly_doubleclick', dynamic=T)
+widget_show(p, 'animation_brush.html', height="100%")
+```
+
+---
+
+## Plotly
+
+```{r, echo=F}
+widget_show(p, 'animation_brush.html', height='100%')
 ```
