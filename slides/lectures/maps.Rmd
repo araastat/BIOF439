@@ -4,6 +4,7 @@ author: Abhijit Dasgupta, PhD
 ---
 
 ```{r setup, include=FALSE}
+options(htmltools.preserve.raw = FALSE)
 knitr::opts_chunk$set(echo = TRUE, message=F, 
                       warning=F, comment = ' ',
                       fig.height=5, cache=FALSE,
@@ -228,14 +229,18 @@ It makes some nice choices
 ## tmap (interactive)
 
 .left-column70[
-```{r maps-9, out.width='100%', out.height='100%'}
+```{r maps-9, out.width='100%', out.height='100%', eval=TRUE}
 tmap_mode('view')  #<<
-tm_shape(spData::world) + tm_polygons(col = 'pop', style='jenks',
-                              palette='Reds', title='Population',
-                              popup.vars = c('pop'), id='name_long')
-  
+mymap <- tm_shape(spData::world) + tm_polygons(col = 'pop', style='jenks',
+                                      palette='Reds', title='Population',
+                                      popup.vars = c('pop'), id='name_long')
+```
+```{r maps9-out, echo=F, eval=T}
+tmap_save(mymap, 'map.html')
+knitr::include_url('map.html')
 
 ```
+
 
 ]
 .right-column70[
