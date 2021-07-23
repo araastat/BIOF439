@@ -384,7 +384,7 @@ h = hchart(object=penguins,
     hc_legend(align='right',
               verticalAlign='top') %>% 
   hc_size(height=400)
-widget_show(h, 'animationh7,html')
+widget_show(h, 'animation7.html')
 ```
 ]
 
