@@ -6,11 +6,10 @@ abstract: Animated graphics in R, with mouseovers
 
 
 ```{r setup, include=FALSE}
-setwd(here::here('slides/lectures'))
 library(tidyverse)
 library(knitr)
 library(kableExtra)
-library(plotly)
+library(plotly) # need version 4.0
 library(palmerpenguins)
 library(htmltools)
 library(htmlwidgets)
@@ -53,9 +52,17 @@ save_tags <- function (tags, file, selfcontained = F, libdir = widgetdir)
 widget_show <- function(widget, filename, 
                         lib = widgetdir,...){
   x <- save_tags(widget, file.path(lib, filename), selfcontained = F, libdir = lib)
-return(htmltools::tags$iframe(
-  src = path_rel(x, topdir),
-  scrolling='no', frameBorder='0',width='100%', ...))
+  ht <- NULL
+  if(!is.null(widget$height)) ht <- widget$height
+  if('layoutAttrs' %in% names(widget$x)){
+    if('height' %in% names(widget$x$layoutAttrs)){
+      ht <- widget$x$layoutAttrs$height
+    }
+  }
+  if(is.null(ht)) stop("need to define height of graph in px")
+  return(htmltools::tags$iframe(
+    src = path_rel(x, topdir),
+    scrolling='no', frameBorder='0',width='100%', height = paste0(ht+10, 'px'),...))
 }
 
 ```
@@ -158,8 +165,8 @@ plt
 ggplotly(plt)
 ```
 ```{r, echo=F}
-p <- ggplotly(plt)
-widget_show(p, 'animation4.html', height="100%")
+p <- ggplotly(plt, height=300)
+widget_show(p, 'animation4.html')
 ```
 
 ]
@@ -169,17 +176,17 @@ widget_show(p, 'animation4.html', height="100%")
 
 You can do some customization on the tooltips (what shows up when you put your mouse over a point). 
 
-```{r animation-5, fig.height=5, fig.width=12, echo=TRUE, eval=F}
+```{r animation-5,  echo=TRUE, eval=F}
 p <- ggplot(data = diamonds, aes(x = cut, fill = clarity))+
     geom_bar(position = 'dodge')
 ggplotly(p, tooltip = c('cut'))
 ```
 
-```{r animation-5-out, fig.height=5, fig.width=12, echo=F, eval=T}
+```{r animation-5-out, echo=F, eval=T}
 p <- ggplot(data = diamonds, aes(x = cut, fill = clarity))+
     geom_bar(position = 'dodge')
-p1 = ggplotly(p, tooltip=c('cut'))
-widget_show(p1 , 'animation5.html', height="100%") #<<
+p1 = ggplotly(p, tooltip=c('cut'), height=300)
+widget_show(p1 , 'animation5.html')
 
 ```
 
@@ -195,7 +202,7 @@ penguins <- penguins %>% mutate(id = 1:n())
 d <- highlight_key(penguins, ~id)
 plt1 <- ggplot(d, aes(x = bill_length_mm, y = body_mass_g))+geom_point()
 plt2 <- ggplot(d, aes(x = bill_length_mm, y = flipper_length_mm))+geom_point()
-subplot(ggplotly(plt1), ggplotly(plt2)) %>% 
+subplot(ggplotly(plt1), ggplotly(plt2), nrows=1) %>% 
     layout(title = "Click and drag to select points") %>%
     highlight(on = "plotly_selected", off = 'plotly_doubleclick', dynamic=T)
 ```
@@ -204,10 +211,10 @@ penguins <- penguins %>% mutate(id = 1:n())
 d <- highlight_key(penguins, ~id)
 plt1 <- ggplot(d, aes(x = bill_length_mm, y = body_mass_g))+geom_point()
 plt2 <- ggplot(d, aes(x = bill_length_mm, y = flipper_length_mm))+geom_point()
-p = subplot(ggplotly(plt1), ggplotly(plt2)) %>% 
+p = subplot(ggplotly(plt1, height=400), ggplotly(plt2, height=400), nrows = 1) %>% 
     layout(title = "Click and drag to select points") %>%
     highlight(on = "plotly_selected", off = 'plotly_doubleclick', dynamic=T)
-widget_show(p, 'animation_brush.html', height="100%")
+
 ```
 
 ---
@@ -215,5 +222,498 @@ widget_show(p, 'animation_brush.html', height="100%")
 ## Plotly
 
 ```{r, echo=F}
-widget_show(p, 'animation_brush.html', height='100%')
+widget_show(p, 'animation_brush.html')
 ```
+
+---
+
+## Plotly
+
+You can also do brushing over multiple plots drawn on the same data
+
+.left-column70[
+```{r brush2, echo=TRUE, eval=FALSE}
+ highlight_key(iris) %>%
+       GGally::ggpairs(aes(colour = Species), columns = 1:4) %>%
+       ggplotly(tooltip = c("x", "y", "colour")) %>%
+       highlight("plotly_selected")
+```
+
+
+]
+.right-column70[
+**GGally** is a **ggplot2** extension that provides additional composite plot types like 
+the pairs plot we use here.
+]
+
+---
+
+## Plotly
+```{r brush2-out, echo=F, eval=T}
+p <- highlight_key(iris) %>%
+       GGally::ggpairs(aes(colour = Species), columns = 1:4) %>%
+       ggplotly(tooltip = c("x", "y", "colour"), height=500) %>%
+       highlight("plotly_selected", off = 'plotly_deselect')
+widget_show(p, 'brush2.html')
+```
+
+---
+class: middle, inverse
+
+# Dygraphs
+https://rstudio.github.io/dygraphs
+
+---
+
+## Dygraphs
+
+The *dygraphs* package wraps the `dygraphs` Javascript library, which is build to chart time-series data.
+
+```{r dyg1, echo=T, eval=F}
+library(dygraphs)
+dygraph(nhtemp, main = "New Haven temperatures") %>%
+    dyRangeSelector(dateWindow = c("1920-01-01","1960-01-01"))
+
+```
+
+```{r dyg1-out, echo=F, eval=T, fig.height=6}
+library(dygraphs)
+p <- dygraph(nhtemp, main = "New Haven temperatures", height=250) %>%
+    dyRangeSelector(dateWindow = c("1920-01-01","1960-01-01"))
+widget_show(p, 'dyg1.html')
+```
+
+-------------------------------------------------------------------------------
+
+This package is built for linked charts, in the form of line charts + annotations + controls
+
+---
+
+## Dygraphs
+
+We can also create multiple linked time series
+
+.left-column30[
+```{r dyg2, echo=TRUE, eval=F}
+
+widget_show(dygraph(ldeaths, main = "All",
+        group = "lung-deaths", height=90), 'dyg2_1.html')
+widget_show(dygraph(mdeaths, main = "Male",
+        group = "lung-deaths", height=90), 'dyg2_2.html') 
+widget_show(dygraph(fdeaths, main = "Female",
+        group = "lung-deaths", height=90), 'dyg2_3.html')
+
+
+```
+
+You could name the group anything you like, as long as it's the same across the plots.
+]
+.right-column30[
+```{r dyg22, echo=FALSE, eval=TRUE, fig.height=2, ref.label='dyg2'}
+
+```
+]
+
+---
+
+## Dygraphs
+
+You could also annotate dygraphs
+
+```{r animation-6,echo=TRUE, eval=F}
+dygraph(presidents, main = "Quarterly Presidential Approval Ratings") %>%
+  dyAxis("y", valueRange = c(0, 100)) %>%
+  dyEvent("1950-6-30", "Korea", labelLoc = "bottom") %>%
+  dyEvent("1965-2-09", "Vietnam", labelLoc = "bottom")
+```
+```{r animation6-out, echo=F, eval=T}
+p <- dygraph(presidents, main = "Quarterly Presidential Approval Ratings", height=35) %>%
+  dyAxis("y", valueRange = c(0, 100)) %>%
+  dyEvent("1950-6-30", "Korea", labelLoc = "bottom") %>%
+  dyEvent("1965-2-09", "Vietnam", labelLoc = "bottom")
+widget_show(p, 'animation6.html')
+```
+
+---
+class: middle, inverse
+
+# Highcharter
+https://jkunst.com/highcharter/index.html
+
+---
+## Highcharter
+
++ The **highcharter** package provides a rich set of plotting functions for dynamic graphics
++ The R package is, in spirit, similar to **ggplot2**
+    + It uses *mappings*, *aesthetics* and *geometries* (called *types*)
+    + Customization can be added using additional functions in a pipe
+    + Very rich set of chart types
+	
+---
+
+## Highcharter
+
+
+.pull-left[
+```{r hc1, echo=T, eval=FALSE}
+library(highcharter)
+
+hchart(object=penguins,
+       type="scatter",
+       mapping = hcaes(x = body_mass_g,
+                       y = flipper_length_mm ,
+                       group = species)) %>%
+    hc_legend(align='right',
+              verticalAlign='top')
+
+```
+
+See how the elements are similar to what you'd put in a **ggplot2** pipe, except they are in a single function
+
+Options can be added with pipes
+]
+.pull-right[
+```{r animation-7, echo=F, eval=T, fig.height=4}
+library(highcharter)
+
+h = hchart(object=penguins,
+       type="scatter",
+       mapping = hcaes(x = body_mass_g,
+                       y = flipper_length_mm ,
+                       group = species)) %>%
+    hc_legend(align='right',
+              verticalAlign='top') %>% 
+  hc_size(height=400)
+widget_show(h, 'animationh7,html')
+```
+]
+
+---
+
+## Highcharter
+
+Unlike **ggplot2**, the object to be plotted doesn't have to be a data frame
+
+.pull-left[
+```{r hc2, echo=T, eval=F}
+hc1=hchart(diamonds$cut, type='column')
+hc1
+```
+]
+.pull-right[
+```{r animation-8,eval=T, echo=F}
+
+hc1=hchart(diamonds$cut, type='column') %>% hc_size(height=400)
+widget_show(hc1, 'animation8.html')
+```
+]
+---
+
+## Highcharter
+
+We can make some more complex plots using **highcharter**
+
+.pull-left[
+```{r animation-9, eval=FALSE, echo=TRUE}
+library(survival)
+library(widgetframe)
+
+data(lung)
+lung <- dplyr::mutate(lung,
+                      sex = ifelse(sex == 1, "Male", "Female"))
+fit <- survfit(Surv(time, status) ~ sex, data = lung)
+hchart(fit, ranges=TRUE)
+```
+]
+.pull-right[
+```{r animation-10, eval=TRUE, echo=FALSE}
+library(survival)
+library(widgetframe)
+
+data(lung)
+lung <- dplyr::mutate(lung,sex = ifelse(sex == 1, "Male", "Female"))
+fit <- survfit(Surv(time, status) ~ sex, data = lung)
+hc <- hchart(fit, ranges=TRUE) %>% hc_size(height=400)
+widget_show(hc, 'animation10.html')
+```
+]
+---
+
+## Highcharter
+
+.pull-left[
+```{r animation-11, echo=TRUE, eval=FALSE}
+library(highcharter)
+mtcars2 <- mtcars[1:20, ]
+x <- dist(mtcars2)
+hchart(x)
+```
+]
+.pull-right[
+```{r animation-12, echo=FALSE, eval=TRUE}
+library(highcharter)
+mtcars2 <- mtcars[1:20, ]
+x <- dist(mtcars2)
+widget_show(hchart(x) %>% hc_size(height=400), 'animation12.html')
+```
+]
+
+---
+
+## Highcharter
+
+### Licensing issues  ###
+
+<quote>
+Highcharter has a dependency on Highcharts, a commercial JavaScript charting library. Highcharts offers both a commercial license as well as a free non-commercial license. Please review the licensing options and terms before using this software, as the highcharter license neither provides nor implies a license for Highcharts.
+
+Highcharts (http://highcharts.com) is a Highsoft product which is not free for commercial and Governmental use.
+</quote>
+
+---
+class: middle, inverse
+
+# rbokeh
+http://hafen.github.io/rbokeh/
+
+---
+
+## rbokeh
+
+**rbokeh** wraps the **bokeh** plotting library in Python
+
+It uses a layering concept similar to **ggplot2**
+
+---
+
+.pull-left[
+```{r rb1, echo=TRUE, eval=FALSE}
+library(rbokeh)
+figure(width=400,height=400) %>%
+    ly_points(bill_length_mm, body_mass_g,
+              data=penguins,
+              color=species, glyph = species,
+              hover=list(bill_length_mm,body_mass_g))
+
+```
+```{r rb1-out, echo=F, eval=T}
+library(rbokeh)
+p <- figure(width=400,height=400) %>%
+    ly_points(bill_length_mm, body_mass_g,
+              data=penguins,
+              color=species, glyph = species,
+              hover=list(bill_length_mm,body_mass_g))
+widget_show(p, 'rb1.html')
+
+```
+
+]
+.pull-right[
+```{r animation-13, echo=T, eval=F }
+z <- lm(dist ~ speed, data = cars)
+p <- figure(width = 400, height = 400) %>%
+  ly_points(cars, hover = cars) %>%
+  ly_lines(lowess(cars), legend = "lowess") %>%
+  ly_abline(z, type = 2, legend = "lm")
+p
+```
+```{r animation-13-out, echo=F, eval=T }
+z <- lm(dist ~ speed, data = cars)
+p <- figure(width = 400, height = 400) %>%
+  ly_points(cars, hover = cars) %>%
+  ly_lines(lowess(cars), legend = "lowess") %>%
+  ly_abline(z, type = 2, legend = "lm")
+widget_show(p, 'animation13.html')
+```
+]
+
+---
+class: middle, inverse
+
+# Maps
+ 
+---
+
+## Maps
+
+We've already seen maps with **leaflet** that allow data to be overlayed over cartographic maps
+
+Using the packages introduced here, we also have mapping capabilities. See the respective websites for 
+details
+
+.pull-left[
+**rbokeh**
+```{r animation-14, echo=FALSE}
+library(maps)
+data(world.cities)
+caps <- subset(world.cities, capital == 1)
+caps$population <- prettyNum(caps$pop, big.mark = ",")
+figure(width = 400, height = 250, padding_factor = 0) %>%
+  ly_map("world", col = "gray") %>%
+  ly_points(long, lat, data = caps, size = 5,
+    hover = c(name, country.etc, population))
+```
+]
+.pull-right[
+**highcharter**
+```{r animation-15, echo=FALSE}
+data <- tibble(
+  country = 
+    c("PT", "IE", "GB", "IS",
+      
+      "NO", "SE", "DK", "DE", "NL", "BE", "LU", "ES", "FR", "PL", "CZ", "AT",
+      "CH", "LI", "SK", "HU", "SI", "IT", "SM", "HR", "BA", "YF", "ME", "AL", "MK",
+      
+      "FI", "EE", "LV", "LT", "BY", "UA", "MD", "RO", "BG", "GR", "TR", "CY",
+      
+      "RU"),  
+  tz = c(rep("UTC", 4), rep("UTC + 1",25), rep("UCT + 2",12), "UTC + 3")
+  )
+
+# auxiliar variable
+data <- data %>% 
+  mutate(value = cumsum(!duplicated(tz)))
+
+
+# now we'll create the dataClasses
+dta_clss <- data %>% 
+  mutate(value = cumsum(!duplicated(tz))) %>% 
+  group_by(tz) %>% 
+  summarise(value = unique(value)) %>% 
+  arrange(value) %>% 
+  rename(name = tz, from = value) %>% 
+  mutate(to = from + 1) %>% 
+  list_parse()
+
+hcmap(
+  map = "custom/europe",
+  data = data, 
+  joinBy = c("iso-a2","country"),
+  name = "Time zone",
+  value = "value",
+  tooltip = list(pointFormat = "{point.name} {point.tz}"),
+  dataLabels = list(enabled = TRUE, format = "{point.country}")
+  ) %>%
+  hc_colorAxis(
+    dataClassColor = "category",
+    dataClasses = dta_clss
+    ) %>% 
+    hc_title(text = "Europe Time Zones") %>%
+    hc_size(width=400, height=250)
+
+```
+]
+
+---
+class: middle, inverse
+
+# Using D3.js in R
+
+---
+
+## r2d3
+
+[D3.js](https://d3js.org) is a state-of-the-art Javascript library for data-driven graphics
+
+It is widely used in data journalism, including the New York Times and the Guardian
+
+However, it controls each aspect of a chart and so can require rather long JS scripts
+
+<iframe src="https://d3js.org" width="100%" height="300"></iframe>
+
+---
+
+## r2d3
+
+If you know D3.js, you can use it pretty easily embed them in R using the **r2d3** package
+
+```{r animation-16, echo=TRUE, eval=TRUE}
+library(r2d3)
+
+r2d3(data =  read_csv('data/flare.csv'), d3_version = 4, script = 'bubbles.js')
+```
+
+---
+
+## r2d3
+
+```{r animation-17, echo=TRUE}
+
+r2d3(data = jsonlite::read_json('data/miserables.json'), d3_version = 4, script = 'forcegraph.js')
+```
+
+---
+
+## networkD3
+
+You can also draw networks slightly more easily using the **networkD3** package.
+
+.pull-left[
+```{r nd3, echo=T, eval=F}
+library(networkD3)
+lemis <- jsonlite::fromJSON('data/miserables.json')
+lemis$links <- lemis$links %>%
+    mutate(ID = 1:n()) %>% 
+    gather(location, nm, source, target) %>%
+    mutate(nm = as.integer(as.factor(nm))-1) %>%
+    spread(location, nm)
+
+forceNetwork(Links = lemis$links, Nodes = lemis$nodes,
+             Source='source', Target='target',
+             Value = 'value',
+             NodeID = 'id', Group = 'group', opacity=0.7,
+             zoom = TRUE, fontSize = 20)
+```
+]
+.pull-right[
+```{r animation-18, echo=FALSE, eval=TRUE, ref.label="nd3"}
+
+```
+]
+
+---
+
+## Crosstalk
+
+**Crosstalk** is a package that allows multiple HTML widgets to share data and interact together. 
+
+Not all packages in the **htmlwidgets** family are **crosstalk**-compatible.
+
+```{r animation-19, echo=TRUE, eval=FALSE}
+load('data/exdata.rda')
+library(leaflet); library(crosstalk); library(d3scatter)
+
+gpx1 <- gpx %>%
+   mutate(Minutes = as.numeric(difftime(Time, min(Time), units = 'mins'))) %>%
+   filter(Minutes <= 50) %>%
+   left_join(run_data)
+
+ shared_gpx1 <- SharedData$new(gpx1)
+ bscols(
+   leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>%
+     addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
+   list(
+   d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=450)
+   )
+ )
+ bscols(
+   filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
+ )
+```
+
+.center[`leaflet` + `d3scatter` + `crosstalk`]
+
+---
+
+## Linked graphs
+
+<iframe src="https://webbedfeet.github.io/DC_R2018/Presentation.html#23" width="100%" height="500"></iframe>
+
+---
+
+## Conclusions
+
++ There are many many resources today to create interactive graphics
++ For many of them, there are wrappers in R
++ You can explore the respective packages for many more details about the different kinds of charts and customizations that are possible. 
+
